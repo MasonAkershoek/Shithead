@@ -13,7 +13,7 @@ function CardTable.new()
     self.deck = Deck.new(1900,(height*.85))
 
     -- player and opponent hands
-    self.playerHand = Hand.new((width/2),(height*.9),width, self.deck)
+    self.playerHand = Hand.new((width/2),(height*.9))
 
     self.opa = OpponentArea.new(screenWidth/2, 100)
     self:initOpponents()
@@ -40,7 +40,7 @@ function CardTable:initDock()
             self.opa.opponents[x]:addCardToDockBottom(self.deck:getCard())
         end
     end
-    self.playerHand:setDockPos()
+    self.playerHand:updateDockPos()
 end
 
 function CardTable:draw()

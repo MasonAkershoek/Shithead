@@ -10,6 +10,7 @@ function Sprite.new()
     self.y = 0
     self.newX = 0
     self.newY = 0
+    self.speed = 1200
     self.baseScale = 1
     self.xScale = self.baseScale
     self.yScale = self.baseScale
@@ -55,6 +56,18 @@ function Sprite:move(dt)
     end
 end
 
+function Sprite:changeScale(newx, newy)
+    newx = newx or nil
+    newy = newy or nil
+    if newx ~= nil then 
+        self.xScale = newx
+        self.baseScale = newx
+    end
+    if newy ~= nil then
+        self.yScale = newy
+    end
+end
+
 function Sprite:setNewPos(newx, newy)
     newx = newx or nil
     newy = newy or nil
@@ -67,7 +80,7 @@ function Sprite:setNewPos(newx, newy)
 end
 
 function Sprite:draw()
-    love.graphics.draw(self.image, self.x, self.y, 0, self.xScale, self.yScale, self.width/2, self.height/2)
+    love.graphics.draw(self.image, self.x, self.y, 0, self.xScale, self.yScale, (self.width/2), (self.height/2))
 end
 
 ---------------------------------------------------------------------------------------------
@@ -79,18 +92,71 @@ HboxContainer.__index = HboxContainer
 function HboxContainer.new()
     local self = setmetatable({}, HboxContainer)
     self.area = nil
+    self.x = 0
+    self.y = 0
+    return self
+end
+
+function HboxContainer:setNewPos(newx, newy)
+    newx = newx or nil
+    newy = newy or nil
+    if newx ~= nil then 
+        self.newX = newx
+    end
+    if newy ~= nil then
+        self.newY = newy
+    end
+end
+
+function HboxContainer:updatePos(items, flag)
+    flag = flag or false
+    if #items > 0 then
+        local xpoints = ((self.area + self.area) / (#items + 1))
+        local nextPoint = (self.x - self.area)
+        for x=1, #items do
+            if flag then
+                items[x]:setNewPos((xpoints + nextPoint), self.y)
+            else
+                items[x]:setNewPos((xpoints + nextPoint))
+            end
+            nextPoint = nextPoint + xpoints
+            if not items[x].fliped then
+                items[x].flipping = true
+            end
+        end
+    end
+end
+
+VboxContainer = {}
+
+VboxContainer.__index = VboxContainer
+
+function VboxContainer.new()
+    local self = setmetatable({}, VboxContainer)
+    self.area = nil
     self.x = nil
     self.y = nil
+    return self
 end
 
-function HboxContainer:updatePos(items)
-    
+function VboxContainer:setNewPos(newx, newy)
+    newx = newx or nil
+    newy = newy or nil
+    if newx ~= nil then 
+        self.x = newx
+    end
+    if newy ~= nil then
+        self.y = newy
+    end
 end
 
-function HboxContainer:update()
-
-end
-
-function HboxContainer:draw()
-
+function VboxContainer:updatePos(items)
+    if #items > 0 then
+        local ypoints = ((self.area + self.area) / (#items + 1))
+        local nextPoint = (self.y - self.area)
+        for x=1, #items do
+            items[x]:setNewPos(self.x, (ypoints + nextPoint))
+            nextPoint = nextPoint + ypoints
+        end
+    end
 end
