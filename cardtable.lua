@@ -1,3 +1,5 @@
+-- cardtable.lua
+
 require("cards")
 require("hand")
 require("opponent")
@@ -35,7 +37,7 @@ function CardTable:initDock()
         table.insert(self.playerHand.dockTop, self.deck:getCard())
     end
     for x=1, #self.opa.opponents do
-        for x=1, 3 do
+        for y=1, 3 do
             self.opa.opponents[x]:addCardToDockTop(self.deck:getCard())
             self.opa.opponents[x]:addCardToDockBottom(self.deck:getCard())
         end

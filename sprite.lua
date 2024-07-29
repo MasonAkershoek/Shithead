@@ -1,3 +1,4 @@
+-- sprite.lua
 
 Sprite = {}
 
@@ -20,8 +21,8 @@ function Sprite.new()
 end
 
 function Sprite:initSprite()
-    self.width = (self.image:getWidth() * self.baseScale)
-    self.height = (self.image:getHeight() * self.baseScale)
+    self.width = (self.image:getWidth())
+    self.height = (self.image:getHeight())
     self.image:setFilter("nearest", "nearest")
 end
 
@@ -65,7 +66,9 @@ function Sprite:changeScale(newx, newy)
     end
     if newy ~= nil then
         self.yScale = newy
+        self.baseScale = newx
     end
+    self:initSprite()
 end
 
 function Sprite:setNewPos(newx, newy)
@@ -92,6 +95,7 @@ HboxContainer.__index = HboxContainer
 function HboxContainer.new()
     local self = setmetatable({}, HboxContainer)
     self.area = nil
+    self.baseScale = 1
     self.x = 0
     self.y = 0
     return self
@@ -101,10 +105,10 @@ function HboxContainer:setNewPos(newx, newy)
     newx = newx or nil
     newy = newy or nil
     if newx ~= nil then 
-        self.newX = newx
+        self.x = newx
     end
     if newy ~= nil then
-        self.newY = newy
+        self.y = newy
     end
 end
 
@@ -127,6 +131,8 @@ function HboxContainer:updatePos(items, flag)
     end
 end
 
+---------------------------------------------------------------------------------------------
+
 VboxContainer = {}
 
 VboxContainer.__index = VboxContainer
@@ -134,8 +140,8 @@ VboxContainer.__index = VboxContainer
 function VboxContainer.new()
     local self = setmetatable({}, VboxContainer)
     self.area = nil
-    self.x = nil
-    self.y = nil
+    self.x = 0
+    self.y = 0
     return self
 end
 
@@ -150,13 +156,14 @@ function VboxContainer:setNewPos(newx, newy)
     end
 end
 
-function VboxContainer:updatePos(items)
+function VboxContainer:updatePos(items, padding)
+    padding = padding or 0
     if #items > 0 then
-        local ypoints = ((self.area + self.area) / (#items + 1))
         local nextPoint = (self.y - self.area)
         for x=1, #items do
-            items[x]:setNewPos(self.x, (ypoints + nextPoint))
-            nextPoint = nextPoint + ypoints
+            nextPoint = nextPoint + ((items[x].height/2) * items[x].baseScale)
+            items[x]:setNewPos(self.x, nextPoint)
+            nextPoint = ((nextPoint + ((items[x].height/2) * items[x].baseScale)) + padding)
         end
     end
 end

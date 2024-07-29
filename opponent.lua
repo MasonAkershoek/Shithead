@@ -19,7 +19,7 @@ function Opponent.new(newName, playerImagePath)
 
     -- Opponent Face Icon
     self.opponent_icon = OpponentIcon.new(playerImagePath)
-    self.area = ((self.nameGraphic.height + self.opponent_icon.height + 50))
+    self.area = ((self.nameGraphic.height + self.opponent_icon.height))
     return self
 end
 
@@ -42,7 +42,7 @@ end
 
 -- Function to hold all the update information for objects in the class and to be called in the main love2d update function
 function Opponent:update(dt)
-    self:updatePos({self.nameGraphic, self.opponent_icon, self.dock})
+    self:updatePos({self.nameGraphic, self.opponent_icon, self.dock}, 20)
     self.opponent_icon:update(dt)
     self.nameGraphic:update(dt)
     self.dock:update(dt)
@@ -81,21 +81,21 @@ OpponentDock.__index = OpponentDock
 function OpponentDock.new()
     local self = setmetatable(HboxContainer.new(), OpponentDock)
     self.dockTop = {}
+    self.height = 0
     self.dockBottom = {}
-    self.area = (95 * 3)
+    self.area = (150)
     return self
 end
 
 function OpponentDock:addCardTop(newCard)
     table.insert(self.dockTop, newCard)
     self.dockTop[#self.dockTop]:changeScale(.5,.5)
-    self.dockTop[#self.dockTop]:initSprite()
+    self.height = (newCard.height * .5)
 end
 
 function OpponentDock:addCardBottom(newCard)
     table.insert(self.dockBottom, newCard)
-    self.dockBottom[#self.dockBottom]:changeScale(.5,.5) 
-    self.dockBottom[#self.dockBottom]:initSprite() 
+    self.dockBottom[#self.dockBottom]:changeScale(.5,.5)
 end
 
 function OpponentDock:draw()
@@ -112,7 +112,6 @@ function OpponentDock:draw()
 end
 
 function OpponentDock:update(dt)
-    print("kys Y: ", self.y)
     self:updatePos(self.dockBottom, true)
     self:updatePos(self.dockTop, true)
     if #self.dockTop > 0 then
@@ -136,6 +135,7 @@ OpponentIcon.__index = OpponentIcon
 function OpponentIcon.new(iconPath)
     local self = setmetatable(Sprite.new(), OpponentIcon)
     self.image = love.graphics.newImage(iconPath)
+    self:changeScale(2,2)
     self:initSprite()
     return self
 end
@@ -147,15 +147,14 @@ end
 -------------------------------------------------------------------------------------------------------------------------------
 
 -- This is the class for containing the opponents UI and determening where they should be placed
-OpponentArea = {}
-
+OpponentArea = setmetatable({}, {__index = HboxContainer})
 OpponentArea.__index = OpponentArea
 
 -- OpponentArea Constructor
 function OpponentArea.new(newX, newY)
-    local self = setmetatable({}, OpponentArea)
+    local self = setmetatable(HboxContainer.new(), OpponentArea)
     self.opponents = {}
-    self.opponentArea = (screenWidth * .50)
+    self.area = (screenWidth * .50)
     self.x = newX
     self.y = newY
     return self
@@ -165,19 +164,8 @@ function OpponentArea:addOpponent(newOpponent)
     table.insert(self.opponents, newOpponent)
 end
 
-function OpponentArea:updatePos(dt)
-    if #self.opponents > 0 then
-        local xpoints = ((self.opponentArea + self.opponentArea) / (#self.opponents + 1))
-        local nextPoint = (( screenWidth / 2) - self.opponentArea)
-        for x=1, #self.opponents do
-            self.opponents[x]:newPos((xpoints + nextPoint), self.y)
-            nextPoint = nextPoint + xpoints
-        end
-    end
-end
-
 function OpponentArea:update(dt)
-    self:updatePos(dt)
+    self:updatePos(self.opponents, true)
     if #self.opponents > 0 then
         for x=1, #self.opponents do
             self.opponents[x]:update(dt)
