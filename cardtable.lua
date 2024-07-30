@@ -13,6 +13,9 @@ function CardTable.new()
     local self = setmetatable({}, CardTable)
     width, height = love.graphics.getDimensions()
     self.deck = Deck.new(1900,(height*.85))
+    self.music = love.audio.newSource("music/music2.mp3", "static")
+    self.music:setVolume(1)
+    love.audio.play(self.music)
 
     -- player and opponent hands
     self.playerHand = Hand.new((width/2),(height*.9))
@@ -33,8 +36,8 @@ end
 
 function CardTable:initDock()
     for x=1, 3 do
-        table.insert(self.playerHand.dockBottom, self.deck:getCard())
-        table.insert(self.playerHand.dockTop, self.deck:getCard())
+        self.playerHand:addDockTop(self.deck:getCard())
+        self.playerHand:addDockBottom(self.deck:getCard())
     end
     for x=1, #self.opa.opponents do
         for y=1, 3 do

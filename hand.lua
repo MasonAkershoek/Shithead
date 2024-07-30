@@ -194,6 +194,16 @@ function Hand:getCardsList()
     return cardList
 end
 
+function Hand:addDockTop(newCard)
+    table.insert(self.dockTop, newCard)
+    self.dockTop[#self.dockTop].y = (self.y - self.dockTop[#self.dockTop].height - 100)
+end
+
+function Hand:addDockBottom(newCard)
+    table.insert(self.dockBottom, newCard)
+    self.dockBottom[#self.dockBottom].y = (self.y - self.dockBottom[#self.dockBottom].height - 100)
+end
+
 function Hand:sortByRank()
     local tmp = nil
     local sorted = false

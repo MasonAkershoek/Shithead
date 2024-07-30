@@ -82,13 +82,13 @@ end
 function Card:flipAnimation()
     if self.flipping then
         if self.flag then
-            self.xScale = self.xScale + .05
+            self.xScale = self.xScale + .03
             if self.xScale == self.baseScale then
                 self.flipping = false
                 self.flag = false
             end
         else
-            self.xScale = self.xScale - .05
+            self.xScale = self.xScale - .03
             if self.xScale <= 0 then
                 self.flag = true
                 if self.fliped then
