@@ -15,6 +15,8 @@ function Sprite.new()
     self.baseScale = 1
     self.xScale = self.baseScale
     self.yScale = self.baseScale
+    self.xSkew = 0
+    self.ySkew = 0
     self.width = nil
     self.height = nil
     return self
@@ -23,7 +25,7 @@ end
 function Sprite:initSprite()
     self.width = (self.image:getWidth())
     self.height = (self.image:getHeight())
-    self.image:setFilter("nearest", "nearest")
+    self.image:setFilter("nearest", "nearest", 1)
 end
 
 function Sprite:move(dt)
@@ -57,6 +59,17 @@ function Sprite:move(dt)
     end
 end
 
+function Sprite:checkMouseHover()
+    local mousex, mousey = love.mouse.getPosition()
+    if mousex > (self.x - ((self.width*self.baseScale)/2)) and mousex < (self.x + ((self.width*self.baseScale)/2)) then
+        if mousey > (self.y - ((self.height*self.baseScale)/2)) and mousey < (self.y + ((self.height*self.baseScale)/2)) then
+            return true
+        end
+        return false
+    end
+    return false
+end
+
 function Sprite:changeScale(newx, newy)
     newx = newx or nil
     newy = newy or nil
@@ -83,7 +96,7 @@ function Sprite:setNewPos(newx, newy)
 end
 
 function Sprite:draw()
-    love.graphics.draw(self.image, self.x, self.y, 0, self.xScale, self.yScale, (self.width/2), (self.height/2))
+    love.graphics.draw(self.image, self.x, self.y, 0, self.xScale, self.yScale, (self.width/2), (self.height/2), self.xSkew, self.ySkew)
 end
 
 ---------------------------------------------------------------------------------------------
@@ -124,9 +137,6 @@ function HboxContainer:updatePos(items, flag)
                 items[x]:setNewPos((xpoints + nextPoint))
             end
             nextPoint = nextPoint + xpoints
-            if not items[x].fliped then
-                items[x].flipping = true
-            end
         end
     end
 end

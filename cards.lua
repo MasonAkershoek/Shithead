@@ -10,21 +10,70 @@ math.randomseed(os.time())
 -- Card Class Constructor method
 function Card.new(newRank, newSuit, nx, ny)
     local self = setmetatable(Sprite.new(), Card)
+
+    -- Card Atributes
     self.rank = newRank
     self.suit = newSuit
+
+    -- Position
     self.x = nx
     self.y = ny
-    self.speed = 1200
+
+    -- Speed
+    self.speed = 500
+
+    -- Card States
     self.hovered = false
     self.selected = false
     self.moving = false
     self.fliped = false
-    self.oldmousedown = ""
     self.active = true
     self.flipping = false
-    self.flag = false
-    self.cardBack = love.graphics.newImage("cards/CardBack.png")
 
+    -- Function Variables
+    self.oldmousedown = ""
+    self.flipFlag = false
+    self.floatFlag = true
+    self.hoverFlag = true
+
+    -- Card Image
+    self.cardBack = love.graphics.newImage("cards/myCards/CardBack2.png")
+    self:getCardFace()
+    self.image = self.cardBack
+    self:initSprite()
+
+    return self
+end
+
+-- This method handles the logic for hovering over the cards
+function Card:hover()
+    if not self.flipping then
+        if self:checkMouseHover() then
+            if self.hoverFlag then
+                self.xScale = self.xScale + .3
+                self.yScale = self.yScale + .3
+                self.hoverFlag = false
+            else
+                if self.xScale >= self.baseScale +.1 then
+                    self.xScale = self.xScale - .1
+                    self.yScale = self.yScale - .1
+                end
+            end
+        else
+            if self.xScale > self.baseScale and not self.flipping then
+                self.xScale = self.xScale - .1
+                self.yScale = self.yScale - .1
+            elseif not self.flipping and self.xScale ~= self.baseScale then
+                self.xScale = self.baseScale
+                self.yScale = self.baseScale
+                self.hoverFlag = true
+            end
+        end
+    end
+end
+
+function Card:getCardFace()
+    
     if self.suit == 1 then
         self.cardFace = love.graphics.newImage("cards/cardSpades" .. tostring(self.rank) .. ".png")
     elseif self.suit == 3  then
@@ -34,28 +83,20 @@ function Card.new(newRank, newSuit, nx, ny)
     else
         self.cardFace = love.graphics.newImage("cards/cardDiamonds" .. tostring(self.rank) .. ".png")
     end
-
-    self.image = self.cardBack
-    self:initSprite()
-    return self
 end
 
--- This method handles the logic for hovering over the cards
-function Card:hover()
-    if not self.moving then
-        mx, my = love.mouse.getPosition()
-        local tlx = (self.x - (self.width/2))
-        local tly = (self.y - (self.height/2))
-        if mx > tlx and mx < (tlx + self.width) and my > tly and my < (tly + self.height) then
-            if self.hovered ~= true then
-                self.hovered = true
-                self.newy = (self.y - 10)
-            end
-        else
-            if self.hovered ~= false then
-                self.hovered = false
-                self.newy = (self.y + 10)
-            end
+function Card:floatingAnimation()
+    if self.floatFlag then
+        self.xSkew = self.xSkew - .001
+        self.ySkew = -(self.xSkew)
+        if self.xSkew <= -0.05 then
+            self.floatFlag = false
+        end
+    else
+        self.xSkew = self.xSkew + .001 
+        self.ySkew = -(self.xSkew)
+        if self.xSkew >= .05 then
+            self.floatFlag = true
         end
     end
 end
@@ -81,19 +122,23 @@ end
 
 function Card:flipAnimation()
     if self.flipping then
-        if self.flag then
-            self.xScale = self.xScale + .03
+        if self.flipFlag then
+            self.xScale = self.xScale + .04
             if self.xScale == self.baseScale then
                 self.flipping = false
-                self.flag = false
+                self.flipFlag = false
+                self.xScale = self.baseScale
+                self.yScale = self.baseScale
             end
         else
-            self.xScale = self.xScale - .03
+            self.xScale = self.xScale - .04
             if self.xScale <= 0 then
-                self.flag = true
+                self.flipFlag = true
                 if self.fliped then
                     self.fliped = false
                     self.image = self.cardBack
+                    self.xScale = self.baseScale
+                    self.yScale = self.baseScale
                 else
                     self.fliped = true
                     self.image = self.cardFace
@@ -106,13 +151,11 @@ end
 function Card:update(dt)
     if self.active then
         self:onSelect() 
+        self:hover()
     end
-    --self:hover()
     self:move(dt)
+    self:floatingAnimation()
     self:flipAnimation()
-    if self.cooldown ~= 0 then
-        self.cooldown = self.cooldown - 5
-    end
 end
 
 Deck = {}
@@ -168,5 +211,5 @@ function Deck:checkUsedCards(cardNum)
 end
 
 function Deck:draw()
-    --love.graphics.draw(self.image, self.x, self.y, 0, .7, .7, self.width/2, self.height/2)
+    love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, self.width/2, self.height/2)
 end

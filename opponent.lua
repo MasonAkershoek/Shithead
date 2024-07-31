@@ -91,22 +91,25 @@ function OpponentDock:addCardTop(newCard)
     table.insert(self.dockTop, newCard)
     self.dockTop[#self.dockTop]:changeScale(.5,.5)
     self.height = (newCard.height * .5)
+    self.dockTop[#self.dockTop].active = false
+    self.dockTop[#self.dockTop].flipping = true
 end
 
 function OpponentDock:addCardBottom(newCard)
     table.insert(self.dockBottom, newCard)
     self.dockBottom[#self.dockBottom]:changeScale(.5,.5)
+    self.dockBottom[#self.dockBottom].active = false
 end
 
 function OpponentDock:draw()
-    if #self.dockTop > 0 then
-        for x=1, #self.dockTop do
-            self.dockTop[x]:draw()
-        end
-    end
     if #self.dockBottom > 0 then
         for x=1, #self.dockBottom do
             self.dockBottom[x]:draw()
+        end
+    end
+    if #self.dockTop > 0 then
+        for x=1, #self.dockTop do
+            self.dockTop[x]:draw()
         end
     end
 end
@@ -114,14 +117,14 @@ end
 function OpponentDock:update(dt)
     self:updatePos(self.dockBottom, true)
     self:updatePos(self.dockTop, true)
-    if #self.dockTop > 0 then
-        for x=1, #self.dockTop do
-            self.dockTop[x]:update(dt)
-        end
-    end
     if #self.dockBottom > 0 then
         for x=1, #self.dockBottom do
             self.dockBottom[x]:update(dt)
+        end
+    end
+    if #self.dockTop > 0 then
+        for x=1, #self.dockTop do
+            self.dockTop[x]:update(dt)
         end
     end
 end
