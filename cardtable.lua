@@ -15,6 +15,9 @@ function CardTable.new()
     -- Table Deck
     self.deck = Deck.new(screenWidth/2,(screenHeight/2 - 100))
 
+    -- Card Pile 
+    self.cardPile = CardPile.new(screenWidth/2,(screenHeight/2 - 100))
+
     -- player and opponent hands
     self.playerHand = Hand.new((screenWidth/2),(screenHeight*.9))
     self.opa = OpponentArea.new(screenWidth/2, 100)
@@ -26,6 +29,8 @@ function CardTable.new()
     self.timer = 0
     self.dealNum = 1
 
+    -- GamePlay Vars
+
     return self
 end
 
@@ -35,32 +40,15 @@ function CardTable:initOpponents()
     end
 end
 
-
-function CardTable:initDock()
-    for x=1, 3 do
-        self.playerHand:addDockTop(self.deck:getCard())
-        self.playerHand:addDockBottom(self.deck:getCard())
-    end
-    for x=1, #self.opa.opponents do
-        for y=1, 3 do
-            self.opa.opponents[x]:addCardToDockTop(self.deck:getCard())
-            self.opa.opponents[x]:addCardToDockBottom(self.deck:getCard())
-        end
-    end
-    self.playerHand:updateDockPos()
-end
-
 function CardTable:deal()
     if self.timer == 0 then
-        self.timer = 10
+        self.timer = 6
         if #self.deck.usedCards ~= 52 then
             if self.dealNum <= #self.opa.opponents then 
-                print(#self.opa.opponents[self.dealNum].dock.dockBottom)
-                print(#self.opa.opponents[self.dealNum].dock.dockTop)
-                if #self.opa.opponents[self.dealNum].dock.dockBottom < 3 then
-                    self.opa.opponents[self.dealNum]:addCardToDockBottom(self.deck:getCard())
-                elseif #self.opa.opponents[self.dealNum].dock.dockTop <= 3 then
+                if self.opa.opponents[self.dealNum].dock:getBottomNum() < 3 then
                     self.opa.opponents[self.dealNum]:addCardToDockTop(self.deck:getCard())
+                elseif self.opa.opponents[self.dealNum].dock:getTopNum() < 3 then
+                    self.opa.opponents[self.dealNum]:addCardToDockBottom(self.deck:getCard())
                 else
                     self.opa.opponents[self.dealNum]:addCardToHand(self.deck:getCard())
                 end
@@ -89,19 +77,44 @@ function CardTable:draw()
     self.deck:draw()
     self.playerHand:draw()
     self.opa:draw()
+    self.cardPile:draw()
+end
+
+function CardTable:checkSelect()
+    tmp = 0
+    if #self.playerHand.cards > 0 then 
+        for x=1, #self.playerHand.cards do
+            if self.playerHand.cards[x].newSelectFlag then
+                tmp = x
+                break
+            end
+        end
+        if tmp ~= 0 then
+            for x=1, #self.playerHand.cards do
+                if x ~= tmp then
+                    if self.playerHand.cards[x].selected then
+                        self.playerHand.cards[x]:deSelect()
+                    end
+                end
+            end
+        end
+    end
+end
+
+function CardTable:gameLogic()
+
 end
 
 function CardTable:update(dt)
-    --[[
-    if self.flag then
-        self:initDock()
-        self.flag = false 
-    end
-    ]]
+    self:checkSelect()
+    self.cardPile:update(dt)
     if self.dealFlag then
         self:deal() 
         self.playerHand:updateDockPos()
     end
     self.playerHand:update(dt)
     self.opa:update(dt)
+    if love.keyboard.isDown("p") then
+        self.cardPile:addCard(self.playerHand:getCard())
+    end
 end

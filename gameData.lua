@@ -13,3 +13,7 @@ screenWidth, screenHeight = love.graphics.getDimensions()
 function updateScreenDimentions()
     screenWidth, screenHeight = love.graphics.getDimensions()
 end
+
+-- graphics
+handContainer = love.graphics.newImage("handContainer.png")
+

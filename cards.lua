@@ -14,13 +14,15 @@ function Card.new(newRank, newSuit, nx, ny)
     -- Card Atributes
     self.rank = newRank
     self.suit = newSuit
+    self.dealSound = love.audio.newSource("music/deal.mp3", "static")
+    self.dealSound:setVolume(1)
 
     -- Position
     self.x = nx
     self.y = ny
 
     -- Speed
-    self.speed = 500
+    self.speed = 1300
 
     -- Card States
     self.hovered = false
@@ -35,6 +37,7 @@ function Card.new(newRank, newSuit, nx, ny)
     self.flipFlag = false
     self.floatFlag = true
     self.hoverFlag = true
+    self.newSelectFlag = false
 
     -- Card Image
     self.cardBack = love.graphics.newImage("cards/myCards/CardBack2.png")
@@ -50,8 +53,8 @@ function Card:hover()
     if not self.flipping then
         if self:checkMouseHover() then
             if self.hoverFlag then
-                self.xScale = self.xScale + .3
-                self.yScale = self.yScale + .3
+                self.xScale = self.xScale + .25
+                self.yScale = self.yScale + .25
                 self.hoverFlag = false
             else
                 if self.xScale >= self.baseScale +.1 then
@@ -113,11 +116,17 @@ function Card:onSelect()
                 self.newY = (self.y + 20)
             else 
                 self.selected = true
+                self.newSelectFlag = true
                 self.newY = (self.y - 20)
             end
         end
     end
     self.oldmousedown = love.mouse.isDown(1)
+end
+
+function Card:deSelect()
+    self.selected = false
+    self.newY = (self.y + 20)
 end
 
 function Card:flipAnimation()
@@ -149,8 +158,13 @@ function Card:flipAnimation()
 end
 
 function Card:update(dt)
+    if self.newSelectFlag then
+        self.newSelectFlag = fasle
+    end
     if self.active then
         self:onSelect() 
+    end
+    if self.fliped then
         self:hover()
     end
     self:move(dt)
@@ -166,12 +180,10 @@ Deck.usedCards = {}
 -- Deck Constructor class
 function Deck.new(newx, newy)
     local self = setmetatable({}, Deck)
-    self.image = love.graphics.newImage("cards/CardBack.png")
+    self.image = love.graphics.newImage("cards/myCards/CardBack2.png")
     self.image:setFilter("nearest","nearest") 
     self.x = newx
     self.y = newy
-    self.dealSound = love.audio.newSource("music/deal.mp3", "static")
-    self.dealSound:setVolume(1)
     self.width = self.image:getWidth()
     self.height = self.image:getHeight()
     self.cards = self:buildDeck(newx, newy)
@@ -195,7 +207,6 @@ function Deck:getCard()
         randCard = math.random(52)
     end
     table.insert(self.usedCards, randCard)
-    love.audio.play(self.dealSound)
     return self.cards[randCard]
 end
 
@@ -211,5 +222,44 @@ function Deck:checkUsedCards(cardNum)
 end
 
 function Deck:draw()
-    love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, self.width/2, self.height/2)
+    print(#self.cards)
+    if #self.usedCards < 52 then
+        love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, self.width/2, self.height/2)
+    end
+end
+
+CardPile = {}
+CardPile.__index = CardPile
+
+function CardPile.new(newx, newy)
+    local self = setmetatable({}, CardPile)
+    self.cards = {}
+    self.x = newx
+    self.y = newy
+    return self
+end
+
+function CardPile:addCard(newCard)
+    table.insert(self.cards, newCard)
+    self.cards[#self.cards]:setNewPos(self.x, self.y)
+end
+
+function CardPile:pickUpPile(hand)
+    
+end
+
+function CardPile:draw()
+    if #self.cards > 0 then
+        for x=1, #self.cards do
+            self.cards[x]:draw()
+        end
+    end
+end
+
+function CardPile:update(dt)
+    if #self.cards > 0 then
+        for x=1, #self.cards do
+            self.cards[x]:update(dt)
+        end
+    end
 end

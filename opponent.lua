@@ -25,6 +25,8 @@ end
 
 function Opponent:addCardToHand(newCard)
     table.insert(self.hand, newCard)
+    self.hand[#self.hand]:setNewPos(self.x, (0-150))
+    love.audio.play(self.hand[#self.hand].dealSound)
 end
 
 function Opponent:addCardToDockBottom(newCard)
@@ -46,6 +48,11 @@ function Opponent:update(dt)
     self.opponent_icon:update(dt)
     self.nameGraphic:update(dt)
     self.dock:update(dt)
+    if #self.hand > 0 then
+        for x=1, #self.hand do
+            self.hand[x]:update(dt)
+        end
+    end
 end
 
 -- Function to call all the draw functions for objects in the class. To be called in the main love2d update function
@@ -53,6 +60,11 @@ function Opponent:draw()
     self.opponent_icon:draw()
     self.nameGraphic:draw()
     self.dock:draw()
+    if #self.hand > 0 then
+        for x=1, #self.hand do
+            self.hand[x]:draw()
+        end
+    end
 end
 
 -------------------------------------------------------------------------------------------------------------------------------
@@ -90,15 +102,25 @@ end
 function OpponentDock:addCardTop(newCard)
     table.insert(self.dockTop, newCard)
     self.dockTop[#self.dockTop]:changeScale(.5,.5)
-    self.height = (newCard.height * .5)
     self.dockTop[#self.dockTop].active = false
     self.dockTop[#self.dockTop].flipping = true
+    love.audio.play(self.dockTop[#self.dockTop].dealSound)
 end
 
 function OpponentDock:addCardBottom(newCard)
     table.insert(self.dockBottom, newCard)
+    self.height = (newCard.height * .5)
     self.dockBottom[#self.dockBottom]:changeScale(.5,.5)
     self.dockBottom[#self.dockBottom].active = false
+    love.audio.play(self.dockBottom[#self.dockBottom].dealSound)
+end
+
+function OpponentDock:getTopNum()
+    return #self.dockTop
+end
+
+function OpponentDock:getBottomNum()
+    return #self.dockBottom
 end
 
 function OpponentDock:draw()
