@@ -22,27 +22,31 @@ function CardTable.new()
     self.playerHand = Hand.new((screenWidth/2),(screenHeight*.9))
     self.opa = OpponentArea.new(screenWidth/2, 100)
     self:initOpponents()
+    love.audio.play(music1)
 
     -- Function Flags
     self.flag = true
     self.dealFlag = true
     self.timer = 0
+    self.turnBuffer = 0
     self.dealNum = 1
 
     -- GamePlay Vars
+    self.topCard = 0
+    self.turn = #self.opa.opponents + 1
 
     return self
 end
 
 function CardTable:initOpponents()
     for x=1, 4 do
-        self.opa:addOpponent(Opponent.new(("Opponent " .. tostring(x)), "face.png"))
+        self.opa:addOpponent(Opponent.new(("Opponent " .. tostring(x)), "graphics/face.png"))
     end
 end
 
 function CardTable:deal()
     if self.timer == 0 then
-        self.timer = 6
+        self.timer = 5
         if #self.deck.usedCards ~= 52 then
             if self.dealNum <= #self.opa.opponents then 
                 if self.opa.opponents[self.dealNum].dock:getBottomNum() < 3 then
@@ -73,13 +77,6 @@ function CardTable:deal()
     end
 end
 
-function CardTable:draw()
-    self.deck:draw()
-    self.playerHand:draw()
-    self.opa:draw()
-    self.cardPile:draw()
-end
-
 function CardTable:checkSelect()
     tmp = 0
     if #self.playerHand.cards > 0 then 
@@ -101,20 +98,66 @@ function CardTable:checkSelect()
     end
 end
 
-function CardTable:gameLogic()
+function CardTable:addCardsToHand(cards)
+    for x=1, #cards do
+        if self.turn < #self.opa.opponents + 1 then
+           self.opa.opponents[self.turn]:addCardToHand(cards[x]) 
+        else
+            self.playerHand:addCardToHand(cards[x])
+        end
+    end
+end
 
+function CardTable:gameLogic()
+    if self.dealFlag then
+        self:deal() 
+        self.playerHand:updateDockPos()
+    else
+        print(self.topCard)
+        if #self.cardPile.cards ~= 0 then
+            self.topCard = self.cardPile:getTopCard()
+        else
+           self.topCard = 0 
+        end
+        if self.turn < (#self.opa.opponents + 1) then
+            if self.turnBuffer == 0 then
+                self.turnBuffer = 50
+                tmp = self.opa.opponents[self.turn]:turn(self.topCard)
+                if tmp == false then
+                    cards = self.cardPile:pickUpPile()
+                    self:addCardsToHand(cards)
+                else   
+                    self.cardPile:addCard(tmp)
+                end
+                self.turn = self.turn + 1
+            else
+               self.turnBuffer = self.turnBuffer - 1 
+            end
+        else
+            if love.keyboard.isDown("p") then
+                self.turnBuffer = 50
+                self.cardPile:addCard(self.playerHand:getCard())
+                self.turn = self.turn + 1
+            end
+        end
+        if self.turn > #self.opa.opponents + 1 then
+            self.turn = 1
+        end
+    end
+end
+
+function CardTable:draw()
+    self.deck:draw()
+    self.playerHand:draw()
+    self.opa:draw()
+    self.cardPile:draw()
 end
 
 function CardTable:update(dt)
     self:checkSelect()
     self.cardPile:update(dt)
-    if self.dealFlag then
-        self:deal() 
-        self.playerHand:updateDockPos()
-    end
+    self:gameLogic()
     self.playerHand:update(dt)
     self.opa:update(dt)
-    if love.keyboard.isDown("p") then
-        self.cardPile:addCard(self.playerHand:getCard())
-    end
+    
 end

@@ -34,14 +34,14 @@ end
 
 function Hand:addDockTop(newCard)
     table.insert(self.dockTop, newCard)
-    self.dockTop[#self.dockTop].newY = (self.y - self.dockTop[#self.dockTop].height - 40)
+    self.dockTop[#self.dockTop]:setNewPos(nil, (self.y - self.dockTop[#self.dockTop].height - 40))
     self.dockTop[#self.dockTop].flipping = true
     love.audio.play(self.dockTop[#self.dockTop].dealSound)
 end
 
 function Hand:addDockBottom(newCard)
     table.insert(self.dockBottom, newCard)
-    self.dockBottom[#self.dockBottom].newY = (self.y - self.dockBottom[#self.dockBottom].height - 50)
+    self.dockBottom[#self.dockBottom]:setNewPos(nil, (self.y - self.dockBottom[#self.dockBottom].height - 40))
     self.dockBottom[#self.dockBottom].active = false
     love.audio.play(self.dockBottom[#self.dockBottom].dealSound)
 end
@@ -89,7 +89,7 @@ function Hand:updateDockPos()
 end
 
 function Hand:draw()
-    love.graphics.draw(handContainer, self.x, (self.y  - 10), 0, (1), .55, (handContainer:getWidth()/2), (handContainer:getHeight()/2))
+    --love.graphics.draw(handContainer, self.x, (self.y  - 10), 0, (1), .55, (handContainer:getWidth()/2), (handContainer:getHeight()/2))
     if #self.cards > 0 then
         for x=1, #self.cards do
             self.cards[x]:draw()

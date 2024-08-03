@@ -55,6 +55,22 @@ function Opponent:update(dt)
     end
 end
 
+function Opponent:turn(topCard)
+    selectedCard = 0
+    for x=#self.hand, #self.hand, -1 do
+        if self.hand[x].rank > topCard then
+            selectedCard = x
+            break
+        end
+    end
+    if selectedCard == 0 then
+        return false
+    end
+    tmp = self.hand[selectedCard]
+    table.remove(self.hand, selectedCard)
+    return tmp
+end
+
 -- Function to call all the draw functions for objects in the class. To be called in the main love2d update function
 function Opponent:draw()
     self.opponent_icon:draw()
@@ -83,7 +99,6 @@ end
 function NameGraphic:update(dt)
     self:move(dt)
 end
-
 
 -------------------------------------------------------------------------------------------------------------------------------
 
