@@ -1,0 +1,115 @@
+--[[
+    Font Manager - This object allows for easy creating of fonts with different font sizes and only creates the Font
+    object when the program requests them
+]]
+FontManager = {}
+FontManager.__index = FontManager
+
+function FontManager.new()
+    local self = setmetatable({}, FontManager)
+    self.fontPaths = {}
+    self.fonts = {}
+    return self
+end
+
+function FontManager:addFont(fontName, fontPath)
+    if self.fontPaths[fontName] == nil and love.filesystem.getInfo(fontPath) then
+        self.fontPaths[fontName] = fontPath
+    else
+       print("Font alredy exists.") 
+    end
+end
+
+function FontManager:getFont(fontName, fontSize)
+    if self.fontPaths[fontName] ~= nil then
+        if self.fonts[fontName][fontSize] == nil then
+            self.fonts[fontName][fontSize] = love.graphics.newFont(self.fontPaths[fontName], fontSize)
+        end
+        return self.fonts[fontName][fontSize]
+    else
+       print("Font dose not exist.") 
+    end
+end
+
+
+--[[
+    Color Manager - This object makes getting colors colors easyer and less combersome
+]]
+ColorManager = {}
+ColorManager.__index = ColorManager
+
+function ColorManager.new()
+    local self = setmetatable({}, ColorManager)
+    self.colors = {}
+    for color in ipairs(colors) do
+        self.colors[colors[color][1]] = love.math.colorFromBytes(colors[color][2], colors[color][3], colors[color][4])
+    end
+    return self
+end
+
+function ColorManager:addColor(colorName, rgbCode)
+    if self.colors[colorName] == nil then
+        self.colors[colorName] = {love.math.colorFromBytes(rgbCode[1], rgbCode[2], rgbCode[3])}
+    else
+       print("Color alredy exists.") 
+    end
+end
+
+function ColorManager:getColor(colorName, transparency)
+    local trans = transparency or 1
+    if self.colors[colorName] ~= nil then
+        local tmp =  self.colors[colorName]
+        table.insert(tmp, #tmp+1, trans)
+        return tmp
+    else
+       print("Color dosnt exist!") 
+    end
+end
+
+-- Color Definitions
+colors = {
+    {"BLACK", {0, 0, 0}},
+    {"WHITE", {255, 255, 255}},
+    {"RED", {150, 16, 9}},
+    {"GREEN", {48, 137, 54}},
+    {"YELLOw", {204, 204, 63}},
+    {"BLUE", {41, 46, 153}},
+    {"LIGHTGRAY", {104, 101, 103}},
+    {"DARKGRAY", {71, 69, 70}},
+    {"BGCOLOR", {68, 119, 102}}
+}
+
+--[[
+    Display Manager - This object deals with all the screen demention/monitor changes happening to the Game
+    this will be helpfull when implementing the display settings menu
+]]
+DisplayManager = {}
+DisplayManager.__index = DisplayManager
+
+function DisplayManager.new()
+    local self = setmetatable({}, DisplayManager)
+    self.displayNum = love.window.getDisplayCount()
+    self.displayModes = {}
+    self.display = 1
+    self.mode = 1
+    self.fullscreen = true
+    return self
+end
+
+function DisplayManager:getDisplayModes()
+    for x in self.displayNum do
+        table.insert(self.displayModes, #self.displayModes + 1, love.window.getFullscreenModes(x))
+    end
+end
+
+function DisplayManager:getCenter()
+    
+end
+
+function DisplayManager:update()
+    local _,_, flags = love.window.getMode()
+    if flags.display ~= self.display then
+        self.display = flags.display
+        push:setupScreen(_GAME_WIDTH, _GAME_HEIGHT, self.displayModes[self.display].width, self.displayModes[self.display].height, {fullscreen = self.fullscreen, resizable = false, canvas = false, pixelperfect = false, stretched=false})
+    end
+end
