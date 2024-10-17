@@ -1,19 +1,19 @@
-require("sprite")
-
 -- hand.lua
 
+-- Hand Object
+--------------------------------------------------
 Hand = setmetatable({}, {__index = HboxContainer})
 Hand.__index = Hand
 
-function Hand.new(newX, newY)
-    local self = setmetatable(HboxContainer.new(), Hand)
+function Hand.new(nx, ny)
+    local self = setmetatable(HboxContainer.new(nx,ny), Hand)
     self.cards = {}
     self.tmpHand = {}
     self.dockBottom = {}
     self.dockTop = {}
-    self.area = (screenWidth * .25)
-    self.x = newX
-    self.y = newY
+    self.area = (G.SCREENVARIABLES["GAMEDEMENTIONS"].x * .25)
+    self.dockArea = self.area - 170
+    self.dockSetFlag = true
     return self
 end
 
@@ -26,24 +26,126 @@ function Hand:getCardsList()
 end
 
 function Hand:addCardToHand(newCard)
+    if not newCard.fliped then
+        newCard.flipping = true
+    end
+    newCard:setPos(nil, self.pos.y)
+    newCard:playSound()
     table.insert(self.cards, newCard)
-    self.cards[#self.cards]:setNewPos(nil, self.y)
-    self.cards[#self.cards].flipping = true
-    love.audio.play(self.cards[#self.cards].dealSound)
+end
+
+function Hand:check(hand, topCard)
+    availableCards = 0
+    for x=1, #hand do
+        if topCard == 5 then
+            if hand[x].rank <= topCard or ifIn(hand[x].rank, {2,5,8,10}) then
+                hand[x].active = true
+                hand[x].notPlayable = false
+                availableCards = availableCards + 1 
+            else
+                hand[x].active = false
+                hand[x].notPlayable = true
+                if hand[x].selected then hand[x]:deSelect() end
+            end
+        else
+            if hand[x].rank <= topCard and not ifIn(hand[x].rank, {2,5,8,10}) then
+                hand[x].active = false
+                hand[x].notPlayable = true
+                if hand[x].selected then hand[x]:deSelect() end
+            else
+                availableCards = availableCards + 1 
+                hand[x].active = true
+                hand[x].notPlayable = false
+
+            end
+        end
+    end
+    return availableCards
+end
+
+function Hand:checkHand(topCard)
+    availableCards = 0
+    if #self.cards > 0 then
+        availableCards = self:check(self.cards, topCard)
+    elseif #self.dockTop > 0 then
+        availableCards = self:check(self.dockTop, topCard)
+    else
+        if #self.dockBottom > 0 then
+            return true 
+        end
+    end
+    if availableCards > 0 then
+        return true
+    else
+       return false 
+    end
+end
+
+function Hand:checkSelect()
+    local tmp = 0
+    if #self.cards > 0 then 
+        for x=1, #self.cards do
+            if self.cards[x].newSelectFlag then
+                tmp = x
+                break
+            end
+        end
+        if tmp ~= 0 then
+            for x=1, #self.cards do
+                if x ~= tmp then
+                    if self.cards[x].selected then
+                        self.cards[x]:deSelect()
+                    end
+                end
+            end
+        end
+    elseif #self.dockTop > 0 then
+        for x=1, #self.dockTop do
+            if self.dockTop[x].newSelectFlag then
+                tmp = x
+                break
+            end
+        end
+        if tmp ~= 0 then
+            for x=1, #self.dockTop do
+                if x ~= tmp then
+                    if self.dockTop[x].selected then
+                        self.dockTop[x]:deSelect()
+                    end
+                end
+            end
+        end
+    else
+        for x=1, #self.dockBottom do
+            if self.dockBottom[x].newSelectFlag then
+                tmp = x
+                break
+            end
+        end
+        if tmp ~= 0 then
+            for x=1, #self.dockBottom do
+                if x ~= tmp then
+                    if self.dockBottom[x].selected then
+                        self.dockBottom[x]:deSelect()
+                    end
+                end
+            end
+        end
+    end
 end
 
 function Hand:addDockTop(newCard)
+    newCard:playSound()
     table.insert(self.dockTop, newCard)
-    self.dockTop[#self.dockTop]:setNewPos(nil, (self.y - self.dockTop[#self.dockTop].height - 40))
+    self.dockTop[#self.dockTop]:setPos(nil, (self.pos.y - self.dockTop[#self.dockTop].size.y - 40))
     self.dockTop[#self.dockTop].flipping = true
-    love.audio.play(self.dockTop[#self.dockTop].dealSound)
 end
 
 function Hand:addDockBottom(newCard)
+    newCard:playSound()
     table.insert(self.dockBottom, newCard)
-    self.dockBottom[#self.dockBottom]:setNewPos(nil, (self.y - self.dockBottom[#self.dockBottom].height - 40))
+    self.dockBottom[#self.dockBottom]:setPos(nil, (self.pos.y - self.dockBottom[#self.dockBottom].size.y - 40))
     self.dockBottom[#self.dockBottom].active = false
-    love.audio.play(self.dockBottom[#self.dockBottom].dealSound)
 end
 
 function Hand:sortByRank()
@@ -71,52 +173,77 @@ function Hand:getCard()
         for x=1, #self.cards do
             if self.cards[x].selected then
                 tmp = self.cards[x]
+                tmp.selected = false
                 table.remove(self.cards, x)
                 return tmp
             end
         end 
     elseif #self.dockTop > 0  then
-
+        for x=1, #self.dockTop do
+            if self.dockTop[x].selected then
+                tmp = self.dockTop[x]
+                tmp.selected = false
+                table.remove(self.dockTop, x)
+                return tmp
+            end
+        end 
     else
-        
+        for x=1, #self.dockBottom do
+            if self.dockBottom[x].selected then
+                tmp = self.dockBottom[x]
+                tmp.selected = false
+                table.remove(self.dockBottom, x)
+                return tmp
+            end
+        end 
     end
         
 end
 
 function Hand:updateDockPos()
+    self.area = self.dockArea
     self:updatePos(self.dockTop)
     self:updatePos(self.dockBottom)
+    self.area = self.area + 170
+end
+
+function Hand:setDockActivity()
+    if #self.cards > 0 then 
+        for x=1, #self.dockTop do
+            self.dockTop[x].active = false
+            self.dockBottom[x].active = false
+            if self.dockBottom[x].selected then self.dockBottom[x]:deSelect() end
+            if self.dockTop[x].selected then self.dockTop[x]:deSelect() end
+        end
+    else
+        if #self.dockTop > 0 then
+            for x=1, #self.dockTop do
+                self.dockTop[x].active = true
+            end
+        else
+            for x=1, #self.dockBottom do
+                self.dockBottom[x].active = true
+            end 
+        end
+    end
 end
 
 function Hand:draw()
-    --love.graphics.draw(handContainer, self.x, (self.y  - 10), 0, (1), .55, (handContainer:getWidth()/2), (handContainer:getHeight()/2))
-    if #self.cards > 0 then
-        for x=1, #self.cards do
-            self.cards[x]:draw()
-        end
-    end
-    for x=1, #self.dockBottom do
-        self.dockBottom[x]:draw()
-    end
-    for x=1, #self.dockTop do
-        self.dockTop[x]:draw()
-    end
+    love.graphics.setColor({0,0,0,.3})
+    love.graphics.rectangle("fill", self.area, (self.pos.y - 100), self.area*2, 200, 20,20)
+    love.graphics.rectangle("fill", (self.area + (self.area/2)), (self.pos.y - 340), self.area, 200, 20,20)
+    love.graphics.setColor({1,1,1,1})
+
+    drawList(self.cards)
+    drawList(self.dockBottom)
+    drawList(self.dockTop)
 end
 
 function Hand:update(dt)
+    self:checkSelect()
     self:sortByRank()
     self:updatePos(self.cards)
-    if #self.dockBottom > 0 then
-        for x = 1, #self.dockTop do
-            self.dockTop[x]:update(dt)
-        end
-        for x = 1, #self.dockBottom do
-            self.dockBottom[x]:update(dt)
-        end
-    end
-    if #self.cards > 0 then
-        for x=1, #self.cards do
-            self.cards[x]:update(dt)
-        end
-    end
+    updateList(self.cards, dt)
+    updateList(self.dockBottom, dt)
+    updateList(self.dockTop, dt)
 end
