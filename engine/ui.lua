@@ -63,7 +63,7 @@ Label = setmetatable({}, {__index = Node})
 Label.__index = Label
 
 function Label.new(newText, fontSize)
-    local self = setmetatable(Node.new(0,0), Label) 
+    local self = setmetatable(Node.new (0,0), Label) 
     self.text = newText or "EMPTY!"
     self.textImage = love.graphics.newText(G.GAMEFONT, {{1,1,1}, self.text})
     return self

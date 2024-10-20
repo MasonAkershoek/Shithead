@@ -20,14 +20,19 @@ function FontManager:addFont(fontName, fontPath)
     end
 end
 
+function FontManager:gg(fontName, fontSize)
+    return self.fonts[fontName] and self.fonts[fontName][fontSize] ~= nil
+end
+
 function FontManager:getFont(fontName, fontSize)
     if self.fontPaths[fontName] ~= nil then
-        if self.fonts[fontName][fontSize] == nil then
+        if not self:gg(fontName, fontSize) then
+            self.fonts[fontName] = self.fonts[fontName] or {}  -- Ensure the fontName table exists
             self.fonts[fontName][fontSize] = love.graphics.newFont(self.fontPaths[fontName], fontSize)
         end
         return self.fonts[fontName][fontSize]
     else
-       print("Font dose not exist.") 
+        print("Font does not exist.") 
     end
 end
 
