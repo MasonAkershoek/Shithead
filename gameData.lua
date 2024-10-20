@@ -71,12 +71,13 @@ function Game.new()
     self.gameScreen = 0
     self.GAMESTATES = {"DEAL", "TURN", "BURN", "PICKUP", "WIN"}
     self.gamestate = self.GAMESTATES[1]
+
     return self
 end
 
 function Game:initGameScreens()
     self.mainMenu = MainMenu.new()
-    --self.cardTable = CardTable.new()
+    self.cardTable = CardTable.new()
 end
 
 function Game:loadSounds()

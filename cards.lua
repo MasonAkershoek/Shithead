@@ -9,6 +9,8 @@ math.randomseed(os.time())
 function Card.new(newRank, newSuit, nx, ny)
     local self = setmetatable(Sprite.new(nx,ny), Card)
 
+    self.T = "Card"
+
     -- Card Atributes
     self.rank = newRank
     self.suit = newSuit

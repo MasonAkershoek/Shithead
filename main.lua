@@ -9,12 +9,11 @@ require "engine.functions"
 require "gameObjects"
 require "gameData"
 moonshine = require 'librarys.moonshine'
+require "engine.UI"
 require "hand"
 require "cards"
 require "mainmenu"
 require "opponent"
---require "engine.ui"
-require "engine.UI"
 require "cardtable"
 require "math"
 
@@ -41,15 +40,12 @@ To-Do Before demo
 
 function love.load()
 	math.randomseed(os.time())
-	push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["GAMEDEMENTIONS"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
+	push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["SCREENSIZE"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
 	G.EVENTMANAGER:on("play", play)
 	G.EVENTMANAGER:on("quit", function() love.event.quit() end)
 	G.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
 	G.EVENTMANAGER:on("advanceTurn", function() G.turn = G.turn + 1 end)
 	G:initGameScreens()
-
-	effect = moonshine(moonshine.effects.crt)
-	.chain(moonshine.effects.scanlines)
 end
   
 function love.update(dt)

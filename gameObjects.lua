@@ -11,6 +11,8 @@ function Node.new(nx,ny)
 
     local self = setmetatable({}, Node)
 
+    self.T = "Node"
+
     -- Node Position and tansformations
     self.pos = Vector.new(nx,ny)
     self.size = Vector.new(1,1)
@@ -355,8 +357,6 @@ function EventManager:on(eventName, callback)
 end
 
 function EventManager:emit(eventName, tim)
-    tim = tim or nil
-    print("Time: ", tim)
     if not tim then 
         print("Event Emited")
         local callbacks = self.listeners[eventName]

@@ -9,26 +9,26 @@ function CardTable.new()
     local self = setmetatable({}, CardTable)
 
     -- Table Deck
-    self.deck = Deck.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
+    self.deck = Deck.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["SCREENSIZE"].y/2 - 100))
     -- Card Pile 
-    self.cardPile = CardPile.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
+    self.cardPile = CardPile.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["SCREENSIZE"].y/2 - 100))
 
     -- player and opponent hands
-    self.playerHand = Hand.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2),(G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.87))
+    self.playerHand = Hand.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2),(G.SCREENVARIABLES["SCREENSIZE"].y*.87))
     self.opa = OpponentArea.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 100)
     self:initOpponents()
-    TEsound.playLooping(G.MUSIC1, "static")
+    -- TEsound.playLooping(G.MUSIC1, "static")
 
     -- PlayButton
-    self.playButton = Button.new("Play", (G.SCREENVARIABLES["GAMEDEMENTIONS"].x * .87),(G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.87), 200, 100, "RED", "playButton")
+    self.playButton = UIButton.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x * .87),(G.SCREENVARIABLES["SCREENSIZE"].y*.87), 200, 100,{color="RED", action="playButton", text="Play!",radius="10"})
+
+    -- WINBOX
+    self.winbox = UIBox.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["SCREENSIZE"].y/2,WINBOXDEF)
+    self.winbox.winner = ""
 
     -- Function Flags
     self.flag = true
     self.dealFlag = true
-
-    -- WINBOX
-    self.winbox = UIBox.new(WINBOX)
-    self.winbox.winner = ""
 
     -- GamePlay Vars
     self.topCard = 0
@@ -117,8 +117,9 @@ function CardTable:gameLogic()
         local winData = self:checkWin()
         if winData ~= nil then
             self.winbox.winner = winData[1]
-            self.winbox.contents[1].textImage = love.graphics.newText(G.GAMEFONT, {{1,1,1,1}, self.winbox.winner .. self.winbox.contents[1].text})
+            self.winbox.contents[1]:setText((self.winbox.winner .. self.winbox.contents[1].text))
             G.gamestate = G.GAMESTATES[5]
+            self.winbox:setActive()
         else
             self.playerHand:setDockActivity()
             if #self.cardPile.cards ~= 0 then
@@ -205,7 +206,7 @@ function CardTable:gameLogic()
         end
     
     elseif G.gamestate == "WIN" then
-        
+
     end
         
 end
@@ -234,3 +235,25 @@ function CardTable:update(dt)
         self.winbox:update(dt)
     end
 end
+
+-- UIDefinitions for the CardTable
+
+-- Definition for Win Box
+WINBOXDEF = {
+    radius=10, 
+    padding=10, 
+    borderSize=10,
+    alignment="right",
+    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,-100),Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2)},
+    contents={
+        UILabel.new(
+        G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,
+        G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2,
+        20,
+        {
+            alignment="center",
+            text=" WINS!!!\n"
+        }
+    )
+    }
+}
