@@ -116,8 +116,10 @@ end
 function UIBox:setActive()
     self.moving = true
     if self.active then
+        logger:log("UIBox Set Inactive")
         self.active = false
     else
+        logger:log("UIBox Set Active")
         self.active = true
     end
     self.changed = true
@@ -143,9 +145,9 @@ function UIBox:HAlign()
 end
 
 function UIBox:VAlign(padding)
-    padding = padding or 10
+    padding = padding or 00
     if #self.contents > 0 then
-        local nextPoint = (self.pos.y - self.size.y/2)+20
+        local nextPoint = (self.pos.y - self.size.y/2)+10
         for x=1, #self.contents do
             nextPoint = nextPoint + ((self.contents[x].size.y/2) * self.contents[x].baseScale)
             self.contents[x]:setPosImidiate(self.pos.x, nextPoint)
@@ -212,6 +214,7 @@ function UILabel.new(x,y,fontSize,args)
     self.fontSize = fontSize or 20
     self.text = locArgs.text or "Empty!"
     self.alignment = locArgs.alignment or "left"
+    self.color = locArgs.color or "WHITE"
 
     self.textGraphics = love.graphics.newText(G.FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
     self.wdithLimit = self.textGraphics:getWidth() or 10
@@ -222,7 +225,7 @@ end
 
 function UILabel:setText(newText)
     self.text = newText
-    self.textGraphics:setf(self.text, self.widthLimit, self.alignment)
+    self.textGraphics:setf(self.text, self.wdithLimit, self.alignment)
     self:setWidthAndHeight()
 end
 
@@ -233,11 +236,12 @@ end
 
 -- set the text without formatting to get the width of the unformatted text then 
 -- check if the newWidth is less then self.size.x
+-- fix the wrap function, there should probably be both a with and wrap variable 
 function UILabel:setWrap(newWidth)
     self.textGraphics:set(self.text)
     self:setWidthAndHeight()
     if newWidth < self.size.x then
-        self.widthLimit = newWidth
+        self.wdithLimit = newWidth
         self.textGraphics:setf(self.text, newWidth, self.alignment)
         self:setWidthAndHeight()
     end 
@@ -254,7 +258,7 @@ function UILabel:setWidthAndHeight()
 end
 
 function UILabel:draw()
-    love.graphics.setColor(1,1,1)
+    love.graphics.setColor(G:getColor(self.color))
     love.graphics.draw(self.textGraphics, self.pos.x, self.pos.y,0,1,1,self.size.x/2, self.size.y/2)
 end
 
@@ -272,8 +276,9 @@ function UIButton.new(x,y,w,h,args)
     self.color = args.color or "RED"
     self.text = args.text or "Empty!"
     self.textGraphics = UILabel.new(self.pos.x,self.pos.y, args.textFontSize, {text=self.text, alignment="center"})
-    self.clickCooldown = args.clickCooldown or 5
     self.oldmousedown = ""
+    self.clickTimer = Timer.new(.2)
+    self.clickTimer:stopTimer()
     return self
 end
 
@@ -294,8 +299,10 @@ function UIButton:onSelect()
         if love.mouse.isDown(1) and not self.oldmousedown then
             if self.action ~= nil then
                 G.EVENTMANAGER:emit(self.action)
+                self.clickTimer:start()
             else
                 print("No Action Supplied!")
+                self.clickTimer:start()
             end
         end
     end
@@ -305,6 +312,8 @@ end
 function UIButton:update(dt)
     self:onHover()
     self:onSelect()
+    self.clickTimer:update(dt)
+    if self.clickTimer:isExpired() then self.clickTimer:stopTimer() end
 end
 
 function UIButton:draw()
@@ -312,9 +321,16 @@ function UIButton:draw()
         self:drawShadow()
     end
     self.textGraphics:setPosImidiate(self.pos.x,self.pos.y)
-    love.graphics.setColor(G:getColor(self.color))
-    love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
-    love.graphics.setShader()
+    if self.hoverFlag then
+        love.graphics.setColor(G:getColor(self.color,1,.2))
+    else
+        love.graphics.setColor(G:getColor(self.color)) 
+    end
+    if self.clickTimer:isStopped() then
+        love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
+    else
+        love.graphics.rectangle("fill", self.pos.x - (self.size.x/2)+self.shadowOffset/3, self.pos.y - (self.size.y/2)+self.shadowOffset/3, self.size.x, self.size.y, self.radius, self.radius)
+    end
     love.graphics.setColor({1,1,1})
     self.textGraphics:draw()
 end
@@ -322,17 +338,27 @@ end
 UITextField = setmetatable({}, {__index = UINode})
 UITextField.__index = UITextField
 
-function UITextField.new(x,y,w,h,args)
+function UITextField.new(x,y,w,h,fontSize,args)
     local args = args or {}
     local self = setmetatable(UINode.new(x,y,w,h,args), UITextField)
 
+    self.T = "UITextField"
+
+    self.fontSize = fontSize or 20
+    self.selected = false
+    self.maxLen = args.maxLen or 10
+    self.color = args.color or "WHITE"
     -- Text Field Text
-    self.text = ""
-    self.textGraphics = UILabel.new()
+    self.text = {}
+    self.textGraphics = UILabel.new(0,0,self.fontSize,{alignment="left", text="", color="BLACK"})
+    self.textGraphics:setPosImidiate(self.pos.x,self.pos.y)
 
     -- Temporary Text for Field
-    self.tmpText = args.tmpText or nil
-    self.tmpTextGraphics = UILabel.new()
+    self.tmpText = args.tmpText or ""
+    self.tmpTextGraphics = UILabel.new(0,0,self.fontSize,{alignment="left", text="",color="LIGHTGRAY"})
+    self.tmpTextGraphics:setPosImidiate(self.pos.x,self.pos.y)
+    self.tmpTextGraphics:setText(self.tmpText)
+    self.tmpTextGraphics:setWrap(self.size.x)
 
     -- Text Field Label Properties
     self.label = {
@@ -343,14 +369,62 @@ function UITextField.new(x,y,w,h,args)
     return self
 end
 
+function UITextField:select()
+    if self:checkMouseHover() and not self.selected and love.mouse.isDown(1) then
+        logger:log("Text Field Selected")
+        self.selected = true
+    elseif not self:checkMouseHover() and self.selected and love.mouse.isDown(1) then
+        logger:log("Text Field Unselected")
+        self.selected = false
+    end  
+end
+
 function UITextField:getText()
-    return self.text
+    local tmp = ""
+    for x,v in ipairs(self.text) do
+        tmp = tmp .. v
+    end
+    return tmp
+end
+
+function UITextField:addText(newChar)
+    if newChar ~= "" and #self.text < self.maxLen then
+        table.insert(self.text, #self.text+1, newChar)
+        self.textGraphics:setText(self:getText())
+        self.textGraphics:setWrap(self.size.x)
+        logger:log("Text Added To", self.T, newChar)
+    end
+end
+
+function UITextField:backSpace()
+    if #self.text > 0 then 
+        table.remove(self.text, #self.text)
+        self.textGraphics:setText(self:getText())
+        self.textGraphics:setWrap(self.size.x)
+    end
 end
 
 function UITextField:update(dt)
+    self:select()
+    if self.selected and G.KEYBOARDMANAGER.keyPressFlag then
+        local key = convertKeyPress(G.KEYBOARDMANAGER:getLastKeyPress())
+        if key == "backspace" then self:backSpace() else self:addText(key) end
+    end
+end
+
+function UITextField:showCursor()
     
 end
 
 function UITextField:draw()
-    
+    if self.showShadow then
+        self:drawShadow()
+    end
+    love.graphics.setColor(G:getColor(self.color))
+    love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
+    if #self.text == 0 and not self.selected then
+        self.tmpTextGraphics:draw()
+    else
+        self.textGraphics:draw()
+    end
 end

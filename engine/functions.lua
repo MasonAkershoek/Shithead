@@ -64,7 +64,16 @@ function play()
 	G.mainMenu.exitFlag = true
 end
 
-
 function setMainMenu()
     self.buttonBox:setPos(nil,G.SCREENVARIABLES["GAMEDEMENTIONS"].y-200)
+end
+
+function convertKeyPress(keyPress)
+    local letters = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+    if ifIn(keyPress, letters) then
+        return keyPress
+    end
+    if keyPress == "space" then  return " " end
+    if keyPress == "backspace" then return keyPress end
+    return ""
 end

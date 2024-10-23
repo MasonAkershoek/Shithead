@@ -118,3 +118,41 @@ function DisplayManager:update()
         push:setupScreen(_GAME_WIDTH, _GAME_HEIGHT, self.displayModes[self.display].width, self.displayModes[self.display].height, {fullscreen = self.fullscreen, resizable = false, canvas = false, pixelperfect = false, stretched=false})
     end
 end
+
+KeyboardManager = {}
+KeyboardManager.__index = KeyboardManager
+
+function KeyboardManager.new()
+    local self = setmetatable({}, KeyboardManager)
+    self.buffer = {}
+    self.keyPressFlag = false
+    return self
+end
+
+function KeyboardManager:getFullBuff()
+    return self.buffer
+end
+
+function KeyboardManager:getBuffasStr()
+    local tmp = ""
+    for x=1, #self.buffer do
+        tmp = tmp .. self.buffer[x]
+    end
+    return tmp
+end
+
+function KeyboardManager:getLastKeyPress()
+    return self.buffer[#self.buffer]
+end
+
+function KeyboardManager:addKeyPress(keyPress)
+    if #self.buffer == 10 then
+        table.remove(self.buffer, 1)
+    end
+    table.insert(self.buffer, #self.buffer+1, keyPress)
+    self.keyPressFlag = true
+end
+
+function KeyboardManager:ifIn(subString)
+    
+end
