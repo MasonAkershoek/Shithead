@@ -6,8 +6,10 @@ MainMenu.__index = MainMenu
 function MainMenu.new()
     local self = setmetatable({}, MainMenu)
 
+    self.T = "MainMenu"
+
     -- Main Menu Title
-    self.titleCards = TitleCards.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2), (G.SCREENVARIABLES["SCREENSIZE"].y/2))
+    self.titleCards = TitleCards.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2), (G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2))
     self.title = {"S", "H", "I", "T", "H", "E", "A", "D"}
     self.titleIndex = 1
     self.titleTimer = Timer.new(.08)
@@ -28,6 +30,7 @@ function MainMenu.new()
 
     self.demoBox = UIBox.new(600,350,DemoDef)
     self.buttonBox = UIBox.new(1000,150,ButtonBoxDef)
+    logger:log("MainMenu Created")
     return self
 end
 
@@ -35,7 +38,7 @@ function MainMenu:initTitleCards()
     if self.titleTimer:isExpired() then
         self.titleTimer:reset()
         local suit = math.random(4)
-        local tmp = Card.new(1,1, -150, (G.SCREENVARIABLES["SCREENSIZE"].y/2))
+        local tmp = Card.new(1,1, -150, (G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2))
         tmp.cardFace = G.CARDGRAPHICS["CARDLETTERS"]["card" .. G.CARDSUITS[suit] .. self.title[self.titleIndex]]
         tmp.active = false
         self.titleIndex = self.titleIndex + 1
@@ -63,7 +66,12 @@ end
 
 function MainMenu:update(dt)
     -- Play the into animation
-    if #self.titleCards.cards ~= #self.title and not self.titleDone then self:initTitleCards() elseif not self.titleDone then self.titleTimer:stopTimer() self.titleDone = true end
+    if #self.titleCards.cards ~= #self.title and not self.titleDone then 
+        self:initTitleCards() 
+    elseif not self.titleDone then
+         self.titleTimer:stopTimer() self.titleDone = true 
+         logger:log("Title Done")
+    end
 
     -- Dely the movment of the buttons
     if self.buttonBoxTimer:isExpired() then
@@ -87,7 +95,7 @@ function MainMenu:update(dt)
 end
 
 function MainMenu:draw()
-    love.graphics.draw(self.versionText, 100,G.SCREENVARIABLES["SCREENSIZE"].y*.9074)
+    love.graphics.draw(self.versionText, 100,G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.9074)
     self.titleCards:draw()
     self.demoBox:draw()
     self.buttonBox:draw()
@@ -168,7 +176,7 @@ ButtonBoxDef = {
     padding=10,
     borderSize=10,
     alignment="Horizontal",
-    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 2000),Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, G.SCREENVARIABLES["SCREENSIZE"].y*.9074)},
+    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 2000),Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.9074)},
     contents={
         UIButton.new(0,0,200,100, {radius=10, text="Play", color="BLUE", action="play"}),
         UIButton.new(0,0,200,100, {radius=10, text="Multiplayer", color="YELLOW"}),

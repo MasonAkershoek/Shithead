@@ -62,20 +62,27 @@ function Opponent:checkCards(cards, topCard)
     selectedCard = nil
     if topCard == 5 then 
         for x=1, #cards do
-            if cards[x].rank < topCard then
+            if cards[x].rank < topCard and ifIn(cards[x].rank, G.SPECIALCARDS) ~= true then
                 selectedCard = x
                 break
             end
         end
     else
         for x=1, #cards do
-            if cards[x].rank > topCard then
+            if cards[x].rank > topCard and ifIn(cards[x].rank, G.SPECIALCARDS) ~= true then
                 selectedCard = x
                 break
             end
         end
     end
-    if selectedCard == nil then 
+    if selectedCard == nil then
+        for x=1, #cards do
+            if ifIn(cards[x].rank, G.SPECIALCARDS) then
+                selectedCard = x
+            end
+        end
+    end
+    if selectedCard == nil then
         return 0
     else
         return selectedCard

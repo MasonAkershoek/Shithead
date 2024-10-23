@@ -16,7 +16,6 @@ function Card.new(newRank, newSuit, nx, ny)
     self.suit = newSuit
 
     -- Card States
-    self.hovered = false
     self.selected = false
     self.moving = false
     self.fliped = false
@@ -239,6 +238,9 @@ Deck.usedCards = {}
 -- Deck Constructor class
 function Deck.new(nx, ny)
     local self = setmetatable(Sprite.new(nx,ny), Deck)
+
+    self.T = "Deck"
+
     self.texture = love.graphics.newImage("resources/graphics/cards/cardBacks/cardBack1.png")
     self.cards = self:buildDeck(nx, ny)
     self.discard = {}
@@ -305,6 +307,9 @@ CardPile.__index = CardPile
 
 function CardPile.new(nx, ny)
     local self = setmetatable(Node.new(nx,ny), CardPile)
+
+    self.T = "CardPile"
+    
     self.cards = {}
     return self
 end

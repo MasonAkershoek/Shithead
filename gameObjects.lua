@@ -89,8 +89,11 @@ Moveable = setmetatable({}, {__index = Node})
 Moveable.__index = Moveable
 
 function Moveable.new(nx,ny,mouseMoveable)
-    mouseMoveable = mouseMoveable or false
+    local mouseMoveable = mouseMoveable or false
     local self = setmetatable(Node.new(nx,ny), Moveable)
+
+    self.T = "Moveable"
+
     self.newPos = Vector.new(nx,ny)
     self.movement = Vector.new(0,0)
     self.distance = 0
@@ -184,6 +187,9 @@ Sprite.__index = Sprite
 function Sprite.new(nx,ny,mouseMoveable,newTexture)
     newTexture = newTexture or nil
     local self = setmetatable(Moveable.new(nx,ny,mouseMoveable), Sprite)
+
+    self.T = "Sprite"
+
     if newTexture ~= nil then
         self.texture = love.graphics.newImage(newTexture)
     else
@@ -215,6 +221,9 @@ Vector.__index = Vector
 
 function Vector.new(x,y)
     local self = setmetatable({}, Vector)
+
+    self.T = "Vector"
+
     x=x or 0
     x=x or 0
     self.x = x
@@ -246,6 +255,9 @@ HboxContainer.__index = HboxContainer
 function HboxContainer.new(nx,ny, bgBox)
     bgBox = bgBox or false
     local self = setmetatable(Moveable.new(nx,ny), HboxContainer)
+
+    self.T = "HboxContainer"
+
     self.area = 0
     self.baseScale = 1
     self.boxFlag = bgBox
@@ -317,6 +329,9 @@ VboxContainer.__index = VboxContainer
 
 function VboxContainer.new(nx,ny)
     local self = setmetatable(Moveable.new(nx,ny), VboxContainer)
+
+    self.T = "VboxContainer"
+
     self.area = 0
     return self
 end
@@ -344,6 +359,9 @@ EventManager.__index = EventManager
 
 function EventManager.new()
     local self = setmetatable({}, EventManager)
+
+    self.T = "EventManager"
+
     self.listeners = {}
     self.queue = {}
     return self
@@ -389,8 +407,10 @@ Timer.__index = Timer
 
 function Timer.new(newTime, ...)
     local self = setmetatable({}, Timer)
-    print("New Timer: ", newTime)
-    self.time = newTime
+
+    self.T = "Timer"
+
+    self.time = newTime or 1
     self.ogTime = newTime
     self.stopped = false
     self.expired = false
@@ -445,11 +465,16 @@ function Timer:update(dt)
 end
 
 -- Timer Manager
+--[[
+    The Timer Manager is good for one time timers used on the system
+]]
 TimerManager = {}
 TimerManager.__index = TimerManager
 
 function TimerManager.new()
     local self = setmetatable({}, TimerManager)
+
+    self.T = "TimerManager"
     self.timers = {}
     return self
 end

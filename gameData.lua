@@ -5,6 +5,10 @@ Game.__index = Game
 function Game.new()
     local self = setmetatable({}, Game)
 
+    -- Main Game Timer
+    self.mainGameTimer = Timer.new(1)
+    self.mainTimePassed = 0
+
     -- Timer Manager
     self.TIMERMANAGER = TimerManager.new()
 
@@ -20,6 +24,9 @@ function Game.new()
     -- FontManager
     self.FONTMANAGER = FontManager.new()
     self.FONTMANAGER:addFont("GAMEFONT", "resources/graphics/pixelFont.otf")
+
+    -- KeyboardStuff
+    self.KEYBOARDMANAGER = KeyboardManager.new()
 
     -- Screen Variables
     local _,_, flags = love.window.getMode()
@@ -61,9 +68,15 @@ function Game.new()
     -- Card Constants
     self.CARDSPEED = 3000
     self.CARDSUITS = {"Spades", "Diamonds", "Clubs", "Hearts"}
+    self.SPECIALCARDS = {2,5,8,10}
 
 
     -- GameFlags
+    self.gameFlag = 
+    {
+        playerPlayButton = false,
+        escMenu = false
+    }
     self.playerPlayButton = false
     self.turn = 0
 
@@ -71,8 +84,25 @@ function Game.new()
     self.gameScreen = 0
     self.GAMESTATES = {"DEAL", "TURN", "BURN", "PICKUP", "WIN"}
     self.gamestate = self.GAMESTATES[1]
-
+    self:updateDisplay()
     return self
+end
+
+function Game:nextTurn(flag)
+    if not flag then
+        self.turn = self.turn + 1
+        logger:log("Next Players Turn: "..self.turn)
+    else
+        if self.turn > #self.cardTable.opa.opponents + 1 then
+            self.turn = 1
+            logger:log("Resetting Turn Counter: "..self.turn)
+        end 
+    end
+end
+
+function Game:setState(newState)
+    self.gamestate = self.GAMESTATES[newState]
+    logger:log("Game state set to: "..self.gamestate)
 end
 
 function Game:initGameScreens()
@@ -100,6 +130,7 @@ function Game:getCardGraphics()
         local imageName = string.sub(file,1, -5)
         self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file)
     end
+    logger:log("Card Graphics Loaded")
 end
 
 function Game:initColors()
@@ -138,14 +169,16 @@ function Game:initColors()
     return colors
 end
 
-function Game:getColor(colorName, transparancy)
+-- Make some changes so this function isnt called so often
+function Game:getColor(colorName, transparancy, darken)
     transparancy = transparancy or 1
     local color = {}
+    local darken = darken or 0
     for key,value in pairs(self.COLORS) do
         if colorName == key then
-            table.insert(color, self.COLORS[colorName].r) 
-            table.insert(color, self.COLORS[colorName].g) 
-            table.insert(color, self.COLORS[colorName].b)
+            table.insert(color, self.COLORS[colorName].r-darken) 
+            table.insert(color, self.COLORS[colorName].g-darken) 
+            table.insert(color, self.COLORS[colorName].b-darken)
             table.insert(color, transparancy)
             return color
         end
@@ -165,17 +198,25 @@ end
 
 function Game:update(dt)
     self:updateDisplay()
+    self.mainGameTimer:update(dt)
+    if self.mainGameTimer:isExpired() then self.mainTimePassed = self.mainTimePassed + 1 self.mainGameTimer:reset() end
     if G.gameScreen == 1 then
         self.cardTable:update(dt)
     else
         self.mainMenu:update(dt)
     end
     if love.keyboard.isDown("q") then
+        logger:log("Total Time Played:",G.mainTimePassed)
+        logger:close()
         love.event.quit()
     end
     self.EVENTMANAGER:update(dt)
     self.TIMERMANAGER:update(dt)
+end
 
+function Game:changeScreen(index)
+    self.gameScreen = index
+    logger:log("Screen Changed to " .. index)
 end
 
 function Game:draw()

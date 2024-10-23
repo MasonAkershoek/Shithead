@@ -8,23 +8,29 @@ CardTable.__index = CardTable
 function CardTable.new()
     local self = setmetatable({}, CardTable)
 
+    self.T = "CardTable"
+
     -- Table Deck
-    self.deck = Deck.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["SCREENSIZE"].y/2 - 100))
+    self.deck = Deck.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
     -- Card Pile 
-    self.cardPile = CardPile.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["SCREENSIZE"].y/2 - 100))
+    self.cardPile = CardPile.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
 
     -- player and opponent hands
-    self.playerHand = Hand.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2),(G.SCREENVARIABLES["SCREENSIZE"].y*.87))
+    self.playerHand = Hand.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2),(G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.87))
     self.opa = OpponentArea.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 100)
     self:initOpponents()
     -- TEsound.playLooping(G.MUSIC1, "static")
 
     -- PlayButton
-    self.playButton = UIButton.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x * .87),(G.SCREENVARIABLES["SCREENSIZE"].y*.87), 200, 100,{color="RED", action="playButton", text="Play!",radius="10"})
+    self.playButton = UIButton.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x * .87),(G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.87), 200, 100,{color="RED", action="playButton", text="Play!",radius="10"})
 
     -- WINBOX
-    self.winbox = UIBox.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["SCREENSIZE"].y/2,WINBOXDEF)
+    self.winbox = UIBox.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2,WINBOXDEF)
     self.winbox.winner = ""
+
+    -- OpponentCards Debug Box
+    self.dbBox = UIBox.new(600,350,DEBUGBOXDEF);
+    self.dbBox:setActive()
 
     -- Function Flags
     self.flag = true
@@ -73,7 +79,7 @@ function CardTable:deal()
             TEsound.pitch("deal", self.pitch)
             self.pitch = self.pitch + .001
         else
-            G.gamestate = G.GAMESTATES[2]
+            G:setState(2)
             self.dealTimer:stopTimer()
             TEsound.pitch("deal", 1)
         end
@@ -118,7 +124,7 @@ function CardTable:gameLogic()
         if winData ~= nil then
             self.winbox.winner = winData[1]
             self.winbox.contents[1]:setText((self.winbox.winner .. self.winbox.contents[1].text))
-            G.gamestate = G.GAMESTATES[5]
+            G:setState(5)
             self.winbox:setActive()
         else
             self.playerHand:setDockActivity()
@@ -127,7 +133,7 @@ function CardTable:gameLogic()
                 self.topCard = self.cardPile:getTopCard()
 
                 if self.topCard == 10 then
-                    G.gamestate = G.GAMESTATES[3]
+                    G:setState(3)
                     self.dealTimer:reset(.5)
                 end
             else
@@ -139,13 +145,13 @@ function CardTable:gameLogic()
                     self.turnBuffer = 50
                     local tmp = self.opa.opponents[G.turn]:turn(self.topCard)
                     if tmp == false then
-                        G.gamestate = G.GAMESTATES[4]
+                        G:setState(4)
                         self.dealTimer:reset(.5)
                     else   
                         self.cardPile:addCard(tmp)
                     end
                     if G.gamestate == "TURN" then
-                        G.turn = G.turn + 1
+                        G:nextTurn()
                     end
                 else
                 self.turnBuffer = self.turnBuffer - 1 
@@ -161,9 +167,9 @@ function CardTable:gameLogic()
                                 self.turnBuffer = 50
                                 print(playerCard.rank, self.cardPile:getTopCard())
                                 if checkCard(playerCard.rank, self.cardPile:getTopCard()) then
-                                    G.turn = G.turn + 1
+                                    G:nextTurn()
                                 else
-                                    G.gamestate = G.GAMESTATES[4]
+                                    G:setState(4)
                                     self.dealTimer:reset(.5)
                                     self.turnBuffer = 50
                                 end
@@ -171,16 +177,14 @@ function CardTable:gameLogic()
                             end
                         end
                     else
-                        G.gamestate = G.GAMESTATES[4]
+                        G:setState(4)
                         self.dealTimer:reset(.5)
                         self.turnBuffer = 50
                     end
                 else
                     self.turnBuffer = self.turnBuffer - 1 
                 end
-            end
-            if G.turn > #self.opa.opponents + 1 then
-                G.turn = 1
+                G:nextTurn(true)
             end
         end
 
@@ -190,7 +194,7 @@ function CardTable:gameLogic()
             self.dealTimer:reset(.05)
             self.cardPile.cards[#self.cardPile.cards].burnParticals:emit(20)
             self.deck:addDiscard(self.cardPile:getCard())
-            if #self.cardPile.cards <= 0 then G.gamestate = G.GAMESTATES[2] self.dealTimer:stopTimer() end
+            if #self.cardPile.cards <= 0 then G:setState(2) self.dealTimer:stopTimer() end
         end
 
     -- Logic for picking up the deck
@@ -202,13 +206,12 @@ function CardTable:gameLogic()
             else
                self.playerHand:addCardToHand(self.cardPile:getCard())
             end
-            if #self.cardPile.cards <= 0 then G.gamestate = G.GAMESTATES[2] self.dealTimer:stopTimer() G.turn = G.turn + 1 end
+            if #self.cardPile.cards <= 0 then G:setState(2) self.dealTimer:stopTimer() G:nextTurn() end
         end
     
     elseif G.gamestate == "WIN" then
 
-    end
-        
+    end    
 end
 
 function CardTable:draw()
@@ -221,6 +224,9 @@ function CardTable:draw()
     if G.gamestate == "WIN" then
         self.winbox:draw()
     end
+    if not _RELESE_MODE then
+        self.dbBox:draw()
+    end
 end
 
 function CardTable:update(dt)
@@ -230,9 +236,26 @@ function CardTable:update(dt)
     self.playerHand:update(dt)
     self.opa:update(dt)
     self.deck:update(dt)
-    self.playButton:update()
+    self.playButton:update(dt)
+    self.dbBox:update(dt)
     if G.gamestate == "WIN" then
         self.winbox:update(dt)
+    end
+    if not _RELESE_MODE then 
+        local index = 1
+        for x=3, #self.dbBox.contents, 2 do
+            local cards = ""
+            for y,card in ipairs(self.opa.opponents[index].hand) do
+                cards = cards .. " " .. tostring(card.rank)
+            end
+            if cards == self.dbBox.contents[x]:getText() then 
+            else
+                self.dbBox.contents[x]:setText(cards)
+                self.dbBox.contents[x]:setAlignment("center")
+                self.dbBox.contents[x]:setWrap(self.dbBox:getWidth()) 
+            end
+            index = index + 1
+        end
     end
 end
 
@@ -255,5 +278,24 @@ WINBOXDEF = {
             text=" WINS!!!\n"
         }
     )
+    }
+}
+
+DEBUGBOXDEF = {
+    radius = 10,
+    padding = 0,
+    borderSize = 10,
+    alignment = "Vertical",
+    positions={Vector.new(-500, G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2),Vector.new(350, G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2)},
+    contents={
+        UILabel.new(0,0,50,{alignment="center", text="Debug Menu"}),
+        UILabel.new(0,0,20,{alignment="center", text="player1: "}),
+        UILabel.new(0,0,20,{alignment="center",text="Empty"}),
+        UILabel.new(0,0,20,{alignment="center", text="player2: "}),
+        UILabel.new(0,0,20,{alignment="center",text="Empty"}),
+        UILabel.new(0,0,20,{alignment="center", text="player3: "}),
+        UILabel.new(0,0,20,{alignment="center",text="Empty"}),
+        UILabel.new(0,0,20,{alignment="center", text="player4: "}),
+        UILabel.new(0,0,20,{alignment="center",text="Empty"})
     }
 }
