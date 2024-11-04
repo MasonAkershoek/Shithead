@@ -1,11 +1,22 @@
+-- MsUI (Mason's simple User Interface) a UI Library for Love2D
+-- @author Mason Akershoek (masonakershoek@gmail.com)
+
+--- This objects serves as a base object for all other UIObjects and shouldnt ever be used as standalone
 UINode = setmetatable({}, {__index = Moveable})
 UINode.__index = UINode
 
+--- Object Constructor for the UINode Object
+---@param x int "X Position of the Node"
+---@param y int "Y Position of the Node"
+---@param w int "Width of the Node"
+---@param h int "Height of the Node"
+---@param args table "This table contains extra options for any of the UI objects"
+---@return table "Returns a UINode Object"
 function UINode.new(x,y,w,h,args)
     local args = args or {}
     local self = setmetatable(Moveable.new(x,y,false), UINode)
 
-    self.T = "Node"
+    self.T = "UINode"
     
     self.size = Vector.new(w,h)
     self.centerPoint = nil
@@ -23,14 +34,19 @@ function UINode.new(x,y,w,h,args)
     return self
 end
 
+--- Gets The X Position of the UINode
+---@return integer
 function UINode:getX()
     return self.pos.x
 end
 
+--- Gets The Y Position of the UINode
+--- @return integer
 function UINode:getY()
     return self.pos.y
 end
 
+-- Move to UIBox class
 function UINode:setPadding(value)
     self.internalPadding = value or 0
 end
@@ -68,6 +84,9 @@ end
 function UINode:drawShadow()
     love.graphics.setColor(G:getColor("BLACK", .5))
     love.graphics.rectangle("fill", self.pos.x - (self.size.x/2) +5, self.pos.y - (self.size.y/2)+5, self.size.x, self.size.y, self.radius, self.radius)
+end
+
+function UINode:drawBorder(color)
 end
 
 -- UIBox class definition
@@ -205,6 +224,12 @@ end
 UILabel = setmetatable({}, {__index = UINode})
 UILabel.__index = UILabel
 
+--- Class UILabel
+--- Constructer for a UILabel
+---@param x integer
+---@param y integer
+---@param fontSize integer
+---@param args table "Posable arguments [text, widthLimit, alignment, color]"
 function UILabel.new(x,y,fontSize,args)
     local locArgs = args or {}
     local self = setmetatable(UINode.new(x,y,0,0,args), UILabel)
@@ -217,7 +242,7 @@ function UILabel.new(x,y,fontSize,args)
     self.color = locArgs.color or "WHITE"
 
     self.textGraphics = love.graphics.newText(G.FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
-    self.wdithLimit = self.textGraphics:getWidth() or 10
+    self.wdithLimit =  locArgs.widthLimit or self.textGraphics:getWidth() or 10
     self.textGraphics:setf(self.text, self.wdithLimit, self.alignment)
     self:setWidthAndHeight()
     return self
@@ -348,10 +373,16 @@ function UITextField.new(x,y,w,h,fontSize,args)
     self.selected = false
     self.maxLen = args.maxLen or 10
     self.color = args.color or "WHITE"
+    self.textColor = args.textColor or "WHITE"
     -- Text Field Text
     self.text = {}
-    self.textGraphics = UILabel.new(0,0,self.fontSize,{alignment="left", text="", color="BLACK"})
+    self.textGraphics = UILabel.new(0,0,self.fontSize,{alignment="left", text="", color=self.textColor})
     self.textGraphics:setPosImidiate(self.pos.x,self.pos.y)
+
+    -- Border stuff 
+    self.borderSize = args.borderSize or 0
+    self.borderColorSelected = args.borderColorSelected or "WHITE"
+    self.borderColor = args.borderColor or "WHITE"
 
     -- Temporary Text for Field
     self.tmpText = args.tmpText or ""
@@ -373,7 +404,7 @@ function UITextField:select()
     if self:checkMouseHover() and not self.selected and love.mouse.isDown(1) then
         logger:log("Text Field Selected")
         self.selected = true
-    elseif not self:checkMouseHover() and self.selected and love.mouse.isDown(1) then
+    elseif (not self:checkMouseHover() and self.selected and love.mouse.isDown(1)) or love.keyboard.isDown("escape") and self.selected then
         logger:log("Text Field Unselected")
         self.selected = false
     end  
@@ -404,6 +435,10 @@ function UITextField:backSpace()
     end
 end
 
+function UITextField:showCursor()
+    
+end
+
 function UITextField:update(dt)
     self:select()
     if self.selected and G.KEYBOARDMANAGER.keyPressFlag then
@@ -412,14 +447,16 @@ function UITextField:update(dt)
     end
 end
 
-function UITextField:showCursor()
-    
-end
-
 function UITextField:draw()
     if self.showShadow then
         self:drawShadow()
     end
+    if self.selected then
+        love.graphics.setColor(G:getColor(self.borderColorSelected))
+    else
+        love.graphics.setColor(G:getColor(self.borderColor))
+    end
+    love.graphics.rectangle("fill", self.pos.x - (self.size.x/2)-(self.borderSize/2), self.pos.y - (self.size.y/2)-(self.borderSize/2), self.size.x+self.borderSize, self.size.y+self.borderSize, self.radius, self.radius)
     love.graphics.setColor(G:getColor(self.color))
     love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
     if #self.text == 0 and not self.selected then

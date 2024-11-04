@@ -1,6 +1,10 @@
 -- functions.lua
 
 -- A simple function for checking if a value is contained in a list
+
+--- This function checks to see if a value <value> is inside a given table
+---@param value any
+---@param list table
 function ifIn(value, list)
     for x=1, #list do
         if value == list[x] then
@@ -10,6 +14,8 @@ function ifIn(value, list)
     return false
 end
 
+--- Takes in a table of objects that all contain a draw function and calls them in the order they appear in the list
+---@param list table
 function drawList(list)
     if #list ~= 0 then 
         for x=1, #list do
@@ -18,6 +24,9 @@ function drawList(list)
     end
 end
 
+--- Takes in a table of objects that all contain an update function and calls them in the order they appear in the list
+---@param list table
+---@param dt integer
 function updateList(list, dt)
     if #list ~= 0 then 
         for x=1, #list do
@@ -26,12 +35,17 @@ function updateList(list, dt)
     end
 end
 
+--- Takes two vectors and calculates the distance between them
+---@param newPos Vector
+---@param currentPos Vector
+---@return integer
 function calcDistance(newPos, currentPos)
     local dirx = newPos.x - currentPos.x
     local diry = newPos.y - currentPos.y
     return math.sqrt((dirx^2) + (diry^2))
 end
 
+-- Depreciate love has a built in function for this
 function getOS()
 	-- ask LuaJIT first
 	if jit then
@@ -47,6 +61,12 @@ function getOS()
 	return osname or "Windows"
 end
 
+-- Move somewhere else, This function is to spesific to shithead to be in this file
+
+--- This function checkks if a given card rank is a special card
+---@param pCardRank any
+---@param tCardRank any
+---@return boolean
 function checkCard(pCardRank, tCardRank)
     if ifIn(pCardRank, {2,5,8,10}) then
         return true
@@ -59,18 +79,16 @@ function checkCard(pCardRank, tCardRank)
     return false
 end
 
--- Event Callbacks
+-- Event Callbacks -- Depreciate
 function play()
 	G.mainMenu.exitFlag = true
 end
 
-function setMainMenu()
-    self.buttonBox:setPos(nil,G.SCREENVARIABLES["GAMEDEMENTIONS"].y-200)
-end
-
+--- This function sorts throiugh key presses to pass only the values requested
+---@param keyPress string
+---@return string
 function convertKeyPress(keyPress)
-    local letters = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
-    if ifIn(keyPress, letters) then
+    if #keyPress ==1 then
         return keyPress
     end
     if keyPress == "space" then  return " " end
