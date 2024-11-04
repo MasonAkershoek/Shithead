@@ -14,6 +14,9 @@ function Game.new()
 
     -- EventManager
     self.EVENTMANAGER = EventManager.new()
+    self.EVENTMANAGER:on("play", play)
+	self.EVENTMANAGER:on("quit", function() self:quit() end)
+	self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
 
     -- DisplayManager
     self.DISPLAYMANAGER = DisplayManager.new()
@@ -110,6 +113,12 @@ function Game:initGameScreens()
     self.cardTable = CardTable.new()
 end
 
+function Game:quit()
+    logger:log("Total Time Played:",G.mainTimePassed)
+    logger:close()
+    love.event.quit()
+end
+
 function Game:loadSounds()
 
 end
@@ -204,11 +213,6 @@ function Game:update(dt)
         self.cardTable:update(dt)
     else
         self.mainMenu:update(dt)
-    end
-    if love.keyboard.isDown("q") then
-        logger:log("Total Time Played:",G.mainTimePassed)
-        logger:close()
-        love.event.quit()
     end
     self.EVENTMANAGER:update(dt)
     self.TIMERMANAGER:update(dt)

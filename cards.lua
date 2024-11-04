@@ -45,10 +45,9 @@ function Card.new(newRank, newSuit, nx, ny)
     self.burnParticals:setLinearAcceleration(100, -200, -100, 0)
     self.burnParticals:setColors(255, 255, 255, 255, 255, 255, 255, 0)
     self.burnParticals:setSpeed(10,10)
-    self.burnParticals:setSpread( 0 )
-    self.particalPos = {}
-    self.particalPos.x = self.pos.x
-    self.particalPos.y = self.pos.y
+    self.burnParticals:setSpread( 2 )
+    self.burnParticals:setEmissionArea("uniform", (self.texture:getWidth()/2)*self.scale.x, (self.texture:getHeight()/2)*self.scale.y)
+    self.burnParticals:setEmissionRate(2)
     -----------------------------------------------------------
 
     return self
@@ -212,7 +211,11 @@ function Card:update(dt)
     self:move(dt)
     self:floatingAnimation(dt)
     self:flipAnimation()
-    self.burnParticals:update(dt)
+    if self.fliped and self.rank==10 then
+        self.burnParticals:update(dt)
+        self.burnParticals:setSizes(self.scale.x)
+        self.burnParticals:setEmissionArea("uniform", math.abs((self.texture:getWidth()/2)*self.scale.x), math.abs((self.texture:getHeight()/2)*self.scale.y))
+    end
     self:op8(dt)
 end
 
@@ -227,7 +230,18 @@ function Card:draw()
     love.graphics.draw(self.texture, self.pos.x, self.pos.y, 0, self.scale.x, self.scale.y, (self.size.x/2), (self.size.y/2), self.skew.x, self.skew.y)
     love.graphics.setColor({1,1,1,1})
     love.graphics.setShader()
-    love.graphics.draw(self.burnParticals, self.particalPos.x, self.particalPos.y)
+    if self.fliped and self.rank==10 then
+        love.graphics.draw(self.burnParticals, self.pos.x, self.pos.y)
+    end
+    
+    if not _RELESE_MODE then
+        if self.deadZone then
+            love.graphics.setColor(G:getColor("RED"))
+            love.graphics.point(self.deadZone.t1.x, self.deadZone.t1.y)
+            love.graphics.point(self.deadZone.t2.x, self.deadZone.t2.y)
+            love.graphics.setColor({1,1,1,1})
+        end
+    end
 end
 
 Deck = setmetatable({}, {__index = Sprite})

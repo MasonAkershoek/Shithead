@@ -17,6 +17,7 @@ require "mainmenu"
 require "opponent"
 require "cardtable"
 require "math"
+local utf8 = require("utf8")
 
 --[[
 TO-DO List
@@ -42,15 +43,12 @@ To-Do Before demo
 function love.load()
 	math.randomseed(os.time())
 	push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["SCREENSIZE"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
-	G.EVENTMANAGER:on("play", play)
-	G.EVENTMANAGER:on("quit", function() love.event.quit() end)
-	G.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
 	G:initGameScreens()
-	tmp = UITextField.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2+200,400,50,20,{showShadow=true,radius=10,maxLen=20,tmpText="Enter Your Name"})
-end
+	myTextField = UITextField.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2+200,400,50,20,{showShadow=true,radius=9,maxLen=20,tmpText="Enter Your Name",borderColorSelected="BLUE",borderColor="YELLOW",borderSize=5,textColor="BLACK"})
 
--- Error Handling
-local utf8 = require("utf8")
+	-- FPS DISPLAY
+	fps = UILabel.new(100,100,20, {widthLimit=150, alignment=center})
+end
 
 local function error_printer(msg, layer)
 	print((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
@@ -189,12 +187,14 @@ end
 function love.update(dt)
     G:update(dt)
 	TEsound.cleanup()
-	tmp:update(dt)
+	--myTextField:update(dt)
 	G.KEYBOARDMANAGER.keyPressFlag = false
+	fps:setText("FPS: " .. love.timer.getFPS())
 end
   
   
 function love.draw()   
 	G:draw()
-	tmp:draw()
+	fps:draw()
+	--myTextField:draw()
 end

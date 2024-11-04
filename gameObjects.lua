@@ -16,6 +16,7 @@ function Node.new(nx,ny)
     -- Node Position and tansformations
     self.pos = Vector.new(nx,ny)
     self.size = Vector.new(1,1)
+    self.deadZone = nil
     self.baseScale = 1
     self.scale = Vector.new(self.baseScale,self.baseScale)
     self.skew = Vector.new(0,0)
@@ -33,6 +34,60 @@ end
 
 function Node:getHeight()
     return self.size.y * self.scale.y
+end
+
+--- Class: Node
+--- Gets the center position of the node, or the the topleft, topright, bottomleft and bottomright points of the node
+--- Needs updating, change the get width and hight functions to translate the with and height with the scale
+---@param pos string ["center", "topleft", "topright", "bottomleft", "bottomright"] default "center"
+---@return vector
+function Node:getPos(pos)
+    local pos = pos or "center"
+    local ret = Vector.new()
+    if pos == "center" then
+        return self.pos
+        
+    elseif pos == "topleft" then
+        ret.x = (self.pos.x - ((self.size.x * self.scale.x)/2))
+        ret.y = (self.pos.y - ((self.size.y * self.scale.y)/2))
+
+    elseif pos == "topright" then
+        ret.x = (self.pos.x + ((self.size.x * self.scale.x)/2))
+        ret.y = (self.pos.y - ((self.size.y * self.scale.y)/2))
+
+    elseif pos == "bottomleft" then
+        ret.x = (self.pos.x - ((self.size.x * self.scale.x)/2))
+        ret.y = (self.pos.y + ((self.size.y * self.scale.y)/2))
+
+    elseif pos == "bottomright" then
+        ret.x = (self.pos.x + ((self.size.x * self.scale.x)/2))
+        ret.y = (self.pos.y + ((self.size.y * self.scale.y)/2))
+        
+    elseif pos == "centerleft" then
+        ret.x = (self.pos.x - ((self.size.x * self.scale.x)/2))
+        ret.y = self.pos.y
+
+    elseif pos == "centerright" then
+        ret.x = (self.pos.x + ((self.size.x * self.scale.x)/2))
+        ret.y = self.pos.y
+        
+    elseif pos == "centertop" then
+        ret.x = self.pos.x
+        ret.y = (self.pos.y - ((self.size.y * self.scale.y)/2))
+
+    elseif pos == "centerbottom" then
+        ret.x = self.pos.x
+        ret.y = (self.pos.y + ((self.size.y * self.scale.y)/2))
+    end
+    return ret
+            
+end
+
+--- Class: Node
+--- This function sets the mouse hover dead zone of the node object and is decendant classes
+---@param deadZone table
+function Node:setDeadZone(deadZone)
+    self.deadZone = deadZone
 end
 
 function Node:setScale(nxs,nys)
@@ -70,12 +125,29 @@ function Node:setPos(nx,ny)
     end
 end
 
+--- this function is only to be called by the checkMouseHover method and checks if the mouse is inside the dead zone
+---@param mx integer
+---@param my integer
+---@return boolean
+function Node:checkDeadZoneMouseHover(mx,my)
+    -- Check the dead Zone
+    if self.deadZone ~= nil then
+        if mx > self.deadZone.t1.x and mx < self.deadZone.t2.x then
+            return true
+        end
+    else   
+        return false
+    end
+end
+
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
     local mousex, mousey = push:toGame(mousex, mousey)
     if mousex > (self.pos.x - ((self.size.x * self.scale.x)/2)) and mousex < (self.pos.x + ((self.size.x * self.scale.x)/2)) then
         if mousey > (self.pos.y - ((self.size.y * self.scale.y)/2)) and mousey < (self.pos.y + ((self.size.y * self.scale.y)/2)) then
-            return true
+            if not self:checkDeadZoneMouseHover(mousex,mousey) then
+                return true 
+            end
         end
         return false
     end

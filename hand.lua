@@ -34,6 +34,20 @@ function Hand:addCardToHand(newCard)
     table.insert(self.cards, newCard)
 end
 
+function Hand:setDeadZones()
+    if #self.cards > 1 then
+        for x=#self.cards, 2, -1 do
+            local deadZone={}
+            deadZone.t1 = self.cards[x]:getPos("centerleft")
+            deadZone.t2 = self.cards[x-1]:getPos("centerright")
+            if deadZone.t1.x > deadZone.t2.x then
+                self.cards[x-1]:setDeadZone(nil)
+            end
+            self.cards[x-1]:setDeadZone(deadZone)
+        end
+    end
+end
+
 function Hand:check(hand, topCard)
     availableCards = 0
     for x=1, #hand do
@@ -243,6 +257,7 @@ function Hand:update(dt)
     self:checkSelect()
     self:sortByRank()
     self:updatePos(self.cards)
+    self:setDeadZones()
     updateList(self.cards, dt)
     updateList(self.dockBottom, dt)
     updateList(self.dockTop, dt)

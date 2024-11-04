@@ -50,7 +50,7 @@ function CardTable.new()
 end
 
 function CardTable:initOpponents()
-    for x=1, 4 do
+    for x=1, 25 do
         self.opa:addOpponent(Opponent.new(("Opponent " .. tostring(x)), "resources/graphics/face.png"))
     end
     self.opa:updatePos(self.opa.opponents, true, true)
@@ -200,7 +200,7 @@ function CardTable:gameLogic()
     -- Logic for picking up the deck
     elseif G.gamestate == "PICKUP" then
         if self.dealTimer:isExpired() then
-            self.dealTimer:reset(.05)
+            self.dealTimer:reset(.02)
             if G.turn < (#self.opa.opponents + 1) then
                 self.opa.opponents[G.turn]:addCardToHand(self.cardPile:getCard()) 
             else

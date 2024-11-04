@@ -42,7 +42,7 @@ function MainMenu:initTitleCards()
         tmp.cardFace = G.CARDGRAPHICS["CARDLETTERS"]["card" .. G.CARDSUITS[suit] .. self.title[self.titleIndex]]
         tmp.active = false
         self.titleIndex = self.titleIndex + 1
-        --tmp.mouseMoveable = true
+        tmp.mouseMoveable = true
         self.titleCards:addCard(tmp)
         TEsound.pitch("deal", self.pitch)
         self.pitch = self.pitch + .005
