@@ -98,6 +98,12 @@ UIBox.__index = UIBox
     object to take to make the movment feel more fluid 
 ]]
 
+--- Class: UIBox
+--- Constructor method for the UIBox class
+---@param w integer
+---@param h integer
+---@param args table ["position[1-2].x/y", "alignment", "content", "positions", "borderSize", "color"]
+---@return UIBox
 function UIBox.new(w,h,args)
     local args = args or {}
     local x = args.positions[1].x or 0
@@ -291,6 +297,14 @@ end
 UIButton = setmetatable({}, {__index = UINode})
 UIButton.__index = UIButton
 
+--- Class: UIButton
+--- This is the Constructor for the UIButton Class
+---@param x integer
+---@param y integer
+---@param w integer
+---@param h integer
+---@param args table "Posable arguments [action, text, color, textFontSize]"
+---@return UIButton
 function UIButton.new(x,y,w,h,args)
     local args = args or {}
     local self = setmetatable(UINode.new(x,y,w,h,args), UIButton)

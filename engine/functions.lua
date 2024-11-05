@@ -95,3 +95,7 @@ function convertKeyPress(keyPress)
     if keyPress == "backspace" then return keyPress end
     return ""
 end
+
+function setMainMenu()
+    G.gameScreen = 0
+end
