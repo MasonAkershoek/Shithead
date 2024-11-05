@@ -50,7 +50,7 @@ function CardTable.new()
 end
 
 function CardTable:initOpponents()
-    for x=1, 52 do
+    for x=1, 4 do
         self.opa:addOpponent(Opponent.new(("Opponent " .. tostring(x)), "resources/graphics/face.png"))
     end
     self.opa:updatePos(self.opa.opponents, true, true)
