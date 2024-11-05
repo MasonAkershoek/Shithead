@@ -30,6 +30,7 @@ function MainMenu.new()
 
     self.demoBox = UIBox.new(600,350,DemoDef)
     self.buttonBox = UIBox.new(1000,150,ButtonBoxDef)
+    --self.signInBox = UIBox.new(500,250, {positions[1].x = G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2})
     logger:log("MainMenu Created")
     return self
 end

@@ -17,6 +17,8 @@ function Game.new()
     self.EVENTMANAGER:on("play", play)
 	self.EVENTMANAGER:on("quit", function() self:quit() end)
 	self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
+    self.EVENTMANAGER:on("setMainMenu", function() G:changeScreen(0) end)
+    self.EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
 
     -- DisplayManager
     self.DISPLAYMANAGER = DisplayManager.new()
@@ -220,6 +222,13 @@ end
 
 function Game:changeScreen(index)
     self.gameScreen = index
+    if index == 1 then
+        self.mainMenu = nil
+        self.mainMenu = MainMenu.new()
+    else
+        self.cardTable = nil
+        self.cardTable = CardTable.new()
+    end
     logger:log("Screen Changed to " .. index)
 end
 

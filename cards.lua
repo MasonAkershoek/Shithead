@@ -233,15 +233,6 @@ function Card:draw()
     if self.fliped and self.rank==10 then
         love.graphics.draw(self.burnParticals, self.pos.x, self.pos.y)
     end
-    
-    if not _RELESE_MODE then
-        if self.deadZone then
-            love.graphics.setColor(G:getColor("RED"))
-            love.graphics.point(self.deadZone.t1.x, self.deadZone.t1.y)
-            love.graphics.point(self.deadZone.t2.x, self.deadZone.t2.y)
-            love.graphics.setColor({1,1,1,1})
-        end
-    end
 end
 
 Deck = setmetatable({}, {__index = Sprite})
@@ -262,14 +253,25 @@ function Deck.new(nx, ny)
     return self
 end
 
+function Deck.shuffle()
+    local tmp = {}
+    for x=1, 52 do
+        table.insert(tmp,#tmp+1,self:getRandCard())
+    end
+    self.cards = tmp
+    self.usedCards = {}
+end
+
 -- This method generates all cards in the deck
 function Deck:buildDeck(x,y)
     local tmp = {}
+    local posIndex = 0
     for i=1, 4 do
         for j=1, 13 do
-            local newCard = Card.new(j,i, self.pos.x, self.pos.y)
+            local newCard = Card.new(j,i, self.pos.x+posIndex, self.pos.y-posIndex)
             newCard.mouseMoveable = false
             table.insert(tmp, newCard)
+            posIndex = posIndex + .5
         end
     end
     return tmp
@@ -285,13 +287,19 @@ function Deck:addDiscard(newCard)
     
 end
 
-function Deck:getCard()
+function Deck:getRandCard()
     local randCard = math.random(52)
     while self:checkUsedCards(randCard) do
         randCard = math.random(52)
     end
     table.insert(self.usedCards, randCard)
     return self.cards[randCard]
+end
+
+function Deck:getDeal()
+    local tmp = self.cards[#self.cards]
+    table.remove(self.cards, #self.cards)
+    return tmp
 end
 
 function Deck:checkUsedCards(cardNum)
@@ -307,7 +315,7 @@ end
 
 function Deck:draw()
     if #self.usedCards < 52 then
-        love.graphics.draw(self.texture, self.pos.x, self.pos.y, 0, 1, 1, self.size.x/2, self.size.y/2)
+        drawList(self.cards)
     end
     drawList(self.discard)
 end

@@ -5,6 +5,10 @@
 Node = {}
 Node.__index = Node
 
+--- Class: Node
+--- Constructer method for the Node class
+---@param nx integer
+---@param ny integer
 function Node.new(nx,ny)
     nx = nx or 0
     ny = ny or 0
@@ -33,7 +37,7 @@ function Node:getWidth()
 end
 
 function Node:getHeight()
-    return self.size.y * self.scale.y
+    return (self.size.y * self.scale.y)
 end
 
 --- Class: Node
@@ -90,6 +94,12 @@ function Node:setDeadZone(deadZone)
     self.deadZone = deadZone
 end
 
+--- Class: Node
+--- Method sets the visual scale of the node object and its decendants
+--- one or both paramaters can be passed depending on what scale you want to change
+--- for x pass nil if you dont want to change it but want to change y
+---@param nxs integer
+---@param nys integer
 function Node:setScale(nxs,nys)
     nxs = nxs or nil
     nys = nys or nil
@@ -114,6 +124,11 @@ function Node:setSkew(nxs,nys)
     end
 end
 
+--- Class: Node
+--- This method sets the x or y or both positions of the node object
+--- One or both paramaters can be passed depending on what value you want to change
+---@param nx integer
+---@param ny integer
 function Node:setPos(nx,ny)
     nx = nx or nil
     ny = ny or nil
@@ -125,6 +140,7 @@ function Node:setPos(nx,ny)
     end
 end
 
+--- Class: Node
 --- this function is only to be called by the checkMouseHover method and checks if the mouse is inside the dead zone
 ---@param mx integer
 ---@param my integer
@@ -140,11 +156,15 @@ function Node:checkDeadZoneMouseHover(mx,my)
     end
 end
 
+--- Class: Node
+--- This method is used to check if the mouse is currently hovering over he node object
+--- It takes into account scale and deadzones
+---@return boolean
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
     local mousex, mousey = push:toGame(mousex, mousey)
-    if mousex > (self.pos.x - ((self.size.x * self.scale.x)/2)) and mousex < (self.pos.x + ((self.size.x * self.scale.x)/2)) then
-        if mousey > (self.pos.y - ((self.size.y * self.scale.y)/2)) and mousey < (self.pos.y + ((self.size.y * self.scale.y)/2)) then
+    if mousex > (self.pos.x - self:getWidth()/2) and mousex < (self.pos.x + self:getWidth()/2) then
+        if mousey > (self.pos.y - self:getHeight()/2) and mousey < (self.pos.y + self:getHeight()/2) then
             if not self:checkDeadZoneMouseHover(mousex,mousey) then
                 return true 
             end
@@ -277,10 +297,6 @@ function Sprite:initSprite()
     self.texture:setFilter("nearest", "nearest", 5)
 end
 
-function Sprite:update()
-    
-end
-
 function Sprite:draw()
     love.graphics.setColor({1,1,1,self.transparency})
     love.graphics.draw(self.texture, self.pos.x, self.pos.y, self.rotation, self.scale.x, self.scale.y, self.size.x/2, self.size.y/2)
@@ -295,17 +311,22 @@ function Vector.new(x,y)
     local self = setmetatable({}, Vector)
 
     self.T = "Vector"
-
-    x=x or 0
-    x=x or 0
-    self.x = x
-    self.y = y
+    self.x = x or 0
+    self.y = y or 0
     return self
 end
 
 function Vector:setVect(x, y)
     self.x = x
     self.y = y
+end
+
+function Vector:getX()
+    return self.x
+end
+
+function Vector:getY()
+    return self.y    
 end
 
 function Vector:checkDistance(otherVect, space)

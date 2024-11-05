@@ -41,6 +41,7 @@ To-Do Before demo
 
 
 function love.load()
+	OS = love.system.getOS()
 	math.randomseed(os.time())
 	push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["SCREENSIZE"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
 	G:initGameScreens()

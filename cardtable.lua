@@ -50,7 +50,7 @@ function CardTable.new()
 end
 
 function CardTable:initOpponents()
-    for x=1, 25 do
+    for x=1, 52 do
         self.opa:addOpponent(Opponent.new(("Opponent " .. tostring(x)), "resources/graphics/face.png"))
     end
     self.opa:updatePos(self.opa.opponents, true, true)
@@ -60,16 +60,16 @@ end
 function CardTable:deal()
     if self.dealTimer:isExpired() then
         self.dealTimer:reset()
-        if #self.deck.usedCards ~= 52 then
+        if #self.deck.cards > 0 then
             if self.dealNum <= #self.opa.opponents then 
-                self.opa:deal(self.deck:getCard(), self.dealNum)
+                self.opa:deal(self.deck:getDeal(), self.dealNum)
             else
                 if #self.playerHand.dockBottom < 3 then
-                self.playerHand:addDockBottom(self.deck:getCard())
+                self.playerHand:addDockBottom(self.deck:getDeal())
                 elseif #self.playerHand.dockTop < 3 then
-                    self.playerHand:addDockTop(self.deck:getCard())
+                    self.playerHand:addDockTop(self.deck:getDeal())
                 else
-                    self.playerHand:addCardToHand(self.deck:getCard())
+                    self.playerHand:addCardToHand(self.deck:getDeal())
                 end
             end
             self.dealNum = self.dealNum + 1
@@ -134,7 +134,7 @@ function CardTable:gameLogic()
 
                 if self.topCard == 10 then
                     G:setState(3)
-                    self.dealTimer:reset(.5)
+                    self.dealTimer:reset(1)
                 end
             else
                 self.topCard = 0 
@@ -219,7 +219,6 @@ function CardTable:draw()
     self.playerHand:draw()
     self.opa:draw()
     self.cardPile:draw()
-    self.deck:draw()
     self.playButton:draw()
     if G.gamestate == "WIN" then
         self.winbox:draw()
@@ -277,7 +276,8 @@ WINBOXDEF = {
             alignment="center",
             text=" WINS!!!\n"
         }
-    )
+        ),
+        UIButton.new(0,0,200,100,{action="setMainMenu", color="RED", text="Main Menu", textFontSize=20})
     }
 }
 
