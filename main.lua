@@ -1,7 +1,6 @@
 -- Comunity Librarys
 push = require "librarys.push"
 require "librarys.tesound"
-moonshine = require 'librarys.moonshine'
 require "math"
 if not _RELESE_MODE then
 	require "librarys.lovedebug"
