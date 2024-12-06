@@ -8,8 +8,11 @@ Hand.__index = Hand
 function Hand.new(nx, ny)
     local self = setmetatable(HboxContainer.new(nx,ny), Hand)
     self.cards = {}
+    self.handEmpty = true
     self.tmpHand = {}
+    self.dockBottomEmpty = true
     self.dockBottom = {}
+    self.dockTopEmpty = true
     self.dockTop = {}
     self.area = (G.SCREENVARIABLES["GAMEDEMENTIONS"].x * .25)
     self.dockArea = self.area - 170
@@ -181,8 +184,19 @@ function Hand:sortByRank()
     end
 end
 
+function Hand:empty()
+    local tmp
+    if not self.handEmpty then
+        return table.remove(self.cards)
+    elseif not self.dockTopEmpty then
+        return table.remove(self.dockTop)
+    elseif not self.dockBottomEmpty then
+        return table.remove(self.dockBottom)
+    end 
+end
+
 function Hand:getCard()
-    tmp = nil
+    local tmp = nil
     if #self.cards > 0 then
         for x=1, #self.cards do
             if self.cards[x].selected then
@@ -254,6 +268,9 @@ function Hand:draw()
 end
 
 function Hand:update(dt)
+    if #self.cards > 0 then self.handEmpty = false else self.handEmpty = true end
+    if #self.dockBottom > 0 then self.dockBottomEmpty = false else self.dockBottomEmpty = true end
+    if #self.dockTop > 0 then self.dockTopEmpty = false else self.dockTopEmpty = true end
     self:checkSelect()
     self:sortByRank()
     self:updatePos(self.cards)

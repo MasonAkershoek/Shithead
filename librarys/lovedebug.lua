@@ -90,6 +90,7 @@ _Debug.handleError = function(err)
 	if _DebugSettings.MultipleErrors == false then
 		for i,v in pairs(_Debug.errors) do
 			if v == err then
+				logger:log(v)
 				return --Don't print the same error multiple times!
 			end
 		end

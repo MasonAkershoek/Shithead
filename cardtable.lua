@@ -8,10 +8,12 @@ CardTable.__index = CardTable
 function CardTable.new()
     local self = setmetatable({}, CardTable)
 
+    love.graphics.setLineStyle("smooth")
     self.T = "CardTable"
 
     -- Table Deck
     self.deck = Deck.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
+    self.deck:shuffle()
     -- Card Pile 
     self.cardPile = CardPile.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
 
@@ -42,9 +44,8 @@ function CardTable.new()
     self.pitch = 1
     self.dealNum = 1
     self.dealTimer = Timer.new(.05)
-    G.turnTimer = Timer.new(3)
+    G.turnTimer = Timer.new(1)
     self.burnIndex = 1
-    self.turnBuffer = 0
 
     return self
 end
@@ -112,6 +113,12 @@ function CardTable:checkWin()
     end
 end
 
+function CardTable:reset()
+    G.gamestate = G.GAMESTATES[1]
+    --self.deck = Deck.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,(G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2 - 100))
+
+end
+
 function CardTable:gameLogic()
     -- Logic for dealing the cards
     if G.gamestate == "DEAL" then
@@ -135,14 +142,15 @@ function CardTable:gameLogic()
                 if self.topCard == 10 then
                     G:setState(3)
                     self.dealTimer:reset(1)
+                    G.turnTimer:stopTimer()
                 end
             else
                 self.topCard = 0 
             end
 
             if G.turn < (#self.opa.opponents + 1) then
-                if self.turnBuffer == 0 then
-                    self.turnBuffer = 50
+                if G.turnTimer:isExpired() then
+                    G.turnTimer:reset()
                     local tmp = self.opa.opponents[G.turn]:turn(self.topCard)
                     if tmp == false then
                         G:setState(4)
@@ -153,25 +161,23 @@ function CardTable:gameLogic()
                     if G.gamestate == "TURN" then
                         G:nextTurn()
                     end
-                else
-                self.turnBuffer = self.turnBuffer - 1 
                 end
             else
-                if self.turnBuffer == 0 then
+                if G.turnTimer:isExpired() then
                     local tmp = self.playerHand:checkHand(self.topCard)
                     if tmp then
                         if G.playerPlayButton then
                             G.playerPlayButton = false
                             local playerCard = self.playerHand:getCard()
                             if playerCard ~= nil then
-                                self.turnBuffer = 50
+                                G.turnTimer:reset()
                                 print(playerCard.rank, self.cardPile:getTopCard())
                                 if checkCard(playerCard.rank, self.cardPile:getTopCard()) then
                                     G:nextTurn()
                                 else
                                     G:setState(4)
                                     self.dealTimer:reset(.5)
-                                    self.turnBuffer = 50
+                                    G.turnTimer:reset()
                                 end
                                 self.cardPile:addCard(playerCard)
                             end
@@ -179,10 +185,8 @@ function CardTable:gameLogic()
                     else
                         G:setState(4)
                         self.dealTimer:reset(.5)
-                        self.turnBuffer = 50
+                        G.turnTimer:reset()
                     end
-                else
-                    self.turnBuffer = self.turnBuffer - 1 
                 end
                 G:nextTurn(true)
             end
@@ -194,6 +198,7 @@ function CardTable:gameLogic()
             self.dealTimer:reset(.05)
             self.cardPile.cards[#self.cardPile.cards].burnParticals:emit(20)
             self.deck:addDiscard(self.cardPile:getCard())
+            G.turnTimer:start()
             if #self.cardPile.cards <= 0 then G:setState(2) self.dealTimer:stopTimer() end
         end
 
@@ -211,7 +216,23 @@ function CardTable:gameLogic()
     
     elseif G.gamestate == "WIN" then
 
-    end    
+    elseif G.gamestate == "CLEANUP" then
+        if self.winbox.active then self.winbox:setActive() end
+        if self.dealTimer.stopped then self.dealTimer:start() end
+        if self.dealTimer:isExpired() then
+            self.dealTimer:reset(.05)
+            local tmp = self.playerHand:empty()
+            local tmp2 = self.opa:empty()
+            local tmp3 = self.cardPile:empty()
+            if not tmp and not tmp2 then 
+                G:changeScreen(0)
+            else 
+                if tmp then self.deck:addDiscard(tmp) end
+                if tmp2 then self.deck:addDiscard(tmp2) end
+                if tmp3 then self.deck:addDiscard(tmp3) end
+            end
+        end
+    end
 end
 
 function CardTable:draw()
@@ -220,9 +241,8 @@ function CardTable:draw()
     self.opa:draw()
     self.cardPile:draw()
     self.playButton:draw()
-    if G.gamestate == "WIN" then
-        self.winbox:draw()
-    end
+    drawList(self.deck.discard)
+    self.winbox:draw()
     if not _RELESE_MODE then
         self.dbBox:draw()
     end
@@ -230,6 +250,7 @@ end
 
 function CardTable:update(dt)
     self.dealTimer:update(dt)
+    G.turnTimer:update(dt)
     self.cardPile:update(dt)
     self:gameLogic()
     self.playerHand:update(dt)
@@ -237,9 +258,7 @@ function CardTable:update(dt)
     self.deck:update(dt)
     self.playButton:update(dt)
     self.dbBox:update(dt)
-    if G.gamestate == "WIN" then
-        self.winbox:update(dt)
-    end
+    self.winbox:update(dt)
     if not _RELESE_MODE then 
         local index = 1
         for x=3, #self.dbBox.contents, 2 do
@@ -257,45 +276,3 @@ function CardTable:update(dt)
         end
     end
 end
-
--- UIDefinitions for the CardTable
-
--- Definition for Win Box
-WINBOXDEF = {
-    radius=10, 
-    padding=10, 
-    borderSize=10,
-    alignment="right",
-    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,-100),Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2)},
-    contents={
-        UILabel.new(
-        G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,
-        G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2,
-        20,
-        {
-            alignment="center",
-            text=" WINS!!!\n"
-        }
-        ),
-        UIButton.new(0,0,200,100,{action="setMainMenu", color="RED", text="Main Menu", textFontSize=20})
-    }
-}
-
-DEBUGBOXDEF = {
-    radius = 10,
-    padding = 0,
-    borderSize = 10,
-    alignment = "Vertical",
-    positions={Vector.new(-500, G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2),Vector.new(350, G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2)},
-    contents={
-        UILabel.new(0,0,50,{alignment="center", text="Debug Menu"}),
-        UILabel.new(0,0,20,{alignment="center", text="player1: "}),
-        UILabel.new(0,0,20,{alignment="center",text="Empty"}),
-        UILabel.new(0,0,20,{alignment="center", text="player2: "}),
-        UILabel.new(0,0,20,{alignment="center",text="Empty"}),
-        UILabel.new(0,0,20,{alignment="center", text="player3: "}),
-        UILabel.new(0,0,20,{alignment="center",text="Empty"}),
-        UILabel.new(0,0,20,{alignment="center", text="player4: "}),
-        UILabel.new(0,0,20,{alignment="center",text="Empty"})
-    }
-}

@@ -60,29 +60,27 @@ function Card:getCardFace()
 end
 
 -- This method handles the logic for hovering over the cards
-function Card:onHover()
-    if not self.flipping then
-        if self:checkMouseHover() then
-            if self.hoverFlag then
-                self.scale.x = self.scale.x + .30
-                self.scale.y = self.scale.y + .30
-                self.hoverFlag = false
-            else
-                if self.scale.x >= self.baseScale +.2 then
-                    self.scale.x = self.scale.x - .1
-                    self.scale.y = self.scale.y - .1
-                end
-            end
-        elseif self.scale.x ~= self.baseScale then
-            if self.scale.x > self.baseScale and not self.flipping then
-                self.scale.x = self.scale.x - .1
-                self.scale.y = self.scale.y - .1
-            elseif not self.flipping and self.scale.x ~= self.baseScale then
-                self.scale.x = self.baseScale
-                self.scale.y = self.baseScale
-                self.hoverFlag = true
+function Card:onHover(dt)
+    -- If the card is flipping instantly return
+    if self.flipping then return end
+    
+    if self:checkMouseHover() then
+        if self.hoverFlag then
+            self.scale.x = self.scale.x + .30
+            self.scale.y = self.scale.y + .30
+            self.hoverFlag = false
+        else
+            if self.scale.x >= self.baseScale +.2 then
+                self.scale.x = math.max(self.scale.x - (3.5 * dt), self.baseScale)
+                self.scale.y = math.max(self.scale.y - (3.5 * dt), self.baseScale)
             end
         end
+    elseif self.scale.x ~= self.baseScale then
+        if self.scale.x > self.baseScale then
+            self.scale.x = math.max(self.scale.x - (3.5 * dt), self.baseScale)
+            self.scale.y = math.max(self.scale.y - (3.5 * dt), self.baseScale)
+        end
+        if self.scale.x == self.baseScale then self.hoverFlag = true end
     end
 end
 
@@ -149,13 +147,14 @@ end
 function Card:flipAnimation()
     if self.flipping then
         if self.flipFlag then
-            self.scale.x = self.scale.x + .09
+            self.scale.x = self.scale.x + (5 * love.timer.getDelta())
             if self.scale.x >= self.baseScale then
+                self:setScale(self.baseScale, self.baseScale)
                 self.flipping = false
                 self.flipFlag = false
             end
         else
-            self.scale.x = self.scale.x - .09
+            self.scale.x = self.scale.x - (5 * love.timer.getDelta())
             if self.scale.x <= 0 then
                 self.flipFlag = true
                 if self.fliped then
@@ -207,7 +206,7 @@ function Card:update(dt)
         self.newSelectFlag = fasle
     end
     self:onSelect() 
-    self:onHover()
+    self:onHover(dt)
     self:move(dt)
     self:floatingAnimation(dt)
     self:flipAnimation()
@@ -253,10 +252,14 @@ function Deck.new(nx, ny)
     return self
 end
 
-function Deck.shuffle()
+function Deck:shuffle()
     local tmp = {}
+    local posIndex = 0
     for x=1, 52 do
-        table.insert(tmp,#tmp+1,self:getRandCard())
+        local tmpCard = self:getRandCard()
+        tmpCard:setPosImidiate(self.pos.x+posIndex, self.pos.y-posIndex)
+        table.insert(tmp,#tmp+1,tmpCard)
+        posIndex = posIndex + .5
     end
     self.cards = tmp
     self.usedCards = {}
@@ -278,7 +281,8 @@ function Deck:buildDeck(x,y)
 end
 
 function Deck:addDiscard(newCard)
-    newCard:setPos(-200, self.y)
+    newCard:setPos(-200, self.pos.y)
+    newCard:setScale(1, 1)
     if newCard.fliped then
         newCard.flipping = true
     end
@@ -317,7 +321,6 @@ function Deck:draw()
     if #self.usedCards < 52 then
         drawList(self.cards)
     end
-    drawList(self.discard)
 end
 
 function Deck:update(dt)
@@ -354,6 +357,10 @@ function CardPile:getCard()
     tmp.inCardPile = false
     table.remove(self.cards, #self.cards)
     return tmp
+end
+
+function CardPile:empty()
+    return table.remove(self.cards)
 end
 
 function CardPile:getTopCard(index)

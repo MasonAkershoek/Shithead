@@ -17,7 +17,7 @@ function MainMenu.new()
     self.exitDone = false
     self.flag = false
     self.pitch = 1
-    self.versionText = love.graphics.newText(G.GAMEFONT, {{0,0,0}, "Version: ", _GAME_VERSION})
+    self.versionText = love.graphics.newText(G.GAMEFONT, {{0,0,0}, "Version: ", GAME_VERSION})
 
     -- Menu Buttons
     self.buttonBoxTimer = Timer.new(1.5)
@@ -62,7 +62,7 @@ function MainMenu:exit()
     end
     if self.titleIndex == #self.title + 1 then self.exitDone = true end
     if self.exitDone and not self.flag then self.buttonBox:setActive() self.demoBox:setActive() self.flag = true end
-    if self.exitDone and not self.buttonBox.moving then G.gameScreen = 1 end
+    if self.exitDone and not self.buttonBox.moving then G:changeScreen(1) end
 end
 
 function MainMenu:update(dt)
@@ -142,61 +142,3 @@ function TitleCards:draw()
     drawList(self.cards)
     drawList(self.discard.cards)
 end
-
--- UIDefinitions for the Main Menu
-
--- Definition for Demo Box
-DemoDef = {
-    radius=10, 
-    padding=10, 
-    borderSize=10,
-    alignment="Horizontal",
-    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, -200), Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 200)},
-    contents={UILabel.new(
-        G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,
-        G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2,
-        20,
-        {
-            alignment="center",
-            text="Thank you for play testing Shithead! " .. 
-            "This is the first play test release " .. 
-            "of the game so expect some bugs and " .. 
-            "missing features. Please feel free to " ..
-            "send me any ideas for fetures that you " ..
-            "would like to see in the game or " ..
-            "problems you encounter during your test " ..
-            "\n\nThanks - Mason"
-        }
-    )
-    }
-}
-
--- Definition for Button Box
-ButtonBoxDef = {
-    radius=10,
-    padding=10,
-    borderSize=10,
-    alignment="Horizontal",
-    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 2000),Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.9074)},
-    contents={
-        UIButton.new(0,0,200,100, {radius=10, text="Play", color="BLUE", action="play"}),
-        UIButton.new(0,0,200,100, {radius=10, text="Multiplayer", color="YELLOW"}),
-        UIButton.new(0,0,200,100, {radius=10, text="Options", color="GREEN"}),
-        UIButton.new(0,0,200,100, {radius=10, text="Quit", color="RED",action="quit"})
-    }
-}
-
--- ESC Menu definition
-ESCMENUDEF = {
-    radius=10, 
-    padding=10, 
-    borderSize=10,
-    alignment="Vertical",
-    positions={Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2), Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2, 200)},
-    contents={
-        UILabel.new(0,0, 50, {alignment="center", text="Menu"}),
-        UIButton.new(0,0,200,100,{radius=10, text="Main Menu", color="RED", action="mainmenu"}),
-        UIButton.new(0,0,200,100,{radius=10, text="Options", color="RED", action="options"}),
-        UIButton.new(0,0,200,100,{radius=10, text="Quit", color="RED", action="quit"})
-    }
-}

@@ -1,22 +1,29 @@
+-- Comunity Librarys
 push = require "librarys.push"
-
+require "librarys.tesound"
+moonshine = require 'librarys.moonshine'
+require "math"
 if not _RELESE_MODE then
 	require "librarys.lovedebug"
 end
+
+-- Personal Librarys
 require "engine.logger"
-require "librarys.tesound"
-require "engine.components"
+require "librarys.mlib.lovecolors"
+require "librarys.mlib.mmen"
 require "engine.functions"
 require "gameObjects"
 require "gameData"
-moonshine = require 'librarys.moonshine'
 require "engine.UI"
+require "engine.event"
 require "hand"
 require "cards"
 require "mainmenu"
 require "opponent"
 require "cardtable"
-require "math"
+require "globals"
+require "uidefs"
+
 local utf8 = require("utf8")
 
 --[[
@@ -49,6 +56,7 @@ function love.load()
 
 	-- FPS DISPLAY
 	fps = UILabel.new(100,100,20, {widthLimit=150, alignment=center})
+	slowdown = 0
 end
 
 local function error_printer(msg, layer)
@@ -186,16 +194,22 @@ function love.keypressed(key,scancode,isrepeat)
 end
   
 function love.update(dt)
-    G:update(dt)
-	TEsound.cleanup()
-	--myTextField:update(dt)
-	G.KEYBOARDMANAGER.keyPressFlag = false
-	fps:setText("FPS: " .. love.timer.getFPS())
+	if slowdown == 0 then
+		slowdown = 1
+		G:update(dt)
+		TIMERMANAGER:update(dt)
+		EVENTMANAGER:update(dt)
+		TEsound.cleanup()
+		--myTextField:update(dt)
+		G.KEYBOARDMANAGER.keyPressFlag = false
+		--fps:setText("FPS: " .. love.timer.getFPS())
+	end
+	slowdown = slowdown - 1
 end
   
   
 function love.draw()   
 	G:draw()
-	fps:draw()
+	--fps:draw()
 	--myTextField:draw()
 end

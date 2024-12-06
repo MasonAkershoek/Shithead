@@ -82,7 +82,7 @@ function UINode:getRadius()
 end
 
 function UINode:drawShadow()
-    love.graphics.setColor(G:getColor("BLACK", .5))
+    love.graphics.setColor(lovecolors:getColor("BLACK", .5))
     love.graphics.rectangle("fill", self.pos.x - (self.size.x/2) +5, self.pos.y - (self.size.y/2)+5, self.size.x, self.size.y, self.radius, self.radius)
 end
 
@@ -118,8 +118,8 @@ function UIBox.new(w,h,args)
     self.active = false
     self.borderSize = args.borderSize or 10
     self.padding = args.padding or 0
-    self.borderColor = args.borderColor or G.COLORS["LIGHTGRAY"]
-    self.color = args.color or G.COLORS["DARKGRAY"]
+    self.borderColor = args.borderColor or "LIGHTGRAY"
+    self.color = args.color or "DARKGRAY"
     return self
 end
 
@@ -217,10 +217,10 @@ function UIBox:draw()
         self:drawShadow()
     end
     if self.showBorder then
-        love.graphics.setColor(G.COLORS["LIGHTGRAY"].r,G.COLORS["LIGHTGRAY"].g,G.COLORS["LIGHTGRAY"].b)
+        love.graphics.setColor(lovecolors:getColor("LIGHTGRAY"))
         love.graphics.rectangle("fill", self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x, self.size.y, self.radius,self.radius)
     end
-    love.graphics.setColor(G.COLORS["DARKGRAY"].r,G.COLORS["DARKGRAY"].g,G.COLORS["DARKGRAY"].b)
+    love.graphics.setColor(lovecolors:getColor("DARKGRAY"))
     love.graphics.rectangle("fill", self.pos.x-((self.size.x-self.borderSize)/2), self.pos.y-((self.size.y-self.borderSize)/2), self.size.x-self.borderSize, self.size.y-self.borderSize, self.radius, self.radius)
     drawList(self.contents)
 end
@@ -243,11 +243,12 @@ function UILabel.new(x,y,fontSize,args)
     self.T = "UILabel"
 
     self.fontSize = fontSize or 20
+    self.font = args.font or nil
     self.text = locArgs.text or "Empty!"
     self.alignment = locArgs.alignment or "left"
     self.color = locArgs.color or "WHITE"
 
-    self.textGraphics = love.graphics.newText(G.FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
+    self.textGraphics = love.graphics.newText(FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
     self.wdithLimit =  locArgs.widthLimit or self.textGraphics:getWidth() or 10
     self.textGraphics:setf(self.text, self.wdithLimit, self.alignment)
     self:setWidthAndHeight()
@@ -289,7 +290,7 @@ function UILabel:setWidthAndHeight()
 end
 
 function UILabel:draw()
-    love.graphics.setColor(G:getColor(self.color))
+    love.graphics.setColor(lovecolors:getColor(self.color))
     love.graphics.draw(self.textGraphics, self.pos.x, self.pos.y,0,1,1,self.size.x/2, self.size.y/2)
 end
 
@@ -337,7 +338,7 @@ function UIButton:onSelect()
     if self:checkMouseHover() then
         if love.mouse.isDown(1) and not self.oldmousedown then
             if self.action ~= nil then
-                G.EVENTMANAGER:emit(self.action)
+                EVENTMANAGER:emit(self.action)
                 self.clickTimer:start()
             else
                 print("No Action Supplied!")
@@ -361,9 +362,9 @@ function UIButton:draw()
     end
     self.textGraphics:setPosImidiate(self.pos.x,self.pos.y)
     if self.hoverFlag then
-        love.graphics.setColor(G:getColor(self.color,1,.2))
+        love.graphics.setColor(lovecolors:getColor(self.color,1,nil,.3))
     else
-        love.graphics.setColor(G:getColor(self.color)) 
+        love.graphics.setColor(lovecolors:getColor(self.color)) 
     end
     if self.clickTimer:isStopped() then
         love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
@@ -466,12 +467,12 @@ function UITextField:draw()
         self:drawShadow()
     end
     if self.selected then
-        love.graphics.setColor(G:getColor(self.borderColorSelected))
+        love.graphics.setColor(lovecolors:getColor(self.borderColorSelected))
     else
-        love.graphics.setColor(G:getColor(self.borderColor))
+        love.graphics.setColor(lovecolors:getColor(self.borderColor))
     end
     love.graphics.rectangle("fill", self.pos.x - (self.size.x/2)-(self.borderSize/2), self.pos.y - (self.size.y/2)-(self.borderSize/2), self.size.x+self.borderSize, self.size.y+self.borderSize, self.radius, self.radius)
-    love.graphics.setColor(G:getColor(self.color))
+    love.graphics.setColor(lovecolors:getColor(self.color))
     love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
     if #self.text == 0 and not self.selected then
         self.tmpTextGraphics:draw()

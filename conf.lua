@@ -1,9 +1,8 @@
 -- conf.lua
 
-_RELESE_MODE = true
+_RELESE_MODE = false
 _GAME_WIDTH = 1920
 _GAME_HEIGHT = 1080
-_GAME_VERSION = "0.0.6"
 
 function love.conf(t)
     t.version = "11.5"

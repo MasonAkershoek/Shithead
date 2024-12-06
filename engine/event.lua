@@ -49,5 +49,14 @@ Event = {}
 Event.__index = Event
 
 function Event.new(args)
+    self.triger = args.triger or "imidiate"
+    self.delay = args.delay or nil
+    if self.delay then 
+        self.timer = TIMERMANAGER:addTimer(delay)
+    end
+    if self.triger == "condition" then
+        self.conditionCheck = args.conditionCallback
+    end
     
+
 end

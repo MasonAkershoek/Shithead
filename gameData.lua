@@ -9,27 +9,6 @@ function Game.new()
     self.mainGameTimer = Timer.new(1)
     self.mainTimePassed = 0
 
-    -- Timer Manager
-    self.TIMERMANAGER = TimerManager.new()
-
-    -- EventManager
-    self.EVENTMANAGER = EventManager.new()
-    self.EVENTMANAGER:on("play", play)
-	self.EVENTMANAGER:on("quit", function() self:quit() end)
-	self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
-    self.EVENTMANAGER:on("setMainMenu", function() G:changeScreen(0) end)
-    self.EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
-
-    -- DisplayManager
-    self.DISPLAYMANAGER = DisplayManager.new()
-
-    -- ColorManager
-    self.COLORMANAGER = ColorManager.new()
-
-    -- FontManager
-    self.FONTMANAGER = FontManager.new()
-    self.FONTMANAGER:addFont("GAMEFONT", "resources/graphics/pixelFont.otf")
-
     -- KeyboardStuff
     self.KEYBOARDMANAGER = KeyboardManager.new()
 
@@ -62,9 +41,6 @@ function Game.new()
     self.GAMEFONT = love.graphics.newFont("resources/graphics/pixelFont.otf", 20)
     self.GAMEFONT:setFilter("linear","nearest")
     love.graphics.setLineStyle("rough")
-
-    -- Colors
-    self.COLORS = self:initColors()
 
     -- Sounds
     self.MUSIC1 = "resources/music/music2.mp3"
@@ -107,7 +83,7 @@ end
 
 function Game:setState(newState)
     self.gamestate = self.GAMESTATES[newState]
-    logger:log("Game state set to: "..self.gamestate)
+    --logger:log("Game state set to: "..self.gamestate)
 end
 
 function Game:initGameScreens()
@@ -123,6 +99,10 @@ end
 
 function Game:loadSounds()
 
+end
+
+function Game:reset()
+    self:setState(1)
 end
 
 function Game:getCardGraphics()
@@ -144,66 +124,21 @@ function Game:getCardGraphics()
     logger:log("Card Graphics Loaded")
 end
 
-function Game:initColors()
-    local colors = {}
-    -- Colors 
-    colors["BLACK"] = {}
-    colors["BLACK"].r = 0
-    colors["BLACK"].g = 0
-    colors["BLACK"].b = 0
-
-    colors["WHITE"] = {}
-    colors["WHITE"].r = 255
-    colors["WHITE"].g = 255
-    colors["WHITE"].b = 255
-
-    colors["RED"] = {}
-    colors["RED"].r, colors["RED"].g, colors["RED"].b = love.math.colorFromBytes(150,16,9)
-
-    colors["GREEN"] = {}
-    colors["GREEN"].r, colors["GREEN"].g, colors["GREEN"].b = love.math.colorFromBytes(48,137,54)
-
-    colors["YELLOW"] = {}
-    colors["YELLOW"].r, colors["YELLOW"].g, colors["YELLOW"].b = love.math.colorFromBytes(204,204,63)
-
-    colors["BLUE"] = {}
-    colors["BLUE"].r, colors["BLUE"].g, colors["BLUE"].b = love.math.colorFromBytes(41,46,153)
-
-    colors["LIGHTGRAY"] = {}
-    colors["LIGHTGRAY"].r, colors["LIGHTGRAY"].g, colors["LIGHTGRAY"].b = love.math.colorFromBytes(104,101,103)
-
-    colors["DARKGRAY"] = {}
-    colors["DARKGRAY"].r, colors["DARKGRAY"].g, colors["DARKGRAY"].b = love.math.colorFromBytes(71,69,70)
-
-    colors["BGCOLOR"] = {}
-    colors["BGCOLOR"].r, colors["BGCOLOR"].g, colors["BGCOLOR"].b = love.math.colorFromBytes(68,119,102)
-    return colors
-end
-
--- Make some changes so this function isnt called so often
-function Game:getColor(colorName, transparancy, darken)
-    transparancy = transparancy or 1
-    local color = {}
-    local darken = darken or 0
-    for key,value in pairs(self.COLORS) do
-        if colorName == key then
-            table.insert(color, self.COLORS[colorName].r-darken) 
-            table.insert(color, self.COLORS[colorName].g-darken) 
-            table.insert(color, self.COLORS[colorName].b-darken)
-            table.insert(color, transparancy)
-            return color
-        end
-    end
-    print("Color ", colorName, " not found!")
-    return nil
-end
-
 function Game:updateDisplay()
     local _,_, flags = love.window.getMode()
     if flags.display ~= self.SCREENVARIABLES["CURRENTDISPLAY"] then
         self.SCREENVARIABLES["CURRENTDISPLAY"] = flags.display
         self.SCREENVARIABLES["SCREENSIZE"].x, self.SCREENVARIABLES["SCREENSIZE"].y = love.window.getDesktopDimensions(flags.display)
         push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["GAMEDEMENTIONS"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
+    end
+end
+
+function Game:changeScreen(index)
+    self.gameScreen = index
+    if index == 0 then 
+        self.mainMenu = MainMenu.new()
+    else
+       self.cardTable:reset() 
     end
 end
 
@@ -216,25 +151,11 @@ function Game:update(dt)
     else
         self.mainMenu:update(dt)
     end
-    self.EVENTMANAGER:update(dt)
-    self.TIMERMANAGER:update(dt)
-end
-
-function Game:changeScreen(index)
-    self.gameScreen = index
-    if index == 1 then
-        self.mainMenu = nil
-        self.mainMenu = MainMenu.new()
-    else
-        self.cardTable = nil
-        self.cardTable = CardTable.new()
-    end
-    logger:log("Screen Changed to " .. index)
 end
 
 function Game:draw()
     push:start()
-    push:setBorderColor({G.COLORS["BGCOLOR"].r, G.COLORS["BGCOLOR"].g, G.COLORS["BGCOLOR"].b})
+    push:setBorderColor(lovecolors:getColor("BGCOLOR"))
     if self.gameScreen == 1 then
         self.cardTable:draw()
     else
@@ -243,5 +164,3 @@ function Game:draw()
 	push:finish()
 end
 
-
-G = Game.new()

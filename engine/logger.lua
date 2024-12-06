@@ -4,6 +4,9 @@ Logger.__index = Logger
 function Logger.new()
     local self = setmetatable({}, Logger)
     self.fileName = os.date("%d-%m-%y_%H:%M:%S.log")
+    if OS == "Windows" then
+        os.execute("mkdir " .. self.fileName)
+    end
     self.file = io.open("logs/"..self.fileName, "a")
     io.output(self.file)
     return self

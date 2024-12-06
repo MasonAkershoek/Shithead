@@ -10,7 +10,7 @@ function Opponent.new(newName, playerImagePath)
 
     -- Opponent Name
     self.name = newName
-    self.nameGraphic = NameGraphic.new(newName)
+    self.nameGraphic = UILabel.new(0,0,20,{alignment="center", text=newName})
 
     -- Opponent Hand
     self.hand = {}
@@ -37,6 +37,17 @@ end
 function Opponent:addCardToDockTop(newCard)
     newCard:playSound()
     self.dock:addCardBottom(newCard)
+end
+
+function Opponent:empty()
+    local tmp
+    if not self.handEmpty then
+        return table.remove(self.hand)
+    elseif not self.dock.topEmpty then
+        return self.dock:empty()
+    elseif not self.dock.bottomEmpty then
+        return self.dock:empty()
+    end 
 end
 
 function Opponent:sortByRank()
@@ -126,15 +137,15 @@ function Opponent:turn(topCard)
 end
 
 -- Function to hold all the update information for objects in the class and to be called in the main love2d update function
-    function Opponent:update(dt)
-        self:sortByRank()
-        self:updatePos({self.nameGraphic, self.opponent_icon, self.dock}, 20, true)
-        self.opponent_icon:update(dt)
-        self.nameGraphic:update(dt)
-        self.dock:update(dt)
-        updateList(self.hand, dt)
-        self:move(dt)
-    end
+function Opponent:update(dt)
+    if #self.hand > 0 then self.handEmpty = false else self.handEmpty = true end
+    self:sortByRank()
+    self:updatePos({self.nameGraphic, self.opponent_icon, self.dock}, 20, true)
+    self.opponent_icon:update(dt)
+    self.dock:update(dt)
+    updateList(self.hand, dt)
+    self:move(dt)
+end
 
 -- Function to call all the draw functions for objects in the class. To be called in the main love2d update function
 function Opponent:draw()
@@ -150,23 +161,6 @@ end
 
 -------------------------------------------------------------------------------------------------------------------------------
 
-NameGraphic = setmetatable({}, {__index = Sprite})
-NameGraphic.__index = NameGraphic
-
-function NameGraphic.new(newName)
-    local self = setmetatable(Sprite.new(), NameGraphic)
-    self.texture = love.graphics.newText(G.GAMEFONT, {{0,0,0}, newName})
-    self.size.y = self.texture:getHeight()
-    self.size.x = self.texture:getWidth()
-    return self
-end
-
-function NameGraphic:update(dt)
-    self:move(dt)
-end
-
--------------------------------------------------------------------------------------------------------------------------------
-
 OpponentDock = setmetatable({}, {__index = HboxContainer})
 OpponentDock.__index = OpponentDock
 
@@ -174,6 +168,8 @@ function OpponentDock.new()
     local self = setmetatable(HboxContainer.new(), OpponentDock)
     self.dockTop = {} 
     self.dockBottom = {}
+    self.topEmpty = true
+    self.bottomEmpty = true
     self.area = (150)
     self.dockSet = true
     return self
@@ -195,6 +191,14 @@ function OpponentDock:addCardBottom(newCard)
     self.size.y = (newCard.size.y * .5)
 end
 
+function OpponentDock:empty()
+    if #self.dockTop > 0 then
+       return table.remove(self.dockTop) 
+    elseif #self.dockBottom > 0 then
+        return table.remove(self.dockBottom)
+    end
+end
+
 function OpponentDock:getTopNum()
     return #self.dockTop
 end
@@ -209,6 +213,8 @@ function OpponentDock:draw()
 end
 
 function OpponentDock:update(dt)
+    if #self.dockTop > 0 then self.topEmpty = false else self.topEmpty = true end
+    if #self.dockBottom > 0 then self.bottomEmpty = false else self.bottomEmpty = true end
     if self.dockSet then
         self:updatePos(self.dockBottom, true)
         self:updatePos(self.dockTop, true)
@@ -264,6 +270,15 @@ function OpponentArea:deal(newCard, opponentIndex)
         self.opponents[opponentIndex].dock:addCardTop(newCard)
     else
         self.opponents[opponentIndex]:addCardToHand(newCard)
+    end
+end
+
+function OpponentArea:empty()
+    for x,opponent in ipairs(self.opponents) do
+        if not opponent.dock.dockTop.isEmpty and not opponent.dock.dockBottom.isEmpty then
+            local tmp = opponent:empty()
+            if tmp then return tmp end
+        end
     end
 end
 
