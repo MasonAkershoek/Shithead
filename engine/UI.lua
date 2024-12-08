@@ -120,6 +120,8 @@ function UIBox.new(w,h,args)
     self.padding = args.padding or 0
     self.borderColor = args.borderColor or "LIGHTGRAY"
     self.color = args.color or "DARKGRAY"
+    table.insert(UI.BOX, self)
+    logger:log(#UI.BOX)
     return self
 end
 

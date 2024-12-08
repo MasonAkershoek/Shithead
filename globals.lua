@@ -20,6 +20,11 @@ EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
 -- Timer Stuff
 TIMERMANAGER = TimerManager.new()
 
+-- Instances
+UI = {
+    BOX = {}
+}
+
 -- Settings
 SETTINGS = {
     showFPS = false,

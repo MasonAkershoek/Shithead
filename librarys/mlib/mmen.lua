@@ -13,7 +13,7 @@ function FontManager.new()
     self.fontPaths = {}
     self.fonts = {}
     return self
-end
+end 
 
 --- Class: addFont
 --- addFont will add a font to the list of available fonts. If the font already exists then it is ignored

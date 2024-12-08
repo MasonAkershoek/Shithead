@@ -4,8 +4,9 @@ Logger.__index = Logger
 function Logger.new()
     local self = setmetatable({}, Logger)
     self.fileName = os.date("%d-%m-%y_%H:%M:%S.log")
-    if OS == "Windows" then
-        os.execute("mkdir " .. self.fileName)
+    if love.system.getOS() == "Windows" then
+        self.fileName = os.date("%d-%m-%y_%H;%M;%S.log")
+        os.execute(("echo '' > logs/"..self.fileName))
     end
     self.file = io.open("logs/"..self.fileName, "a")
     io.output(self.file)
@@ -24,7 +25,9 @@ function Logger:log(message, ...)
 end
 
 function Logger:close()
-    io.close(self.file)
+    if self.file then
+        io.close(self.file)
+    end
 end
 
 logger = Logger.new()
