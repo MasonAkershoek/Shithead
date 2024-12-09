@@ -1,18 +1,18 @@
 return {
 -- Table: {1}
 {
-   ["escMenuActive"]=false,
+   ["PAUSED"]=false,
+   ["ESCAPEMENUACTIVE"]=false,
+   ["SHOWFPS"]=false,
    ["SCREENVARIABLES"]={2},
-   ["debugBoxActive"]=false,
-   ["paused"]=false,
-   ["showFPS"]=false,
+   ["DEBUGBOXACTIVE"]=false,
 },
 -- Table: {2}
 {
-   ["DIPLAYNUM"]=1,
-   ["DISPLAY"]={3},
+   ["SCREENMODE"]="Borderless",
    ["CURRENTDISPLAY"]=1,
-   ["SCREENMODE"]="Fullscreen",
+   ["DISPLAY"]={3},
+   ["DIPLAYNUM"]=1,
 },
 -- Table: {3}
 {

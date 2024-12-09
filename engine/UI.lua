@@ -123,7 +123,9 @@ function UIBox.new(w, h, args)
     self.padding = args.padding or 0
     self.borderColor = args.borderColor or "LIGHTGRAY"
     self.color = args.color or "DARKGRAY"
-    table.insert(UI.BOX, self)
+    self.drawBox = args.drawBox
+    if self.drawBox ~= false then self.drawBox = true end
+    table.insert(G.UI.BOX, self)
     return self
 end
 
@@ -225,18 +227,21 @@ function UIBox:update(dt)
 end
 
 function UIBox:draw()
-    if self.showShadow then
-        self:drawShadow()
+    if self.drawBox then
+        if self.showShadow then
+            self:drawShadow()
+        end
+        if self.showBorder then
+            love.graphics.setColor(lovecolors:getColor("LIGHTGRAY"))
+            love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2), self.pos.y - (self.size.y / 2), self.size.x,
+                self.size.y, self.radius, self.radius)
+        end
+        love.graphics.setColor(lovecolors:getColor("DARKGRAY"))
+        love.graphics.rectangle("fill", self.pos.x - ((self.size.x - self.borderSize) / 2),
+            self.pos.y - ((self.size.y - self.borderSize) / 2), self.size.x - self.borderSize,
+            self.size.y - self.borderSize,
+            self.radius, self.radius)
     end
-    if self.showBorder then
-        love.graphics.setColor(lovecolors:getColor("LIGHTGRAY"))
-        love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2), self.pos.y - (self.size.y / 2), self.size.x,
-            self.size.y, self.radius, self.radius)
-    end
-    love.graphics.setColor(lovecolors:getColor("DARKGRAY"))
-    love.graphics.rectangle("fill", self.pos.x - ((self.size.x - self.borderSize) / 2),
-        self.pos.y - ((self.size.y - self.borderSize) / 2), self.size.x - self.borderSize, self.size.y - self.borderSize,
-        self.radius, self.radius)
     drawList(self.contents)
 end
 
@@ -262,7 +267,7 @@ function UILabel.new(x, y, fontSize, args)
     self.alignment = locArgs.alignment or "left"
     self.color = locArgs.color or "WHITE"
 
-    self.textGraphics = love.graphics.newText(FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
+    self.textGraphics = love.graphics.newText(G.FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
     self.wdithLimit = locArgs.widthLimit or self.textGraphics:getWidth() or 10
     self.textGraphics:setf(self.text, self.wdithLimit, self.alignment)
     self:setWidthAndHeight()

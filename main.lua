@@ -23,6 +23,7 @@ require "cardtable"
 require "globals"
 require "uidefs"
 require "librarys.tableSave"
+require "engine.state_functions"
 
 local utf8 = require("utf8")
 
@@ -185,18 +186,22 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	G.KEYBOARDMANAGER:addKeyPress(key)
 	if key == "k" and not G.SETTINGS.debugBoxActive then
-		G.KEYBOARDMANAGER.buffer = {}
+		G.KEYBOARDMANAGER:clearBuff()
 		G.EVENTMANAGER:emit("activateDebug")
 	end
 	if key == "escape" and not G.SETTINGS.escMenuActive then
-		G.KEYBOARDMANAGER.buffer = {}
+		G.KEYBOARDMANAGER:clearBuff()
 		G.EVENTMANAGER:emit("activateEscapeMenu")
+	end
+	if key == "f3" and not G.SETTINGS.SHOWFPS then
+		G.KEYBOARDMANAGER:clearBuff()
+		G.SETTINGS.SHOWFPS = true
+		MAKE_FPS_HUD()
 	end
 end
 
 function love.update(dt)
 	G:update(dt)
-	--G.CARDGRAPHICSTIMERMANAGER:update(dt)
 	G.EVENTMANAGER:update(dt)
 	TEsound.cleanup()
 	G.KEYBOARDMANAGER.keyPressFlag = false

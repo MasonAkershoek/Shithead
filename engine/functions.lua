@@ -64,11 +64,6 @@ function checkCard(pCardRank, tCardRank)
     return false
 end
 
--- Event Callbacks -- Depreciate
-function play()
-    G.mainMenu.exitFlag = true
-end
-
 --- This function sorts throiugh key presses to pass only the values requested
 ---@param keyPress string
 ---@return string
@@ -79,10 +74,6 @@ function convertKeyPress(keyPress)
     if keyPress == "space" then return " " end
     if keyPress == "backspace" then return keyPress end
     return ""
-end
-
-function setMainMenu()
-    G.gameScreen = 0
 end
 
 function removeSelf(obj, tbl)

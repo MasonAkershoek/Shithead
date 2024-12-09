@@ -153,7 +153,7 @@ MAKE_MAIN_MENU_BUTTON_BOX = function()
             padding = 10,
             borderSize = 10,
             alignment = "Horizontal",
-            positions = { Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2, 2000), Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2, G.SCREENVARIABLES["GAMEDEMENTIONS"].y * .9074) }
+            positions = { Vector.new(_GAME_WIDTH / 2, 2000), Vector.new(_GAME_WIDTH / 2, _GAME_HEIGHT * .9074) }
         }
     )
     t:setActive()
@@ -161,4 +161,36 @@ MAKE_MAIN_MENU_BUTTON_BOX = function()
     t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Multiplayer", color = "DARKERYELLOW" }))
     t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "DARKERGREEN" }))
     t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "DARKERRED", action = "quit" }))
+end
+
+MAKE_INTRO_CARDS = function()
+
+end
+
+MAKE_FPS_HUD = function()
+    local t = UIBox.new(
+        100,
+        100,
+        {
+            drawBox = false,
+            positions = { Vector.new(-200, 100), Vector.new(100, 100) }
+        }
+    )
+    t:setActive()
+    logger:log(t.drawBox)
+    t:addContent(UILabel.new(0, 0, 20, { alignment = "center" }))
+    t:addFunction(
+        function(self)
+            self.contents[1]:setText(love.timer.getFPS())
+        end
+    )
+    t:addFunction(
+        function(self)
+            if G.KEYBOARDMANAGER:getLastKeyPress() == "f3" and G.SETTINGS.SHOWFPS then
+                G.SETTINGS.SHOWFPS = false
+                logger:log("Close FPS")
+                removeSelf(self, G.UI.BOX)
+            end
+        end
+    )
 end

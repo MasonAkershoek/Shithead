@@ -10,15 +10,24 @@ end
 
 function Game:setup()
     bootManager("Start up", "Load settings", .1)
+
+    -- Import settings
     local saveSet = table.load("settings.shit")
-    self.SETTINGS.SCREENVARIABLES.SCREENMODE = saveSet.SCREENVARIABLES.SCREENMODE
-    print(self.SETTINGS.SCREENVARIABLES.SCREENMODE)
+    os.remove("shithead.shit")
+    if saveSet then
+        self.SETTINGS.SCREENVARIABLES.SCREENMODE = saveSet.SCREENVARIABLES.SCREENMODE
+        self.SETTINGS.SHOWFPS = saveSet.SHOWFPS
+        if self.SETTINGS.SHOWFPS then
+            MAKE_FPS_HUD()
+        end
+        self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
+    end
 
     bootManager("Load Settings", "Load Graphics", .3)
     self:getCardGraphics()
     bootManager("Load Graphics", "Load Sounds", .2)
     self:loadSounds()
-    local saveSet = table.save(self.SETTINGS, "settings.shit")
+    startMainMenu()
 end
 
 function Game:createGameObj()
@@ -42,6 +51,7 @@ end
 function Game:quit()
     logger:log("Total Time Played:", G.mainTimePassed)
     logger:close()
+    table.save(self.SETTINGS, "settings.shit")
     love.event.quit()
 end
 

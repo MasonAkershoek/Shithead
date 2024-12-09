@@ -16,14 +16,15 @@ function Game:setGlobals()
 
     self.MINORSTATES = {
         MAININTRO = 1,
-        LEAVEMAINMENU = 2,
-        MULTIPLAYERMENU = 3,
-        STARTGAME = 4,
-        TURN = 5,
-        BURN = 6,
-        PICKUP = 7,
-        WIN = 8,
-        CLEANUP = 9,
+        MAINMENUIDLE = 2,
+        LEAVEMAINMENU = 3,
+        MULTIPLAYERMENU = 4,
+        STARTGAME = 5,
+        TURN = 6,
+        BURN = 7,
+        PICKUP = 8,
+        WIN = 9,
+        CLEANUP = 10,
     }
 
     -- ============
@@ -43,10 +44,10 @@ function Game:setGlobals()
     -- == Settings ==
     -- ==============
     self.SETTINGS = {
-        showFPS = false,
-        debugBoxActive = false,
-        paused = false,
-        escMenuActive = false,
+        SHOWFPS = false,
+        DEBUGBOXACTIVE = false,
+        PAUSED = false,
+        ESCAPEMENUACTIVE = false,
         SCREENVARIABLES = {
             SCREENMODE = "Borderless",
             DIPLAYNUM = 1,

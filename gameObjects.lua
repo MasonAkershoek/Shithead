@@ -9,7 +9,7 @@ Node.__index = Node
 --- Constructer method for the Node class
 ---@param nx integer
 ---@param ny integer
-function Node.new(nx,ny)
+function Node.new(nx, ny)
     nx = nx or 0
     ny = ny or 0
 
@@ -18,14 +18,14 @@ function Node.new(nx,ny)
     self.T = "Node"
 
     -- Node Position and tansformations
-    self.pos = Vector.new(nx,ny)
-    self.size = Vector.new(1,1)
+    self.pos = Vector.new(nx, ny)
+    self.size = Vector.new(1, 1)
     self.deadZone = nil
     self.baseScale = 1
-    self.scale = Vector.new(self.baseScale,self.baseScale)
-    self.skew = Vector.new(0,0)
+    self.scale = Vector.new(self.baseScale, self.baseScale)
+    self.skew = Vector.new(0, 0)
     self.rotation = 0
-    
+
     -- Object Flags
     self.hoverFlag = false
 
@@ -50,41 +50,32 @@ function Node:getPos(pos)
     local ret = Vector.new()
     if pos == "center" then
         return self.pos
-        
     elseif pos == "topleft" then
-        ret.x = (self.pos.x - ((self.size.x * self.scale.x)/2))
-        ret.y = (self.pos.y - ((self.size.y * self.scale.y)/2))
-
+        ret.x = (self.pos.x - ((self.size.x * self.scale.x) / 2))
+        ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
     elseif pos == "topright" then
-        ret.x = (self.pos.x + ((self.size.x * self.scale.x)/2))
-        ret.y = (self.pos.y - ((self.size.y * self.scale.y)/2))
-
+        ret.x = (self.pos.x + ((self.size.x * self.scale.x) / 2))
+        ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
     elseif pos == "bottomleft" then
-        ret.x = (self.pos.x - ((self.size.x * self.scale.x)/2))
-        ret.y = (self.pos.y + ((self.size.y * self.scale.y)/2))
-
+        ret.x = (self.pos.x - ((self.size.x * self.scale.x) / 2))
+        ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
     elseif pos == "bottomright" then
-        ret.x = (self.pos.x + ((self.size.x * self.scale.x)/2))
-        ret.y = (self.pos.y + ((self.size.y * self.scale.y)/2))
-        
+        ret.x = (self.pos.x + ((self.size.x * self.scale.x) / 2))
+        ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
     elseif pos == "centerleft" then
-        ret.x = (self.pos.x - ((self.size.x * self.scale.x)/2))
+        ret.x = (self.pos.x - ((self.size.x * self.scale.x) / 2))
         ret.y = self.pos.y
-
     elseif pos == "centerright" then
-        ret.x = (self.pos.x + ((self.size.x * self.scale.x)/2))
+        ret.x = (self.pos.x + ((self.size.x * self.scale.x) / 2))
         ret.y = self.pos.y
-        
     elseif pos == "centertop" then
         ret.x = self.pos.x
-        ret.y = (self.pos.y - ((self.size.y * self.scale.y)/2))
-
+        ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
     elseif pos == "centerbottom" then
         ret.x = self.pos.x
-        ret.y = (self.pos.y + ((self.size.y * self.scale.y)/2))
+        ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
     end
     return ret
-            
 end
 
 --- Class: Node
@@ -100,10 +91,10 @@ end
 --- for x pass nil if you dont want to change it but want to change y
 ---@param nxs integer
 ---@param nys integer
-function Node:setScale(nxs,nys)
+function Node:setScale(nxs, nys)
     nxs = nxs or nil
     nys = nys or nil
-    if nxs ~= nil then 
+    if nxs ~= nil then
         self.scale.x = nxs
         self.baseScale = nxs
     end
@@ -113,10 +104,10 @@ function Node:setScale(nxs,nys)
     end
 end
 
-function Node:setSkew(nxs,nys)
+function Node:setSkew(nxs, nys)
     nxs = nxs or nil
     nys = nys or nil
-    if nxs ~= nil then 
+    if nxs ~= nil then
         self.skew.x = nxs
     end
     if nys ~= nil then
@@ -129,10 +120,10 @@ end
 --- One or both paramaters can be passed depending on what value you want to change
 ---@param nx integer
 ---@param ny integer
-function Node:setPos(nx,ny)
+function Node:setPos(nx, ny)
     nx = nx or nil
     ny = ny or nil
-    if nx ~= nil then 
+    if nx ~= nil then
         self.pos.x = nx
     end
     if ny ~= nil then
@@ -145,13 +136,13 @@ end
 ---@param mx integer
 ---@param my integer
 ---@return boolean
-function Node:checkDeadZoneMouseHover(mx,my)
+function Node:checkDeadZoneMouseHover(mx, my)
     -- Check the dead Zone
     if self.deadZone ~= nil then
         if mx > self.deadZone.t1.x and mx < self.deadZone.t2.x then
             return true
         end
-    else   
+    else
         return false
     end
     return nil
@@ -163,11 +154,11 @@ end
 ---@return boolean
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
-    local mousex, mousey = push:toGame(mousex, mousey)
-    if mousex > (self.pos.x - self:getWidth()/2) and mousex < (self.pos.x + self:getWidth()/2) then
-        if mousey > (self.pos.y - self:getHeight()/2) and mousey < (self.pos.y + self:getHeight()/2) then
-            if not self:checkDeadZoneMouseHover(mousex,mousey) then
-                return true 
+    --local mousex, mousey = push:toGame(mousex, mousey)
+    if mousex > (self.pos.x - self:getWidth() / 2) and mousex < (self.pos.x + self:getWidth() / 2) then
+        if mousey > (self.pos.y - self:getHeight() / 2) and mousey < (self.pos.y + self:getHeight() / 2) then
+            if not self:checkDeadZoneMouseHover(mousex, mousey) then
+                return true
             end
         end
         return false
@@ -175,20 +166,19 @@ function Node:checkMouseHover()
     return false
 end
 
-
 -- Moveable Object
 ----------------------------------------------
-Moveable = setmetatable({}, {__index = Node})
+Moveable = setmetatable({}, { __index = Node })
 Moveable.__index = Moveable
 
-function Moveable.new(nx,ny,mouseMoveable)
+function Moveable.new(nx, ny, mouseMoveable)
     local mouseMoveable = mouseMoveable or false
-    local self = setmetatable(Node.new(nx,ny), Moveable)
+    local self = setmetatable(Node.new(nx, ny), Moveable)
 
     self.T = "Moveable"
 
-    self.newPos = Vector.new(nx,ny)
-    self.movement = Vector.new(0,0)
+    self.newPos = Vector.new(nx, ny)
+    self.movement = Vector.new(0, 0)
     self.distance = 0
     self.HCenter = {}
     self.HCenter.x = 0
@@ -205,19 +195,19 @@ function Moveable:mouseMoving()
         local mx, my = love.mouse.getPosition()
         local xOffset = 0
         local yOffset = 0
-        mx,my = push:toGame(mx,my)
-        self:setPosImidiate(mx,my)
+        --mx, my = push:toGame(mx, my)
+        self:setPosImidiate(mx, my)
         self.mouseMove = true
     else
         self.mouseMove = false
     end
 end
 
-function Moveable:setPos(nx,ny)
+function Moveable:setPos(nx, ny)
     if not self.mouseMove then
         nx = nx or nil
         ny = ny or nil
-        if nx ~= nil then 
+        if nx ~= nil then
             self.newPos.x = nx
             self.moveFlag = true
             self.moving = true
@@ -230,10 +220,10 @@ function Moveable:setPos(nx,ny)
     end
 end
 
-function Moveable:setPosImidiate(nx,ny)
+function Moveable:setPosImidiate(nx, ny)
     nx = nx or nil
     ny = ny or nil
-    if nx ~= nil then 
+    if nx ~= nil then
         self.pos.x = nx
     end
     if ny ~= nil then
@@ -248,17 +238,17 @@ function Moveable:move(dt)
     if self.moveFlag then
         local dirx = self.newPos.x - self.pos.x
         local diry = self.newPos.y - self.pos.y
-        self.distance = math.sqrt((dirx^2) + (diry^2))
+        self.distance = math.sqrt((dirx ^ 2) + (diry ^ 2))
         local normx = dirx / self.distance
         local normy = diry / self.distance
-        self.HCenter.x = ((self.pos.x + self.newPos.x)/2)
-        self.HCenter.y = ((self.pos.y + self.newPos.y)/2)
+        self.HCenter.x = ((self.pos.x + self.newPos.x) / 2)
+        self.HCenter.y = ((self.pos.y + self.newPos.y) / 2)
         self.movement:setVect(normx, normy)
         self.moveFlag = false
     end
-    if not self.pos:checkDistance(self.newPos, 5) and not self.mouseMove then 
-        for x=1, G.CARDSPEED*dt do
-            if not self.pos:checkDistance(self.newPos, 5) then 
+    if not self.pos:checkDistance(self.newPos, 5) and not self.mouseMove then
+        for x = 1, G.CARDSPEED * dt do
+            if not self.pos:checkDistance(self.newPos, 5) then
                 self.pos.x = (self.pos.x + (self.movement.x))
                 self.pos.y = (self.pos.y + (self.movement.y))
             else
@@ -271,22 +261,21 @@ function Moveable:move(dt)
     end
 end
 
-
 -- Sprite Object
 ----------------------------------------------
-Sprite = setmetatable({}, {__index = Moveable})
+Sprite = setmetatable({}, { __index = Moveable })
 Sprite.__index = Sprite
 
-function Sprite.new(nx,ny,mouseMoveable,newTexture)
+function Sprite.new(nx, ny, mouseMoveable, newTexture)
     newTexture = newTexture or nil
-    local self = setmetatable(Moveable.new(nx,ny,mouseMoveable), Sprite)
+    local self = setmetatable(Moveable.new(nx, ny, mouseMoveable), Sprite)
 
     self.T = "Sprite"
 
     if newTexture ~= nil then
         self.texture = love.graphics.newImage(newTexture)
     else
-       self.texture = nil 
+        self.texture = nil
     end
     self.transparency = 1
     return self
@@ -299,8 +288,9 @@ function Sprite:initSprite()
 end
 
 function Sprite:draw()
-    love.graphics.setColor({1,1,1,self.transparency})
-    love.graphics.draw(self.texture, self.pos.x, self.pos.y, self.rotation, self.scale.x, self.scale.y, self.size.x/2, self.size.y/2)
+    love.graphics.setColor({ 1, 1, 1, self.transparency })
+    love.graphics.draw(self.texture, self.pos.x, self.pos.y, self.rotation, self.scale.x, self.scale.y, self.size.x / 2,
+        self.size.y / 2)
 end
 
 -- Vector2 Object
@@ -308,7 +298,7 @@ end
 Vector = {}
 Vector.__index = Vector
 
-function Vector.new(x,y)
+function Vector.new(x, y)
     local self = setmetatable({}, Vector)
 
     self.T = "Vector"
@@ -327,13 +317,13 @@ function Vector:getX()
 end
 
 function Vector:getY()
-    return self.y    
+    return self.y
 end
 
 function Vector:checkDistance(otherVect, space)
     if self.x > (otherVect.x - space) and self.x < (otherVect.x + space) then
         if self.y > (otherVect.y - space) and self.y < (otherVect.y + space) then
-            return true 
+            return true
         end
     else
         return false
@@ -342,13 +332,13 @@ end
 
 -- HboxContainer
 ----------------------------------------------
-HboxContainer = setmetatable({}, {__index = Moveable})
+HboxContainer = setmetatable({}, { __index = Moveable })
 
 HboxContainer.__index = HboxContainer
 
-function HboxContainer.new(nx,ny, bgBox)
+function HboxContainer.new(nx, ny, bgBox)
     bgBox = bgBox or false
-    local self = setmetatable(Moveable.new(nx,ny), HboxContainer)
+    local self = setmetatable(Moveable.new(nx, ny), HboxContainer)
 
     self.T = "HboxContainer"
 
@@ -361,7 +351,7 @@ function HboxContainer.new(nx,ny, bgBox)
 end
 
 function HboxContainer:getWidth()
-    return self.size.x/2 + self.area
+    return self.size.x / 2 + self.area
 end
 
 function HboxContainer:updatePos(items, flag, i)
@@ -374,8 +364,8 @@ function HboxContainer:updatePos(items, flag, i)
     if #items > 0 then
         local xpoints = ((self.area + self.area) / (#items + 1))
         local nextPoint = (self.pos.x - self.area)
-        for x=1, #items do
-            if not i then 
+        for x = 1, #items do
+            if not i then
                 if flag then
                     items[x]:setPos((xpoints + nextPoint), self.pos.y)
                 else
@@ -401,7 +391,7 @@ end
 
 function HboxContainer:checkMoving(items)
     for _, card in ipairs(items) do
-        if card.moving then 
+        if card.moving then
             return false
         end
     end
@@ -417,12 +407,12 @@ end
 
 -- VboxContainer1
 ---------------------------------------------------------------------------------------------
-VboxContainer = setmetatable({}, {__index = Moveable})
+VboxContainer = setmetatable({}, { __index = Moveable })
 
 VboxContainer.__index = VboxContainer
 
-function VboxContainer.new(nx,ny)
-    local self = setmetatable(Moveable.new(nx,ny), VboxContainer)
+function VboxContainer.new(nx, ny)
+    local self = setmetatable(Moveable.new(nx, ny), VboxContainer)
 
     self.T = "VboxContainer"
 
@@ -434,14 +424,14 @@ function VboxContainer:updatePos(items, padding, i)
     padding = padding or 0
     if #items > 0 then
         local nextPoint = (self.pos.y - self.area)
-        for x=1, #items do
-            nextPoint = nextPoint + ((items[x].size.y/2) * items[x].baseScale)
+        for x = 1, #items do
+            nextPoint = nextPoint + ((items[x].size.y / 2) * items[x].baseScale)
             if not i then
                 items[x]:setPos(self.pos.x, nextPoint)
             else
                 items[x]:setPosImidiate(self.pos.x, nextPoint)
             end
-            nextPoint = ((nextPoint + ((items[x].size.y/2) * items[x].baseScale)) + padding)
+            nextPoint = ((nextPoint + ((items[x].size.y / 2) * items[x].baseScale)) + padding)
         end
     end
 end

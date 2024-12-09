@@ -13,7 +13,7 @@ function FontManager.new()
     self.fontPaths = {}
     self.fonts = {}
     return self
-end 
+end
 
 --- Class: addFont
 --- addFont will add a font to the list of available fonts. If the font already exists then it is ignored
@@ -24,7 +24,7 @@ function FontManager:addFont(fontName, fontPath)
     if self.fontPaths[fontName] == nil and love.filesystem.getInfo(fontPath) then
         self.fontPaths[fontName] = fontPath
     else
-       print("Font alredy exists.") 
+        print("Font alredy exists.")
     end
 end
 
@@ -35,12 +35,12 @@ end
 function FontManager:getFont(fontName, fontSize)
     if self.fontPaths[fontName] ~= nil then
         if not self:gg(fontName, fontSize) then
-            self.fonts[fontName] = self.fonts[fontName] or {}  -- Ensure the fontName table exists
+            self.fonts[fontName] = self.fonts[fontName] or {} -- Ensure the fontName table exists
             self.fonts[fontName][fontSize] = love.graphics.newFont(self.fontPaths[fontName], fontSize)
         end
         return self.fonts[fontName][fontSize]
     else
-        print("Font does not exist.") 
+        print("Font does not exist.")
     end
 end
 
@@ -69,14 +69,16 @@ function DisplayManager:getDisplayModes()
 end
 
 function DisplayManager:getCenter()
-    return Vector.new(self.screenWidth/2, self.screenHeight/2)
+    return Vector.new(self.screenWidth / 2, self.screenHeight / 2)
 end
 
 function DisplayManager:update()
-    local _,_, flags = love.window.getMode()
+    local _, _, flags = love.window.getMode()
     if flags.display ~= self.display then
         self.display = flags.display
-        push:setupScreen(_GAME_WIDTH, _GAME_HEIGHT, self.displayModes[self.display].width, self.displayModes[self.display].height, {fullscreen = self.fullscreen, resizable = false, canvas = false, pixelperfect = false, stretched=false})
+        push:setupScreen(_GAME_WIDTH, _GAME_HEIGHT, self.displayModes[self.display].width,
+            self.displayModes[self.display].height,
+            { fullscreen = self.fullscreen, resizable = false, canvas = false, pixelperfect = false, stretched = false })
     end
 end
 
@@ -96,21 +98,27 @@ end
 
 function KeyboardManager:getBuffasStr()
     local tmp = ""
-    for x=1, #self.buffer do
+    for x = 1, #self.buffer do
         tmp = tmp .. self.buffer[x]
     end
     return tmp
 end
 
+function KeyboardManager:clearBuff()
+    self.buffer = {}
+end
+
 function KeyboardManager:getLastKeyPress(waitForNextKeyPress)
     local waitForNextKeyPress = waitForNextKeyPress or false
-    if waitForNextKeyPress then
-        if self.keyPressFlag then
+    if #self.buffer ~= 0 then
+        if waitForNextKeyPress then
+            if self.keyPressFlag then
+                return self.buffer[#self.buffer]
+            end
+            return nil
+        else
             return self.buffer[#self.buffer]
         end
-        return nil
-    else
-        return self.buffer[#self.buffer]
     end
 end
 
@@ -118,12 +126,12 @@ function KeyboardManager:addKeyPress(keyPress)
     if #self.buffer == 10 then
         table.remove(self.buffer, 1)
     end
-    table.insert(self.buffer, #self.buffer+1, keyPress)
+    table.insert(self.buffer, #self.buffer + 1, keyPress)
     self.keyPressFlag = true
 end
 
 function KeyboardManager:ifIn(subString)
-    
+
 end
 
 -- Timer
@@ -139,7 +147,7 @@ function Timer.new(newTime, ...)
     self.ogTime = newTime
     self.stopped = false
     self.expired = false
-    if ... ~= nil then 
+    if ... ~= nil then
         self.callback = ...
     end
     return self
@@ -163,10 +171,10 @@ function Timer:isExpired()
 end
 
 function Timer:isStopped()
-    if self.stopped then 
-        return true 
-    else 
-        return false 
+    if self.stopped then
+        return true
+    else
+        return false
     end
 end
 
@@ -177,14 +185,14 @@ end
 
 function Timer:update(dt)
     if not self.stopped then
-        if self.time < 0 and not self.expired then 
+        if self.time < 0 and not self.expired then
             self.expired = true
             if self.callback ~= nil then
                 self.callback()
             end
             return self.expired
         else
-            self.time = self.time - dt 
+            self.time = self.time - dt
         end
     end
 end
@@ -220,7 +228,7 @@ function TimerManager:checkExpire(index)
 end
 
 function TimerManager:update(dt)
-    for x=1, #self.timers do
+    for x = 1, #self.timers do
         self.timers[x]:update(dt)
     end
 end
