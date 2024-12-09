@@ -180,7 +180,7 @@ function Timer:update(dt)
         if self.time < 0 and not self.expired then 
             self.expired = true
             if self.callback ~= nil then
-                callback(self.callback)
+                self.callback()
             end
             return self.expired
         else

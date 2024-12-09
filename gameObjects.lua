@@ -154,6 +154,7 @@ function Node:checkDeadZoneMouseHover(mx,my)
     else   
         return false
     end
+    return nil
 end
 
 --- Class: Node

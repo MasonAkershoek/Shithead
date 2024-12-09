@@ -203,7 +203,7 @@ end
 
 function Card:update(dt)
     if self.newSelectFlag then
-        self.newSelectFlag = fasle
+        self.newSelectFlag = false
     end
     self:onSelect() 
     self:onHover(dt)

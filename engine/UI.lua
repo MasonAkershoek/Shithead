@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 -- MsUI (Mason's simple User Interface) a UI Library for Love2D
 -- @author Mason Akershoek (masonakershoek@gmail.com)
 
@@ -6,10 +7,10 @@ UINode = setmetatable({}, {__index = Moveable})
 UINode.__index = UINode
 
 --- Object Constructor for the UINode Object
----@param x int "X Position of the Node"
----@param y int "Y Position of the Node"
----@param w int "Width of the Node"
----@param h int "Height of the Node"
+---@param x integer "X Position of the Node"
+---@param y integer "Y Position of the Node"
+---@param w integer "Width of the Node"
+---@param h integer "Height of the Node"
 ---@param args table "This table contains extra options for any of the UI objects"
 ---@return table "Returns a UINode Object"
 function UINode.new(x,y,w,h,args)
@@ -158,7 +159,7 @@ function UIBox:setActive()
 end
 
 function UIBox:HAlign()
-    local flag = flag or true
+    local flag = true
     local tmpWidth = 0
     local sizeOffset = 400
     tmpHeight = 0

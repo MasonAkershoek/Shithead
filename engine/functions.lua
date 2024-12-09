@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 -- functions.lua
 
 -- A simple function for checking if a value is contained in a list
@@ -45,22 +46,6 @@ function calcDistance(newPos, currentPos)
     return math.sqrt((dirx^2) + (diry^2))
 end
 
--- Depreciate love has a built in function for this
-function getOS()
-	-- ask LuaJIT first
-	if jit then
-		return jit.os
-	end
-
-	-- Unix, Linux variants
-	local fh,err = assert(io.popen("uname -o 2>/dev/null","r"))
-	if fh then
-		osname = fh:read()
-	end
-
-	return osname or "Windows"
-end
-
 -- Move somewhere else, This function is to spesific to shithead to be in this file
 
 --- This function checkks if a given card rank is a special card
@@ -106,4 +91,8 @@ function removeSelf(obj, tbl)
             table.remove(tbl, x)
         end
     end
+end
+
+function addCardToHand(card, hand)
+
 end
