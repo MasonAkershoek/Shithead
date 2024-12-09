@@ -20,17 +20,16 @@ end
 
 function EventManager:emit(eventName, tim)
     if not tim then
-        print("Event Emited")
+        logger:log("Event ", eventName, " Emited")
         local callbacks = self.listeners[eventName]
-        print(#callbacks)
         if callbacks then
             for _, callback in ipairs(callbacks) do
                 callback(callback)
             end
         end
     else
-        print("Event Added to Queue")
-        tmp = G.TIMERMANAGER:addTimer(tim)
+        logger:log("Event ", eventName ," Added to Queue")
+        local tmp = G.TIMERMANAGER:addTimer(tim)
         table.insert(self.queue, { eventName, tmp })
     end
 end
@@ -38,8 +37,7 @@ end
 function EventManager:update(dt)
     for _, event in ipairs(self.queue) do
         if G.TIMERMANAGER:checkExpire(event[2]) then
-            print("Timer Expired")
-            print(event[1])
+            logger:log("Timer Expired")
             self:emit(event[1])
         end
     end
@@ -48,13 +46,18 @@ end
 Event = {}
 Event.__index = Event
 
-function Event.new(args)
+function Event.new(func, args)
+    local self = setmetatable({}, Event)
     self.triger = args.triger or "imidiate"
     self.delay = args.delay or nil
     if self.delay then
-        self.timer = TIMERMANAGER:addTimer(delay)
+        self.timer = Timer.new(self.delay)
     end
     if self.triger == "condition" then
         self.conditionCheck = args.conditionCallback
     end
+end
+
+function Event:update()
+    
 end

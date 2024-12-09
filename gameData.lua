@@ -28,6 +28,7 @@ function Game:setup()
     bootManager("Load Graphics", "Load Sounds", .2)
     self:loadSounds()
     startMainMenu()
+    logger:log("Number of UI: ", #G.UI.BOX)
 end
 
 function Game:createGameObj()
@@ -100,6 +101,10 @@ end
 function Game:update(dt)
     updateList(G.UI.BOX, dt)
     --self:updateDisplay()
+    for _,func in ipairs(self.BUFFEREDFUNCS) do
+        func()
+    end 
+    self.BUFFEREDFUNCS = {}
 end
 
 function Game:draw()

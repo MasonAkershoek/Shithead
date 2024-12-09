@@ -186,11 +186,13 @@ MAKE_FPS_HUD = function()
     )
     t:addFunction(
         function(self)
-            if G.KEYBOARDMANAGER:getLastKeyPress() == "f3" and G.SETTINGS.SHOWFPS then
-                G.SETTINGS.SHOWFPS = false
-                logger:log("Close FPS")
-                removeSelf(self, G.UI.BOX)
-            end
+            table.insert(G.BUFFEREDFUNCS, function ()
+                if G.KEYBOARDMANAGER:getLastKeyPress() == "f3" and G.SETTINGS.SHOWFPS then
+                    G.SETTINGS.SHOWFPS = false
+                    logger:log("Close FPS")
+                    removeSelf(self, G.UI.BOX)
+                end
+            end)
         end
     )
 end

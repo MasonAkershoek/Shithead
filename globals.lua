@@ -83,6 +83,8 @@ function Game:setGlobals()
 
     self.CARDAREAS = {}
 
+    G.BUFFEREDFUNCS = {}
+
     self.EVENTMANAGER:on("play", play)
     self.EVENTMANAGER:on("quit", function() G:quit() end)
     self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)

@@ -167,7 +167,6 @@ function CardTable:gameLogic()
                             local playerCard = self.playerHand:getCard()
                             if playerCard ~= nil then
                                 G.turnTimer:reset()
-                                print(playerCard.rank, self.cardPile:getTopCard())
                                 if checkCard(playerCard.rank, self.cardPile:getTopCard()) then
                                     G:nextTurn()
                                 else

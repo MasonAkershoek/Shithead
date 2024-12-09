@@ -24,7 +24,7 @@ function FontManager:addFont(fontName, fontPath)
     if self.fontPaths[fontName] == nil and love.filesystem.getInfo(fontPath) then
         self.fontPaths[fontName] = fontPath
     else
-        print("Font alredy exists.")
+        logger:log("Font ", fontName ," alredy exists.")
     end
 end
 
@@ -40,7 +40,7 @@ function FontManager:getFont(fontName, fontSize)
         end
         return self.fonts[fontName][fontSize]
     else
-        print("Font does not exist.")
+        logger:log("Font ", fontName ," does not exist.")
     end
 end
 
@@ -212,16 +212,16 @@ function TimerManager.new()
     return self
 end
 
-function TimerManager:addTimer(time)
-    print("Time: ", time)
+function TimerManager:addTimer(time, labal)
+    logger:log("New Timer: ", labal, " Time: ", time)
     local timer = Timer.new(time)
-    table.insert(self.timers, timer)
-    return timer
+    self.timers[labal] = timer
+    return labal
 end
 
-function TimerManager:checkExpire(index)
-    if self.timers[index]:isExpired() then
-        table.remove(self.timers[index])
+function TimerManager:checkExpire(labal)
+    if self.timers[labal]:isExpired() then
+        table.remove(self.timers[labal])
         return true
     end
     return false

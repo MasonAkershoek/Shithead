@@ -359,7 +359,7 @@ function UIButton:onSelect()
                 G.EVENTMANAGER:emit(self.action)
                 self.clickTimer:start()
             else
-                print("No Action Supplied!")
+                logger:log("No Action Supplied!")
                 self.clickTimer:start()
             end
         end
