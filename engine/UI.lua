@@ -114,6 +114,7 @@ function UIBox.new(w,h,args)
 
     self.alignment = args.alignment or "Vertical"
     self.contents = args.contents or {}
+    self.functions = args.functions or {}
     self.positions = args.positions or {Vector.new(0,0),Vector.new(0,0)}
     self.active = false
     self.borderSize = args.borderSize or 10
@@ -121,7 +122,6 @@ function UIBox.new(w,h,args)
     self.borderColor = args.borderColor or "LIGHTGRAY"
     self.color = args.color or "DARKGRAY"
     table.insert(UI.BOX, self)
-    logger:log(#UI.BOX)
     return self
 end
 
@@ -131,9 +131,14 @@ function UIBox:removeContent(index)
 end
 
 function UIBox:addContent(newContent, Index)
-    local index = Index or 0
+    local index = Index or #self.contents + 1
+    newContent.parent = self
     table.insert(self.contents, index, newContent)
     self.changed = true
+end
+
+function UIBox:addFunction(newFunction)
+    table.insert(self.functions, newFunction)
 end
 
 function UIBox:getContentSize()
@@ -191,7 +196,10 @@ end
 
 ]]
 function UIBox:update(dt)
-    if self.alignment == "Vertical" then self:VAlign() else self:HAlign() end
+    for _, func in ipairs(self.functions) do
+        func(self)
+    end
+    if self.alignment == "Vertical" then self:VAlign(10) else self:HAlign() end
     self:move(dt)
     for item=1, #self.contents do
         if self.contents[item].T == "UIButton" then

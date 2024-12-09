@@ -16,6 +16,14 @@ EVENTMANAGER:on("quit", function() G.quit() end)
 EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
 EVENTMANAGER:on("setMainMenu", function() G.gamestate = "CLEANUP" end)
 EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
+EVENTMANAGER:on("activateEscapeMenu", function () SETTINGS.escMenuActive = true SETTINGS.paused = ture MAKE_ESC_MENU() end)
+if not _RELESE_MODE then
+    EVENTMANAGER:on("activateDebug", function ()
+        if not _RELESE_MODE then
+            MAKE_DEBUG_BOX()
+        end
+    end)
+end
 
 -- Timer Stuff
 TIMERMANAGER = TimerManager.new()
@@ -28,6 +36,9 @@ UI = {
 -- Settings
 SETTINGS = {
     showFPS = false,
+    debugBoxActive = false,
+    paused = false,
+    escMenuActive = false
 }
 
 

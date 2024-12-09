@@ -22,9 +22,6 @@ function MainMenu.new()
     -- Menu Buttons
     self.buttonBoxTimer = Timer.new(1.5)
 
-    -- TEST ESC Menu
-    self.escMenu = UIBox.new(400,700, ESCMENUDEF)
-
     -- Exit
     self.exitFlag = false
 

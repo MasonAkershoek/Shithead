@@ -51,11 +51,6 @@ function love.load()
 	math.randomseed(os.time())
 	push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["SCREENSIZE"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
 	G:initGameScreens()
-	myTextField = UITextField.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2+200,400,50,20,{showShadow=true,radius=9,maxLen=20,tmpText="Enter Your Name",borderColorSelected="BLUE",borderColor="YELLOW",borderSize=5,textColor="BLACK"})
-
-	-- FPS DISPLAY
-	fps = UILabel.new(100,100,20, {widthLimit=150, alignment=center})
-	slowdown = 0
 end
 
 local function error_printer(msg, layer)
@@ -190,20 +185,24 @@ end
 
 function love.keypressed(key,scancode,isrepeat)
 	G.KEYBOARDMANAGER:addKeyPress(key)
+	if key == "k" and not SETTINGS.debugBoxActive then
+		G.KEYBOARDMANAGER.buffer = {}
+		EVENTMANAGER:emit("activateDebug")
+	end
+	if key == "escape" and not SETTINGS.escMenuActive then
+		G.KEYBOARDMANAGER.buffer = {}
+		EVENTMANAGER:emit("activateEscapeMenu")
+	end
 end
   
 function love.update(dt)
-	if slowdown == 0 then
-		slowdown = 1
-		G:update(dt)
-		TIMERMANAGER:update(dt)
-		EVENTMANAGER:update(dt)
-		TEsound.cleanup()
-		--myTextField:update(dt)
-		G.KEYBOARDMANAGER.keyPressFlag = false
-		--fps:setText("FPS: " .. love.timer.getFPS())
-	end
-	slowdown = slowdown - 1
+	G:update(dt)
+	TIMERMANAGER:update(dt)
+	EVENTMANAGER:update(dt)
+	TEsound.cleanup()
+	--myTextField:update(dt)
+	G.KEYBOARDMANAGER.keyPressFlag = false
+	--fps:setText("FPS: " .. love.timer.getFPS())
 end
   
   

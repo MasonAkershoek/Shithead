@@ -30,9 +30,6 @@ function CardTable.new()
     self.winbox = UIBox.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2,G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2,WINBOXDEF)
     self.winbox.winner = ""
 
-    -- OpponentCards Debug Box
-    self.dbBox = UIBox.new(600,350,DEBUGBOXDEF);
-    self.dbBox:setActive()
 
     -- Function Flags
     self.flag = true
@@ -46,6 +43,8 @@ function CardTable.new()
     self.dealTimer = Timer.new(.05)
     G.turnTimer = Timer.new(1)
     self.burnIndex = 1
+
+    
 
     return self
 end
@@ -243,9 +242,6 @@ function CardTable:draw()
     self.playButton:draw()
     drawList(self.deck.discard)
     self.winbox:draw()
-    if not _RELESE_MODE then
-        self.dbBox:draw()
-    end
 end
 
 function CardTable:update(dt)
@@ -257,22 +253,5 @@ function CardTable:update(dt)
     self.opa:update(dt)
     self.deck:update(dt)
     self.playButton:update(dt)
-    self.dbBox:update(dt)
     self.winbox:update(dt)
-    if not _RELESE_MODE then 
-        local index = 1
-        for x=3, #self.dbBox.contents, 2 do
-            local cards = ""
-            for y,card in ipairs(self.opa.opponents[index].hand) do
-                cards = cards .. " " .. tostring(card.rank)
-            end
-            if cards == self.dbBox.contents[x]:getText() then 
-            else
-                self.dbBox.contents[x]:setText(cards)
-                self.dbBox.contents[x]:setAlignment("center")
-                self.dbBox.contents[x]:setWrap(self.dbBox:getWidth()) 
-            end
-            index = index + 1
-        end
-    end
 end

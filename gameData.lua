@@ -143,6 +143,7 @@ function Game:changeScreen(index)
 end
 
 function Game:update(dt)
+    updateList(UI.BOX, dt)
     self:updateDisplay()
     self.mainGameTimer:update(dt)
     if self.mainGameTimer:isExpired() then self.mainTimePassed = self.mainTimePassed + 1 self.mainGameTimer:reset() end
@@ -161,6 +162,7 @@ function Game:draw()
     else
         self.mainMenu:draw()
     end
+    drawList(UI.BOX)
 	push:finish()
 end
 

@@ -102,8 +102,16 @@ function KeyboardManager:getBuffasStr()
     return tmp
 end
 
-function KeyboardManager:getLastKeyPress()
-    return self.buffer[#self.buffer]
+function KeyboardManager:getLastKeyPress(waitForNextKeyPress)
+    local waitForNextKeyPress = waitForNextKeyPress or false
+    if waitForNextKeyPress then
+        if self.keyPressFlag then
+            return self.buffer[#self.buffer]
+        end
+        return nil
+    else
+        return self.buffer[#self.buffer]
+    end
 end
 
 function KeyboardManager:addKeyPress(keyPress)

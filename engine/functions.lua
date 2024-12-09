@@ -99,3 +99,11 @@ end
 function setMainMenu()
     G.gameScreen = 0
 end
+
+function removeSelf(obj, tbl)
+    for x, y in ipairs(tbl) do
+        if y == obj then 
+            table.remove(tbl, x)
+        end
+    end
+end
