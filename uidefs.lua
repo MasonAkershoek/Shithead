@@ -115,7 +115,6 @@ MAKE_DEBUG_BOX = function ()
             end
         end
     )
-    logger:log("made debug Box")
     SETTINGS.debugBoxActive = true
 end
 
@@ -145,7 +144,6 @@ MAKE_ESC_MENU = function ()
             end
         end
     )
-    logger:log("Made esc menu", " ", #UI.BOX)
 end
 
 -- UIDefinitions for the Main Menu
