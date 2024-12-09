@@ -14,8 +14,8 @@ MAKE_WIN_BOX = function()
         }
     )
     t:setActive()
-    t:addContent(UILabel.new(0, 0, 20, { alignment = "center", text = " WINS!!!\n" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, {
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center", text = " WINS!!!\n" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, {
         radius = 10,
         text = "Main Menu",
         color = "DARKERRED",
@@ -33,7 +33,7 @@ MAKE_WIN_BOX = function()
     t:addFunction(
         function(self)
             if G.gamestate == "CLEANUP" then
-                removeSelf(self, UI.BOX)
+                removeSelf(self, G.UI.BOX)
             end
         end
     )
@@ -53,10 +53,10 @@ MAKE_DEBUG_BOX = function()
         }
     );
     t:setActive()
-    t:addContent(UILabel.new(0, 0, 50, { alignment = "center", text = "Debug Menu" }))
+    t:addChildren(UILabel.new(0, 0, 50, { alignment = "center", text = "Debug Menu" }))
     for _, op in ipairs(G.cardTable.opa.opponents) do
-        t:addContent(UILabel.new(0, 0, 20, { alignment = "center", text = op.name .. ": " }))
-        t:addContent(UILabel.new(0, 0, 20, { alignment = "center", text = "Empty" }))
+        t:addChildren(UILabel.new(0, 0, 20, { alignment = "center", text = op.name .. ": " }))
+        t:addChildren(UILabel.new(0, 0, 20, { alignment = "center", text = "Empty" }))
     end
 
     t:addFunction(
@@ -80,7 +80,7 @@ MAKE_DEBUG_BOX = function()
     t:addFunction(
         function(self)
             if G.SETTINGS.debugBoxActive and G.KEYBOARDMANAGER:getLastKeyPress() == "k" then
-                removeSelf(self, UI.BOX)
+                removeSelf(self, G.UI.BOX)
                 G.SETTINGS.debugBoxActive = false
             end
         end
@@ -101,10 +101,10 @@ MAKE_ESC_MENU = function()
         }
     )
     t:setActive()
-    t:addContent(UILabel.new(0, 0, 50, { alignment = "center", text = "Menu" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "options" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit" }))
+    t:addChildren(UILabel.new(0, 0, 50, { alignment = "center", text = "Menu" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "options" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit" }))
     t:addFunction(
         function(self)
             if G.SETTINGS.escMenuActive and G.KEYBOARDMANAGER:getLastKeyPress() == "escape" then
@@ -157,10 +157,10 @@ MAKE_MAIN_MENU_BUTTON_BOX = function()
         }
     )
     t:setActive()
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Play", color = "DARKERBLUE", action = "play" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Multiplayer", color = "DARKERYELLOW" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "DARKERGREEN" }))
-    t:addContent(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "DARKERRED", action = "quit" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Play", color = "DARKERBLUE", action = "play" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Multiplayer", color = "DARKERYELLOW" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "DARKERGREEN" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "DARKERRED", action = "quit" }))
 end
 
 MAKE_INTRO_CARDS = function()
@@ -169,7 +169,7 @@ end
 
 MAKE_FPS_HUD = function()
     local t = UIBox.new(
-        100,
+        200,
         100,
         {
             drawBox = false,
@@ -178,18 +178,19 @@ MAKE_FPS_HUD = function()
     )
     t:setActive()
     logger:log(t.drawBox)
-    t:addContent(UILabel.new(0, 0, 20, { alignment = "center" }))
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addFunction(
         function(self)
-            self.contents[1]:setText(love.timer.getFPS())
+            self.children[1]:setText("FPS: " .. love.timer.getFPS())
+            self.children[1]:setAlignment("center")
+            self.children[1]:setWrap(self:getWidth())
         end
     )
     t:addFunction(
         function(self)
-            table.insert(G.BUFFEREDFUNCS, function ()
+            table.insert(G.BUFFEREDFUNCS, function()
                 if G.KEYBOARDMANAGER:getLastKeyPress() == "f3" and G.SETTINGS.SHOWFPS then
                     G.SETTINGS.SHOWFPS = false
-                    logger:log("Close FPS")
                     removeSelf(self, G.UI.BOX)
                 end
             end)

@@ -9,15 +9,16 @@ function MainMenu.new()
     self.T = "MainMenu"
 
     -- Main Menu Title
-    self.titleCards = TitleCards.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2), (G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2))
-    self.title = {"S", "H", "I", "T", "H", "E", "A", "D"}
+    self.titleCards = TitleCards.new((G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2),
+        (G.SCREENVARIABLES["GAMEDEMENTIONS"].y / 2))
+    self.title = { "S", "H", "I", "T", "H", "E", "A", "D" }
     self.titleIndex = 1
     self.titleTimer = Timer.new(.08)
     self.titleDone = false
     self.exitDone = false
     self.flag = false
     self.pitch = 1
-    self.versionText = love.graphics.newText(G.GAMEFONT, {{0,0,0}, "Version: ", GAME_VERSION})
+    self.versionText = love.graphics.newText(G.GAMEFONT, { { 0, 0, 0 }, "Version: ", GAME_VERSION })
 
     -- Menu Buttons
     self.buttonBoxTimer = Timer.new(1.5)
@@ -25,8 +26,8 @@ function MainMenu.new()
     -- Exit
     self.exitFlag = false
 
-    self.demoBox = UIBox.new(600,350,DemoDef)
-    self.buttonBox = UIBox.new(1000,150,ButtonBoxDef)
+    self.demoBox = UIBox.new(600, 350)
+    self.buttonBox = UIBox.new(1000, 150)
     --self.signInBox = UIBox.new(500,250, {positions[1].x = G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2})
     logger:log("MainMenu Created")
     return self
@@ -36,7 +37,7 @@ function MainMenu:initTitleCards()
     if self.titleTimer:isExpired() then
         self.titleTimer:reset()
         local suit = math.random(4)
-        local tmp = Card.new(1,1, -150, (G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2))
+        local tmp = Card.new(1, 1, -150, (G.SCREENVARIABLES["GAMEDEMENTIONS"].y / 2))
         tmp.cardFace = G.CARDGRAPHICS["CARDLETTERS"]["card" .. G.CARDSUITS[suit] .. self.title[self.titleIndex]]
         tmp.active = false
         self.titleIndex = self.titleIndex + 1
@@ -45,7 +46,10 @@ function MainMenu:initTitleCards()
         TEsound.pitch("deal", self.pitch)
         self.pitch = self.pitch + .005
     end
-    if self.titleIndex == #self.title + 1 then self.titleIndex = 1 self.pitch = 1 end
+    if self.titleIndex == #self.title + 1 then
+        self.titleIndex = 1
+        self.pitch = 1
+    end
 end
 
 function MainMenu:exit()
@@ -55,20 +59,25 @@ function MainMenu:exit()
         self.titleCards:addDiscard(self.titleIndex)
         TEsound.pitch("deal", self.pitch)
         self.pitch = self.pitch - .005
-        self.titleIndex = self.titleIndex+1
+        self.titleIndex = self.titleIndex + 1
     end
     if self.titleIndex == #self.title + 1 then self.exitDone = true end
-    if self.exitDone and not self.flag then self.buttonBox:setActive() self.demoBox:setActive() self.flag = true end
+    if self.exitDone and not self.flag then
+        self.buttonBox:setActive()
+        self.demoBox:setActive()
+        self.flag = true
+    end
     if self.exitDone and not self.buttonBox.moving then G:changeScreen(1) end
 end
 
 function MainMenu:update(dt)
     -- Play the into animation
-    if #self.titleCards.cards ~= #self.title and not self.titleDone then 
-        self:initTitleCards() 
+    if #self.titleCards.cards ~= #self.title and not self.titleDone then
+        self:initTitleCards()
     elseif not self.titleDone then
-         self.titleTimer:stopTimer() self.titleDone = true 
-         logger:log("Title Done")
+        self.titleTimer:stopTimer()
+        self.titleDone = true
+        logger:log("Title Done")
     end
 
     -- Dely the movment of the buttons
@@ -93,25 +102,25 @@ function MainMenu:update(dt)
 end
 
 function MainMenu:draw()
-    love.graphics.draw(self.versionText, 100,G.SCREENVARIABLES["GAMEDEMENTIONS"].y*.9074)
+    love.graphics.draw(self.versionText, 100, G.SCREENVARIABLES["GAMEDEMENTIONS"].y * .9074)
     self.titleCards:draw()
     self.demoBox:draw()
     self.buttonBox:draw()
     --self.escMenu:draw()
 end
 
-
 --[[ Title Card Logic ]]
-TitleCards = setmetatable({}, {__index = HboxContainer})
+TitleCards = setmetatable({}, { __index = HboxContainer })
 TitleCards.__index = TitleCards
 
-function TitleCards.new(nx,ny)
-    local self = setmetatable(HboxContainer.new(nx,ny), TitleCards)
-        self.cards = {}
-        self.area = (G.SCREENVARIABLES["GAMEDEMENTIONS"].x/2) - (350)
-        self.discard = HboxContainer.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x + 200, G.SCREENVARIABLES["GAMEDEMENTIONS"].y/2)
-        self.discard.cards = {}
-        self.discard.area = 20
+function TitleCards.new(nx, ny)
+    local self = setmetatable(HboxContainer.new(nx, ny), TitleCards)
+    self.cards = {}
+    self.area = (G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2) - (350)
+    self.discard = HboxContainer.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x + 200, G.SCREENVARIABLES["GAMEDEMENTIONS"].y /
+    2)
+    self.discard.cards = {}
+    self.discard.area = 20
     return self
 end
 

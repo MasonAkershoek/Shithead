@@ -26,12 +26,17 @@ function Node.new(nx, ny)
     self.skew = Vector.new(0, 0)
     self.rotation = 0
 
+    -- Parent/Children pointers
+    self.parent = nil
+    self.children = {}
+
     -- Object Flags
     self.hoverFlag = false
 
     return self
 end
 
+-- Width and height getters
 function Node:getWidth()
     return (self.size.x * self.scale.x)
 end
@@ -40,11 +45,28 @@ function Node:getHeight()
     return (self.size.y * self.scale.y)
 end
 
---- Class: Node
---- Gets the center position of the node, or the the topleft, topright, bottomleft and bottomright points of the node
---- Needs updating, change the get width and hight functions to translate the with and height with the scale
----@param pos string ["center", "topleft", "topright", "bottomleft", "bottomright"] default "center"
----@return vector
+-- Parent Child relationship functions
+function Node:addChildren(newChild, tag)
+    newChild:setParent(self)
+    if tag then
+        self.children[tag] = newChild
+    else
+        table.insert(self.children, newChild)
+    end
+end
+
+function Node:removeChild(tag)
+    table.remove(self.children[tag])
+end
+
+function Node:setParent(newParent)
+    self.parent = newParent
+end
+
+function Node:removeParent()
+    self:setParent(nil)
+end
+
 function Node:getPos(pos)
     local pos = pos or "center"
     local ret = Vector.new()
@@ -78,19 +100,10 @@ function Node:getPos(pos)
     return ret
 end
 
---- Class: Node
---- This function sets the mouse hover dead zone of the node object and is decendant classes
----@param deadZone table
 function Node:setDeadZone(deadZone)
     self.deadZone = deadZone
 end
 
---- Class: Node
---- Method sets the visual scale of the node object and its decendants
---- one or both paramaters can be passed depending on what scale you want to change
---- for x pass nil if you dont want to change it but want to change y
----@param nxs integer
----@param nys integer
 function Node:setScale(nxs, nys)
     nxs = nxs or nil
     nys = nys or nil
@@ -115,11 +128,6 @@ function Node:setSkew(nxs, nys)
     end
 end
 
---- Class: Node
---- This method sets the x or y or both positions of the node object
---- One or both paramaters can be passed depending on what value you want to change
----@param nx integer
----@param ny integer
 function Node:setPos(nx, ny)
     nx = nx or nil
     ny = ny or nil
@@ -131,11 +139,6 @@ function Node:setPos(nx, ny)
     end
 end
 
---- Class: Node
---- this function is only to be called by the checkMouseHover method and checks if the mouse is inside the dead zone
----@param mx integer
----@param my integer
----@return boolean
 function Node:checkDeadZoneMouseHover(mx, my)
     -- Check the dead Zone
     if self.deadZone ~= nil then
@@ -145,13 +148,9 @@ function Node:checkDeadZoneMouseHover(mx, my)
     else
         return false
     end
-    return nil
+    return false
 end
 
---- Class: Node
---- This method is used to check if the mouse is currently hovering over he node object
---- It takes into account scale and deadzones
----@return boolean
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
     --local mousex, mousey = push:toGame(mousex, mousey)

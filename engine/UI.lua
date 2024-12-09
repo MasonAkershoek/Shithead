@@ -115,7 +115,6 @@ function UIBox.new(w, h, args)
     self.T = "UIBox"
 
     self.alignment = args.alignment or "Vertical"
-    self.contents = args.contents or {}
     self.functions = args.functions or {}
     self.positions = args.positions or { Vector.new(0, 0), Vector.new(0, 0) }
     self.active = false
@@ -129,24 +128,8 @@ function UIBox.new(w, h, args)
     return self
 end
 
-function UIBox:removeContent(index)
-    table.remove(self.contents, index)
-    self.changed = true
-end
-
-function UIBox:addContent(newContent, Index)
-    local index = Index or #self.contents + 1
-    newContent.parent = self
-    table.insert(self.contents, index, newContent)
-    self.changed = true
-end
-
 function UIBox:addFunction(newFunction)
     table.insert(self.functions, newFunction)
-end
-
-function UIBox:getContentSize()
-    return #self.contents
 end
 
 function UIBox:setActive()
@@ -166,14 +149,14 @@ function UIBox:HAlign()
     local tmpWidth = 0
     local sizeOffset = 400
     tmpHeight = 0
-    if #self.contents > 0 then
-        local xpoints = (((self.size.x - sizeOffset) + (self.size.x - (self.borderSize / 2) - sizeOffset)) / (#self.contents + 1))
+    if #self.children > 0 then
+        local xpoints = (((self.size.x - sizeOffset) + (self.size.x - (self.borderSize / 2) - sizeOffset)) / (#self.children + 1))
         local nextPoint = (self.pos.x + sizeOffset - self.size.x)
-        for x = 1, #self.contents do
+        for x = 1, #self.children do
             if flag then
-                self.contents[x]:setPosImidiate((xpoints + nextPoint), self.pos.y)
+                self.children[x]:setPosImidiate((xpoints + nextPoint), self.pos.y)
             else
-                self.contents[x]:setPosImidiate((xpoints + nextPoint))
+                self.children[x]:setPosImidiate((xpoints + nextPoint))
             end
             nextPoint = nextPoint + xpoints
         end
@@ -182,12 +165,12 @@ end
 
 function UIBox:VAlign(padding)
     padding = padding or 00
-    if #self.contents > 0 then
+    if #self.children > 0 then
         local nextPoint = (self.pos.y - self.size.y / 2) + 10
-        for x = 1, #self.contents do
-            nextPoint = nextPoint + ((self.contents[x].size.y / 2) * self.contents[x].baseScale)
-            self.contents[x]:setPosImidiate(self.pos.x, nextPoint)
-            nextPoint = ((nextPoint + ((self.contents[x].size.y / 2) * self.contents[x].baseScale)) + padding)
+        for x = 1, #self.children do
+            nextPoint = nextPoint + ((self.children[x].size.y / 2) * self.children[x].baseScale)
+            self.children[x]:setPosImidiate(self.pos.x, nextPoint)
+            nextPoint = ((nextPoint + ((self.children[x].size.y / 2) * self.children[x].baseScale)) + padding)
         end
     end
 end
@@ -205,16 +188,16 @@ function UIBox:update(dt)
     end
     if self.alignment == "Vertical" then self:VAlign(10) else self:HAlign() end
     self:move(dt)
-    for item = 1, #self.contents do
-        if self.contents[item].T == "UIButton" then
-            self.contents[item]:update(dt)
+    for item = 1, #self.children do
+        if self.children[item].T == "UIButton" then
+            self.children[item]:update(dt)
         end
     end
     if self.changed then
-        for item = 1, #self.contents do
-            if self.contents[item].T == "UILabel" then
+        for item = 1, #self.children do
+            if self.children[item].T == "UILabel" then
                 --self.contents[item]:update()
-                self.contents[item]:setWrap(self.size.x - (self.borderSize * 2) - (self.padding * 2))
+                self.children[item]:setWrap(self.size.x - (self.borderSize * 2) - (self.padding * 2))
             end
         end
         if self.active then
@@ -242,7 +225,7 @@ function UIBox:draw()
             self.size.y - self.borderSize,
             self.radius, self.radius)
     end
-    drawList(self.contents)
+    drawList(self.children)
 end
 
 -- UILabel class definition
@@ -316,14 +299,6 @@ end
 UIButton = setmetatable({}, { __index = UINode })
 UIButton.__index = UIButton
 
---- Class: UIButton
---- This is the Constructor for the UIButton Class
----@param x integer
----@param y integer
----@param w integer
----@param h integer
----@param args table "Posable arguments [action, text, color, textFontSize]"
----@return UIButton
 function UIButton.new(x, y, w, h, args)
     local args = args or {}
     local self = setmetatable(UINode.new(x, y, w, h, args), UIButton)

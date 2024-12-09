@@ -9,10 +9,10 @@ return {
 },
 -- Table: {2}
 {
+   ["DISPLAY"]={3},
+   ["DIPLAYNUM"]=1,
    ["SCREENMODE"]="Borderless",
    ["CURRENTDISPLAY"]=1,
-   ["DIPLAYNUM"]=1,
-   ["DISPLAY"]={3},
 },
 -- Table: {3}
 {
