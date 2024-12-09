@@ -38,7 +38,7 @@ Ideas
 * When a 8 is played use some kind of shader effect to make the 8 card look like glass when hovered over
 * when a 5 is played make blue arrow partical effects that go down
 
-To-Do Before demo 
+To-Do Before demo
 -------------------
 * Get all special cards working
 * Get the main menu to work
@@ -49,13 +49,12 @@ To-Do Before demo
 function love.load()
 	OS = love.system.getOS()
 	math.randomseed(os.time())
-	push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["SCREENSIZE"].y, G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y, {fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched=false})
-	G:initGameScreens()
+	G:setup()
 end
 
 local function error_printer(msg, layer)
-	print((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
-	logger:log((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
+	print((debug.traceback("Error: " .. tostring(msg), 1 + (layer or 1)):gsub("\n[^\n]+$", "")))
+	logger:log((debug.traceback("Error: " .. tostring(msg), 1 + (layer or 1)):gsub("\n[^\n]+$", "")))
 end
 
 function love.errorhandler(msg)
@@ -85,7 +84,7 @@ function love.errorhandler(msg)
 	end
 	if love.joystick then
 		-- Stop all joystick vibrations.
-		for i,v in ipairs(love.joystick.getJoysticks()) do
+		for i, v in ipairs(love.joystick.getJoysticks()) do
 			v:setVibration()
 		end
 	end
@@ -132,7 +131,7 @@ function love.errorhandler(msg)
 	local function draw()
 		if not love.graphics.isActive() then return end
 		local pos = 70
-		love.graphics.clear(89/255, 157/255, 220/255)
+		love.graphics.clear(89 / 255, 157 / 255, 220 / 255)
 		love.graphics.printf(p, pos, pos, love.graphics.getWidth() - pos)
 		love.graphics.present()
 	end
@@ -161,11 +160,11 @@ function love.errorhandler(msg)
 			elseif e == "touchpressed" then
 				local name = love.window.getTitle()
 				if #name == 0 or name == "Untitled" then name = "Game" end
-				local buttons = {"OK", "Cancel"}
+				local buttons = { "OK", "Cancel" }
 				if love.system then
 					buttons[3] = "Copy to clipboard"
 				end
-				local pressed = love.window.showMessageBox("Quit "..name.."?", "", buttons)
+				local pressed = love.window.showMessageBox("Quit " .. name .. "?", "", buttons)
 				if pressed == 1 then
 					return 1
 				elseif pressed == 3 then
@@ -180,34 +179,28 @@ function love.errorhandler(msg)
 			love.timer.sleep(0.1)
 		end
 	end
-
 end
 
-function love.keypressed(key,scancode,isrepeat)
+function love.keypressed(key, scancode, isrepeat)
 	G.KEYBOARDMANAGER:addKeyPress(key)
-	if key == "k" and not SETTINGS.debugBoxActive then
+	if key == "k" and not G.SETTINGS.debugBoxActive then
 		G.KEYBOARDMANAGER.buffer = {}
-		EVENTMANAGER:emit("activateDebug")
+		G.EVENTMANAGER:emit("activateDebug")
 	end
-	if key == "escape" and not SETTINGS.escMenuActive then
+	if key == "escape" and not G.SETTINGS.escMenuActive then
 		G.KEYBOARDMANAGER.buffer = {}
-		EVENTMANAGER:emit("activateEscapeMenu")
+		G.EVENTMANAGER:emit("activateEscapeMenu")
 	end
 end
-  
+
 function love.update(dt)
 	G:update(dt)
-	TIMERMANAGER:update(dt)
-	EVENTMANAGER:update(dt)
+	--G.CARDGRAPHICSTIMERMANAGER:update(dt)
+	G.EVENTMANAGER:update(dt)
 	TEsound.cleanup()
-	--myTextField:update(dt)
 	G.KEYBOARDMANAGER.keyPressFlag = false
-	--fps:setText("FPS: " .. love.timer.getFPS())
 end
-  
-  
-function love.draw()   
+
+function love.draw()
 	G:draw()
-	--fps:draw()
-	--myTextField:draw()
 end

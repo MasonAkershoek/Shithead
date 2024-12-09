@@ -3,7 +3,7 @@
 -- @author Mason Akershoek (masonakershoek@gmail.com)
 
 --- This objects serves as a base object for all other UIObjects and shouldnt ever be used as standalone
-UINode = setmetatable({}, {__index = Moveable})
+UINode = setmetatable({}, { __index = Moveable })
 UINode.__index = UINode
 
 --- Object Constructor for the UINode Object
@@ -13,13 +13,13 @@ UINode.__index = UINode
 ---@param h integer "Height of the Node"
 ---@param args table "This table contains extra options for any of the UI objects"
 ---@return table "Returns a UINode Object"
-function UINode.new(x,y,w,h,args)
+function UINode.new(x, y, w, h, args)
     local args = args or {}
-    local self = setmetatable(Moveable.new(x,y,false), UINode)
+    local self = setmetatable(Moveable.new(x, y, false), UINode)
 
     self.T = "UINode"
-    
-    self.size = Vector.new(w,h)
+
+    self.size = Vector.new(w, h)
     self.centerPoint = nil
 
     -- Setting UI Elements attrabutes
@@ -30,7 +30,7 @@ function UINode.new(x,y,w,h,args)
 
     -- Shadow
     self.shadowOffset = 10
-    self.shadowPos = Vector.new(self.pos.x+self.shadowOffset,self.pos.y+self.shadowOffset)
+    self.shadowPos = Vector.new(self.pos.x + self.shadowOffset, self.pos.y + self.shadowOffset)
     self.showShadow = args.showShadow or true
     return self
 end
@@ -84,19 +84,20 @@ end
 
 function UINode:drawShadow()
     love.graphics.setColor(lovecolors:getColor("BLACK", .5))
-    love.graphics.rectangle("fill", self.pos.x - (self.size.x/2) +5, self.pos.y - (self.size.y/2)+5, self.size.x, self.size.y, self.radius, self.radius)
+    love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2) + 5, self.pos.y - (self.size.y / 2) + 5, self.size.x,
+        self.size.y, self.radius, self.radius)
 end
 
 function UINode:drawBorder(color)
 end
 
 -- UIBox class definition
-UIBox = setmetatable({}, {__index = UINode})
+UIBox = setmetatable({}, { __index = UINode })
 UIBox.__index = UIBox
 
 --[[
     Add an over shoot to the move function that allows you to specify an amout of over shoot for the
-    object to take to make the movment feel more fluid 
+    object to take to make the movment feel more fluid
 ]]
 
 --- Class: UIBox
@@ -105,18 +106,18 @@ UIBox.__index = UIBox
 ---@param h integer
 ---@param args table ["position[1-2].x/y", "alignment", "content", "positions", "borderSize", "color"]
 ---@return UIBox
-function UIBox.new(w,h,args)
+function UIBox.new(w, h, args)
     local args = args or {}
     local x = args.positions[1].x or 0
     local y = args.positions[1].y or 0
-    local self = setmetatable(UINode.new(x,y,w,h,args), UIBox)
+    local self = setmetatable(UINode.new(x, y, w, h, args), UIBox)
 
     self.T = "UIBox"
 
     self.alignment = args.alignment or "Vertical"
     self.contents = args.contents or {}
     self.functions = args.functions or {}
-    self.positions = args.positions or {Vector.new(0,0),Vector.new(0,0)}
+    self.positions = args.positions or { Vector.new(0, 0), Vector.new(0, 0) }
     self.active = false
     self.borderSize = args.borderSize or 10
     self.padding = args.padding or 0
@@ -164,9 +165,9 @@ function UIBox:HAlign()
     local sizeOffset = 400
     tmpHeight = 0
     if #self.contents > 0 then
-        local xpoints = (((self.size.x-sizeOffset) + (self.size.x - (self.borderSize/2) -sizeOffset)) / (#self.contents + 1))
-        local nextPoint = (self.pos.x+sizeOffset - self.size.x)
-        for x=1, #self.contents do
+        local xpoints = (((self.size.x - sizeOffset) + (self.size.x - (self.borderSize / 2) - sizeOffset)) / (#self.contents + 1))
+        local nextPoint = (self.pos.x + sizeOffset - self.size.x)
+        for x = 1, #self.contents do
             if flag then
                 self.contents[x]:setPosImidiate((xpoints + nextPoint), self.pos.y)
             else
@@ -180,11 +181,11 @@ end
 function UIBox:VAlign(padding)
     padding = padding or 00
     if #self.contents > 0 then
-        local nextPoint = (self.pos.y - self.size.y/2)+10
-        for x=1, #self.contents do
-            nextPoint = nextPoint + ((self.contents[x].size.y/2) * self.contents[x].baseScale)
+        local nextPoint = (self.pos.y - self.size.y / 2) + 10
+        for x = 1, #self.contents do
+            nextPoint = nextPoint + ((self.contents[x].size.y / 2) * self.contents[x].baseScale)
             self.contents[x]:setPosImidiate(self.pos.x, nextPoint)
-            nextPoint = ((nextPoint + ((self.contents[x].size.y/2) * self.contents[x].baseScale)) + padding)
+            nextPoint = ((nextPoint + ((self.contents[x].size.y / 2) * self.contents[x].baseScale)) + padding)
         end
     end
 end
@@ -192,7 +193,7 @@ end
 --[[
     change update list to allow the passing of arguments
     for all contents of the UIBox there update functions need have a pointer to there parent function
-    add a variable to the UINode called changed that is set anytime a function that changes the dementions/pos 
+    add a variable to the UINode called changed that is set anytime a function that changes the dementions/pos
     of a ui object happens and then resets at the end of the update function
 
 ]]
@@ -202,16 +203,16 @@ function UIBox:update(dt)
     end
     if self.alignment == "Vertical" then self:VAlign(10) else self:HAlign() end
     self:move(dt)
-    for item=1, #self.contents do
+    for item = 1, #self.contents do
         if self.contents[item].T == "UIButton" then
             self.contents[item]:update(dt)
         end
     end
     if self.changed then
-        for item=1, #self.contents do
+        for item = 1, #self.contents do
             if self.contents[item].T == "UILabel" then
                 --self.contents[item]:update()
-                self.contents[item]:setWrap(self.size.x-(self.borderSize * 2)-(self.padding*2))
+                self.contents[item]:setWrap(self.size.x - (self.borderSize * 2) - (self.padding * 2))
             end
         end
         if self.active then
@@ -229,16 +230,18 @@ function UIBox:draw()
     end
     if self.showBorder then
         love.graphics.setColor(lovecolors:getColor("LIGHTGRAY"))
-        love.graphics.rectangle("fill", self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x, self.size.y, self.radius,self.radius)
+        love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2), self.pos.y - (self.size.y / 2), self.size.x,
+            self.size.y, self.radius, self.radius)
     end
     love.graphics.setColor(lovecolors:getColor("DARKGRAY"))
-    love.graphics.rectangle("fill", self.pos.x-((self.size.x-self.borderSize)/2), self.pos.y-((self.size.y-self.borderSize)/2), self.size.x-self.borderSize, self.size.y-self.borderSize, self.radius, self.radius)
+    love.graphics.rectangle("fill", self.pos.x - ((self.size.x - self.borderSize) / 2),
+        self.pos.y - ((self.size.y - self.borderSize) / 2), self.size.x - self.borderSize, self.size.y - self.borderSize,
+        self.radius, self.radius)
     drawList(self.contents)
 end
 
-
 -- UILabel class definition
-UILabel = setmetatable({}, {__index = UINode})
+UILabel = setmetatable({}, { __index = UINode })
 UILabel.__index = UILabel
 
 --- Class UILabel
@@ -247,9 +250,9 @@ UILabel.__index = UILabel
 ---@param y integer
 ---@param fontSize integer
 ---@param args table "Posable arguments [text, widthLimit, alignment, color]"
-function UILabel.new(x,y,fontSize,args)
+function UILabel.new(x, y, fontSize, args)
     local locArgs = args or {}
-    local self = setmetatable(UINode.new(x,y,0,0,args), UILabel)
+    local self = setmetatable(UINode.new(x, y, 0, 0, args), UILabel)
 
     self.T = "UILabel"
 
@@ -260,7 +263,7 @@ function UILabel.new(x,y,fontSize,args)
     self.color = locArgs.color or "WHITE"
 
     self.textGraphics = love.graphics.newText(FONTMANAGER:getFont("GAMEFONT", self.fontSize), self.text)
-    self.wdithLimit =  locArgs.widthLimit or self.textGraphics:getWidth() or 10
+    self.wdithLimit = locArgs.widthLimit or self.textGraphics:getWidth() or 10
     self.textGraphics:setf(self.text, self.wdithLimit, self.alignment)
     self:setWidthAndHeight()
     return self
@@ -276,10 +279,9 @@ function UILabel:getText()
     return self.text
 end
 
-
--- set the text without formatting to get the width of the unformatted text then 
+-- set the text without formatting to get the width of the unformatted text then
 -- check if the newWidth is less then self.size.x
--- fix the wrap function, there should probably be both a with and wrap variable 
+-- fix the wrap function, there should probably be both a with and wrap variable
 function UILabel:setWrap(newWidth)
     self.textGraphics:set(self.text)
     self:setWidthAndHeight()
@@ -287,7 +289,7 @@ function UILabel:setWrap(newWidth)
         self.wdithLimit = newWidth
         self.textGraphics:setf(self.text, newWidth, self.alignment)
         self:setWidthAndHeight()
-    end 
+    end
 end
 
 function UILabel:setAlignment(alignment)
@@ -302,11 +304,11 @@ end
 
 function UILabel:draw()
     love.graphics.setColor(lovecolors:getColor(self.color))
-    love.graphics.draw(self.textGraphics, self.pos.x, self.pos.y,0,1,1,self.size.x/2, self.size.y/2)
+    love.graphics.draw(self.textGraphics, self.pos.x, self.pos.y, 0, 1, 1, self.size.x / 2, self.size.y / 2)
 end
 
 -- UIButton class definition
-UIButton = setmetatable({}, {__index = UINode})
+UIButton = setmetatable({}, { __index = UINode })
 UIButton.__index = UIButton
 
 --- Class: UIButton
@@ -317,16 +319,16 @@ UIButton.__index = UIButton
 ---@param h integer
 ---@param args table "Posable arguments [action, text, color, textFontSize]"
 ---@return UIButton
-function UIButton.new(x,y,w,h,args)
+function UIButton.new(x, y, w, h, args)
     local args = args or {}
-    local self = setmetatable(UINode.new(x,y,w,h,args), UIButton)
+    local self = setmetatable(UINode.new(x, y, w, h, args), UIButton)
 
     self.T = "UIButton"
 
     self.action = args.action or nil
     self.color = args.color or "RED"
     self.text = args.text or "Empty!"
-    self.textGraphics = UILabel.new(self.pos.x,self.pos.y, args.textFontSize, {text=self.text, alignment="center"})
+    self.textGraphics = UILabel.new(self.pos.x, self.pos.y, args.textFontSize, { text = self.text, alignment = "center" })
     self.oldmousedown = ""
     self.clickTimer = Timer.new(.2)
     self.clickTimer:stopTimer()
@@ -337,7 +339,7 @@ function UIButton:onHover()
     if self:checkMouseHover() then
         self.hoverFlag = true
     else
-       self.hoverFlag = false 
+        self.hoverFlag = false
     end
 end
 
@@ -349,7 +351,7 @@ function UIButton:onSelect()
     if self:checkMouseHover() then
         if love.mouse.isDown(1) and not self.oldmousedown then
             if self.action ~= nil then
-                EVENTMANAGER:emit(self.action)
+                G.EVENTMANAGER:emit(self.action)
                 self.clickTimer:start()
             else
                 print("No Action Supplied!")
@@ -371,27 +373,29 @@ function UIButton:draw()
     if self.showShadow then
         self:drawShadow()
     end
-    self.textGraphics:setPosImidiate(self.pos.x,self.pos.y)
+    self.textGraphics:setPosImidiate(self.pos.x, self.pos.y)
     if self.hoverFlag then
-        love.graphics.setColor(lovecolors:getColor(self.color,1,nil,.3))
+        love.graphics.setColor(lovecolors:getColor(self.color, 1, nil, .3))
     else
-        love.graphics.setColor(lovecolors:getColor(self.color)) 
+        love.graphics.setColor(lovecolors:getColor(self.color))
     end
     if self.clickTimer:isStopped() then
-        love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
+        love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2), self.pos.y - (self.size.y / 2), self.size.x,
+            self.size.y, self.radius, self.radius)
     else
-        love.graphics.rectangle("fill", self.pos.x - (self.size.x/2)+self.shadowOffset/3, self.pos.y - (self.size.y/2)+self.shadowOffset/3, self.size.x, self.size.y, self.radius, self.radius)
+        love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2) + self.shadowOffset / 3,
+            self.pos.y - (self.size.y / 2) + self.shadowOffset / 3, self.size.x, self.size.y, self.radius, self.radius)
     end
-    love.graphics.setColor({1,1,1})
+    love.graphics.setColor({ 1, 1, 1 })
     self.textGraphics:draw()
 end
 
-UITextField = setmetatable({}, {__index = UINode})
+UITextField = setmetatable({}, { __index = UINode })
 UITextField.__index = UITextField
 
-function UITextField.new(x,y,w,h,fontSize,args)
+function UITextField.new(x, y, w, h, fontSize, args)
     local args = args or {}
-    local self = setmetatable(UINode.new(x,y,w,h,args), UITextField)
+    local self = setmetatable(UINode.new(x, y, w, h, args), UITextField)
 
     self.T = "UITextField"
 
@@ -402,18 +406,18 @@ function UITextField.new(x,y,w,h,fontSize,args)
     self.textColor = args.textColor or "WHITE"
     -- Text Field Text
     self.text = {}
-    self.textGraphics = UILabel.new(0,0,self.fontSize,{alignment="left", text="", color=self.textColor})
-    self.textGraphics:setPosImidiate(self.pos.x,self.pos.y)
+    self.textGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = self.textColor })
+    self.textGraphics:setPosImidiate(self.pos.x, self.pos.y)
 
-    -- Border stuff 
+    -- Border stuff
     self.borderSize = args.borderSize or 0
     self.borderColorSelected = args.borderColorSelected or "WHITE"
     self.borderColor = args.borderColor or "WHITE"
 
     -- Temporary Text for Field
     self.tmpText = args.tmpText or ""
-    self.tmpTextGraphics = UILabel.new(0,0,self.fontSize,{alignment="left", text="",color="LIGHTGRAY"})
-    self.tmpTextGraphics:setPosImidiate(self.pos.x,self.pos.y)
+    self.tmpTextGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = "LIGHTGRAY" })
+    self.tmpTextGraphics:setPosImidiate(self.pos.x, self.pos.y)
     self.tmpTextGraphics:setText(self.tmpText)
     self.tmpTextGraphics:setWrap(self.size.x)
 
@@ -433,12 +437,12 @@ function UITextField:select()
     elseif (not self:checkMouseHover() and self.selected and love.mouse.isDown(1)) or love.keyboard.isDown("escape") and self.selected then
         logger:log("Text Field Unselected")
         self.selected = false
-    end  
+    end
 end
 
 function UITextField:getText()
     local tmp = ""
-    for x,v in ipairs(self.text) do
+    for x, v in ipairs(self.text) do
         tmp = tmp .. v
     end
     return tmp
@@ -446,7 +450,7 @@ end
 
 function UITextField:addText(newChar)
     if newChar ~= "" and #self.text < self.maxLen then
-        table.insert(self.text, #self.text+1, newChar)
+        table.insert(self.text, #self.text + 1, newChar)
         self.textGraphics:setText(self:getText())
         self.textGraphics:setWrap(self.size.x)
         logger:log("Text Added To", self.T, newChar)
@@ -454,7 +458,7 @@ function UITextField:addText(newChar)
 end
 
 function UITextField:backSpace()
-    if #self.text > 0 then 
+    if #self.text > 0 then
         table.remove(self.text, #self.text)
         self.textGraphics:setText(self:getText())
         self.textGraphics:setWrap(self.size.x)
@@ -462,7 +466,7 @@ function UITextField:backSpace()
 end
 
 function UITextField:showCursor()
-    
+
 end
 
 function UITextField:update(dt)
@@ -482,9 +486,12 @@ function UITextField:draw()
     else
         love.graphics.setColor(lovecolors:getColor(self.borderColor))
     end
-    love.graphics.rectangle("fill", self.pos.x - (self.size.x/2)-(self.borderSize/2), self.pos.y - (self.size.y/2)-(self.borderSize/2), self.size.x+self.borderSize, self.size.y+self.borderSize, self.radius, self.radius)
+    love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2) - (self.borderSize / 2),
+        self.pos.y - (self.size.y / 2) - (self.borderSize / 2), self.size.x + self.borderSize,
+        self.size.y + self.borderSize, self.radius, self.radius)
     love.graphics.setColor(lovecolors:getColor(self.color))
-    love.graphics.rectangle("fill", self.pos.x - (self.size.x/2), self.pos.y - (self.size.y/2), self.size.x, self.size.y, self.radius, self.radius)
+    love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2), self.pos.y - (self.size.y / 2), self.size.x,
+        self.size.y, self.radius, self.radius)
     if #self.text == 0 and not self.selected then
         self.tmpTextGraphics:draw()
     else

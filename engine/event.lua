@@ -19,7 +19,7 @@ function EventManager:on(eventName, callback)
 end
 
 function EventManager:emit(eventName, tim)
-    if not tim then 
+    if not tim then
         print("Event Emited")
         local callbacks = self.listeners[eventName]
         print(#callbacks)
@@ -31,12 +31,12 @@ function EventManager:emit(eventName, tim)
     else
         print("Event Added to Queue")
         tmp = G.TIMERMANAGER:addTimer(tim)
-        table.insert(self.queue, {eventName, tmp})
+        table.insert(self.queue, { eventName, tmp })
     end
 end
 
 function EventManager:update(dt)
-    for _,event in ipairs(self.queue) do
+    for _, event in ipairs(self.queue) do
         if G.TIMERMANAGER:checkExpire(event[2]) then
             print("Timer Expired")
             print(event[1])
@@ -51,12 +51,10 @@ Event.__index = Event
 function Event.new(args)
     self.triger = args.triger or "imidiate"
     self.delay = args.delay or nil
-    if self.delay then 
+    if self.delay then
         self.timer = TIMERMANAGER:addTimer(delay)
     end
     if self.triger == "condition" then
         self.conditionCheck = args.conditionCallback
     end
-    
-
 end

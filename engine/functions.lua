@@ -7,7 +7,7 @@
 ---@param value any
 ---@param list table
 function ifIn(value, list)
-    for x=1, #list do
+    for x = 1, #list do
         if value == list[x] then
             return true
         end
@@ -18,8 +18,8 @@ end
 --- Takes in a table of objects that all contain a draw function and calls them in the order they appear in the list
 ---@param list table
 function drawList(list)
-    if #list ~= 0 then 
-        for x=1, #list do
+    if #list ~= 0 then
+        for x = 1, #list do
             list[x]:draw()
         end
     end
@@ -29,8 +29,8 @@ end
 ---@param list table
 ---@param dt integer
 function updateList(list, dt)
-    if #list ~= 0 then 
-        for x=1, #list do
+    if #list ~= 0 then
+        for x = 1, #list do
             list[x]:update(dt)
         end
     end
@@ -43,7 +43,7 @@ end
 function calcDistance(newPos, currentPos)
     local dirx = newPos.x - currentPos.x
     local diry = newPos.y - currentPos.y
-    return math.sqrt((dirx^2) + (diry^2))
+    return math.sqrt((dirx ^ 2) + (diry ^ 2))
 end
 
 -- Move somewhere else, This function is to spesific to shithead to be in this file
@@ -53,7 +53,7 @@ end
 ---@param tCardRank any
 ---@return boolean
 function checkCard(pCardRank, tCardRank)
-    if ifIn(pCardRank, {2,5,8,10}) then
+    if ifIn(pCardRank, { 2, 5, 8, 10 }) then
         return true
     end
     if tCardRank == 5 then
@@ -66,17 +66,17 @@ end
 
 -- Event Callbacks -- Depreciate
 function play()
-	G.mainMenu.exitFlag = true
+    G.mainMenu.exitFlag = true
 end
 
 --- This function sorts throiugh key presses to pass only the values requested
 ---@param keyPress string
 ---@return string
 function convertKeyPress(keyPress)
-    if #keyPress ==1 then
+    if #keyPress == 1 then
         return keyPress
     end
-    if keyPress == "space" then  return " " end
+    if keyPress == "space" then return " " end
     if keyPress == "backspace" then return keyPress end
     return ""
 end
@@ -87,7 +87,7 @@ end
 
 function removeSelf(obj, tbl)
     for x, y in ipairs(tbl) do
-        if y == obj then 
+        if y == obj then
             table.remove(tbl, x)
         end
     end
@@ -95,4 +95,24 @@ end
 
 function addCardToHand(card, hand)
 
+end
+
+function setScreenSettings()
+
+end
+
+-- This function was written by localthunk and slightly modified by me
+-- I plan to make more changes in the future
+function bootManager(Labal, next, progress)
+    local w, h = love.window.getMode()
+    love.graphics.push()
+    love.graphics.clear(0, 0, 0, 1)
+    love.graphics.setColor(lovecolors:getColor("SKYBLUE"))
+    if progress > 0 then love.graphics.rectangle('fill', w / 2 - 150, h / 2 - 15, progress * 300, 30) end
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setLineWidth(3)
+    love.graphics.rectangle('line', w / 2 - 150, h / 2 - 15, 300, 30)
+    love.graphics.pop()
+    love.graphics.present()
+    logger:log(Labal, " > ", next, " : ", progress)
 end
