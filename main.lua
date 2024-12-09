@@ -22,6 +22,7 @@ require "opponent"
 require "cardtable"
 require "globals"
 require "uidefs"
+require "librarys.tableSave"
 
 local utf8 = require("utf8")
 

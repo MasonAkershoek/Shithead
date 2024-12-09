@@ -9,10 +9,16 @@ function Game.new()
 end
 
 function Game:setup()
-    bootManager("Startup", "Load Graphics", .1)
+    bootManager("Start up", "Load settings", .1)
+    local saveSet = table.load("settings.shit")
+    self.SETTINGS.SCREENVARIABLES.SCREENMODE = saveSet.SCREENVARIABLES.SCREENMODE
+    print(self.SETTINGS.SCREENVARIABLES.SCREENMODE)
+
+    bootManager("Load Settings", "Load Graphics", .3)
     self:getCardGraphics()
     bootManager("Load Graphics", "Load Sounds", .2)
     self:loadSounds()
+    local saveSet = table.save(self.SETTINGS, "settings.shit")
 end
 
 function Game:createGameObj()
