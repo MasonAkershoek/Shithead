@@ -97,7 +97,7 @@ MAKE_ESC_MENU = function()
             padding = 10,
             borderSize = 10,
             alignment = "Vertical",
-            positions = { Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2, -200), Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2, G.SCREENVARIABLES["GAMEDEMENTIONS"].y / 2) }
+            positions = { Vector.new(_GAME_WIDTH / 2, -200), Vector.new(_GAME_WIDTH / 2, _GAME_HEIGHT / 2) }
         }
     )
     t:setActive()
@@ -107,9 +107,9 @@ MAKE_ESC_MENU = function()
     t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit" }))
     t:addFunction(
         function(self)
-            if G.SETTINGS.escMenuActive and G.KEYBOARDMANAGER:getLastKeyPress() == "escape" then
-                G.SETTINGS.escMenuActive = false
-                G.SETTINGS.paused = false
+            if G.SETTINGS.ESCAPEMENUACTIVE and G.KEYBOARDMANAGER:getLastKeyPress() == "escape" then
+                G.SETTINGS.ESCAPEMENUACTIVE = false
+                G.SETTINGS.PAUSED = false
                 removeSelf(self, G.UI.BOX)
             end
         end

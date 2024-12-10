@@ -22,7 +22,7 @@ function Game:setup()
         if self.SETTINGS.SHOWFPS then
             MAKE_FPS_HUD()
         end
-        if saveSet.SCREENVARIABLES.CURRENTDISPLAY <= love.window.getDisplayCount() then 
+        if saveSet.SCREENVARIABLES.CURRENTDISPLAY <= love.window.getDisplayCount() then
             self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
         end
     end
@@ -30,7 +30,7 @@ function Game:setup()
     bootManager("init Display", .3)
     initDisplay()
 
-    bootManager("Loading Graphics",.4)
+    bootManager("Loading Graphics", .4)
     self:getCardGraphics()
 
     bootManager("Loading Sounds", .5)
@@ -38,8 +38,6 @@ function Game:setup()
 
     bootManager("Loading Shader Scripts", .6)
     self:loadShaders()
-
-    MAKE_MAIN_MENU_BUTTON_BOX()
 
     bootManager("Done!", 1)
 end

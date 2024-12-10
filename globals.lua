@@ -99,12 +99,15 @@ function Game:setGlobals()
     -- self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
     -- self.EVENTMANAGER:on("setMainMenu", function() G.gamestate = "CLEANUP" end)
     -- self.EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
-    -- self.EVENTMANAGER:on("activateEscapeMenu",
-    --     function()
-    --         G.SETTINGS.escMenuActive = true
-    --         G.SETTINGS.paused = true
-    --         MAKE_ESC_MENU()
-    --     end)
+    self.EVENTMANAGER:addListener("activateEscapeMenu",
+        Event.new(
+            function()
+                G.SETTINGS.ESCAPEMENUACTIVE = true
+                G.SETTINGS.PAUSED = true
+                MAKE_ESC_MENU()
+            end
+        )
+    )
     -- self.EVENTMANAGER:on("makeWinBox", function()
     --     G.SETTINGS.paused = true
     --     MAKE_WIN_BOX()

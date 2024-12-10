@@ -34,7 +34,8 @@ end
 function EventManager:update(dt)
     updateList(self.queue, dt)
     for x = #self.queue, 1, -1 do
-        if self.queue[x].isExpired then
+        if self.queue[x].emited then
+            logger:log("Removed an event")
             table.remove(self.queue, x)
         end
     end
@@ -51,14 +52,12 @@ function Event.new(func, args)
     -- Main event configurations
     local args = args or {}
     self.trigger = args.trigger or "imidiate"
-    self.delay = args.delay or nil
+    self.delay = args.delay or 0
     self.callback = func or function() logger:log("Empty Callback!") end
     self.emited = false
 
     -- trigger spesific configurations
-    if self.delay then
-        self.timer = Timer.new(self.delay)
-    end
+    self.timer = Timer.new(self.delay)
 
     if self.trigger == "after" then
         self.timer:stopTimer()
@@ -76,11 +75,12 @@ function Event:emit()
     self.emited = true
 end
 
-function Event:update()
+function Event:update(dt)
+    self.timer:update(dt)
     if self.trigger == "after" then
         if self.after.timer:isExpired() then
             if self.timer:isStopped() and not self.timer:isExpired() then self.timer:start() end
-            if self.timer:isExpired() then
+            if self.timer:isExpired() and not self.emited then
                 self:emit()
             end
         end
