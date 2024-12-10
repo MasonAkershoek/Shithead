@@ -1,6 +1,6 @@
 -- conf.lua
 
-_RELESE_MODE = true
+_RELESE_MODE = false
 _GAME_WIDTH = 1920
 _GAME_HEIGHT = 1080
 

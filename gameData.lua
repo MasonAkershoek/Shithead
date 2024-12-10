@@ -9,7 +9,7 @@ function Game.new()
 end
 
 function Game:setup()
-    bootManager("Start up", "Load settings", .1)
+    bootManager("Start up", "Load settings", .3)
 
     -- Import settings
     local saveSet = table.load("settings.shit")
@@ -23,9 +23,9 @@ function Game:setup()
         self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
     end
 
-    bootManager("Load Settings", "Load Graphics", .3)
+    bootManager("Load Settings", "Load Graphics", .6)
     self:getCardGraphics()
-    bootManager("Load Graphics", "Load Sounds", .2)
+    bootManager("Load Graphics", "Load Sounds", 1)
     self:loadSounds()
     startMainMenu()
     logger:log("Number of UI: ", #G.UI.BOX)
@@ -101,9 +101,9 @@ end
 function Game:update(dt)
     updateList(G.UI.BOX, dt)
     --self:updateDisplay()
-    for _,func in ipairs(self.BUFFEREDFUNCS) do
+    for _, func in ipairs(self.BUFFEREDFUNCS) do
         func()
-    end 
+    end
     self.BUFFEREDFUNCS = {}
 end
 

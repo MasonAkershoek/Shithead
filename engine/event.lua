@@ -11,34 +11,31 @@ function EventManager.new()
     return self
 end
 
-function EventManager:on(eventName, callback)
-    if not self.listeners[eventName] then
-        self.listeners[eventName] = {}
-    end
-    table.insert(self.listeners[eventName], callback)
+function EventManager:addListener(listenerName, event)
+    logger:log("Adding Listener: ", listenerName)
+    self.listeners[listenerName] = event
 end
 
-function EventManager:emit(eventName, tim)
-    if not tim then
-        logger:log("Event ", eventName, " Emited")
-        local callbacks = self.listeners[eventName]
-        if callbacks then
-            for _, callback in ipairs(callbacks) do
-                callback(callback)
-            end
-        end
+function EventManager:addEventToQueue(event)
+    if event.trigger == "after" and #self.queue > 0 then
+        event.after = self.queue[#self.queue]
+    end
+    table.insert(self.queue, event)
+end
+
+function EventManager:emit(eventName)
+    if self.listeners[eventName] then
+        self.listeners[eventName]:emit()
     else
-        logger:log("Event ", eventName ," Added to Queue")
-        local tmp = G.TIMERMANAGER:addTimer(tim)
-        table.insert(self.queue, { eventName, tmp })
+        logger:log("No listener found for event: ", eventName)
     end
 end
 
 function EventManager:update(dt)
-    for _, event in ipairs(self.queue) do
-        if G.TIMERMANAGER:checkExpire(event[2]) then
-            logger:log("Timer Expired")
-            self:emit(event[1])
+    updateList(self.queue, dt)
+    for x = #self.queue, 1, -1 do
+        if self.queue[x].isExpired then
+            table.remove(self.queue, x)
         end
     end
 end
@@ -48,16 +45,48 @@ Event.__index = Event
 
 function Event.new(func, args)
     local self = setmetatable({}, Event)
-    self.triger = args.triger or "imidiate"
+
+    self.T = "Event"
+
+    -- Main event configurations
+    local args = args or {}
+    self.trigger = args.trigger or "imidiate"
     self.delay = args.delay or nil
+    self.callback = func or function() logger:log("Empty Callback!") end
+    self.emited = false
+
+    -- trigger spesific configurations
     if self.delay then
         self.timer = Timer.new(self.delay)
     end
-    if self.triger == "condition" then
+
+    if self.trigger == "after" then
+        self.timer:stopTimer()
+        self.after = nil
+    end
+    if self.trigger == "condition" then
         self.conditionCheck = args.conditionCallback
     end
+    return self
+end
+
+function Event:emit()
+    logger:log("Event Emiting Event")
+    self.callback()
+    self.emited = true
 end
 
 function Event:update()
-    
+    if self.trigger == "after" then
+        if self.after.timer:isExpired() then
+            if self.timer:isStopped() and not self.timer:isExpired() then self.timer:start() end
+            if self.timer:isExpired() then
+                self:emit()
+            end
+        end
+    elseif self.trigger == "imidiate" then
+        if self.timer:isExpired() then
+            self:emit()
+        end
+    end
 end

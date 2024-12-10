@@ -24,7 +24,7 @@ function FontManager:addFont(fontName, fontPath)
     if self.fontPaths[fontName] == nil and love.filesystem.getInfo(fontPath) then
         self.fontPaths[fontName] = fontPath
     else
-        logger:log("Font ", fontName ," alredy exists.")
+        logger:log("Font ", fontName, " alredy exists.")
     end
 end
 
@@ -40,7 +40,7 @@ function FontManager:getFont(fontName, fontSize)
         end
         return self.fonts[fontName][fontSize]
     else
-        logger:log("Font ", fontName ," does not exist.")
+        logger:log("Font ", fontName, " does not exist.")
     end
 end
 
@@ -147,9 +147,6 @@ function Timer.new(newTime, ...)
     self.ogTime = newTime
     self.stopped = false
     self.expired = false
-    if ... ~= nil then
-        self.callback = ...
-    end
     return self
 end
 
@@ -187,9 +184,6 @@ function Timer:update(dt)
     if not self.stopped then
         if self.time < 0 and not self.expired then
             self.expired = true
-            if self.callback ~= nil then
-                self.callback()
-            end
             return self.expired
         else
             self.time = self.time - dt

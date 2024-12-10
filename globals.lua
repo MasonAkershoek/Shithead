@@ -85,21 +85,21 @@ function Game:setGlobals()
 
     self.BUFFEREDFUNCS = {}
 
-    self.EVENTMANAGER:on("play")
-    self.EVENTMANAGER:on("quit", function() G:quit() end)
-    self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
-    self.EVENTMANAGER:on("setMainMenu", function() G.gamestate = "CLEANUP" end)
-    self.EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
-    self.EVENTMANAGER:on("activateEscapeMenu",
-        function()
-            G.SETTINGS.escMenuActive = true
-            G.SETTINGS.paused = true
-            MAKE_ESC_MENU()
-        end)
-    self.EVENTMANAGER:on("makeWinBox", function()
-        G.SETTINGS.paused = true
-        MAKE_WIN_BOX()
-    end)
+    -- self.EVENTMANAGER:on("play")
+    self.EVENTMANAGER:addListener("quit", Event.new(function() G:quit() end))
+    -- self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
+    -- self.EVENTMANAGER:on("setMainMenu", function() G.gamestate = "CLEANUP" end)
+    -- self.EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
+    -- self.EVENTMANAGER:on("activateEscapeMenu",
+    --     function()
+    --         G.SETTINGS.escMenuActive = true
+    --         G.SETTINGS.paused = true
+    --         MAKE_ESC_MENU()
+    --     end)
+    -- self.EVENTMANAGER:on("makeWinBox", function()
+    --     G.SETTINGS.paused = true
+    --     MAKE_WIN_BOX()
+    -- end)
 end
 
 G = Game.new()

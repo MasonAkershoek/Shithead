@@ -92,6 +92,25 @@ function setScreenSettings()
 
 end
 
+function sortByRank(cards)
+    local tmp = nil
+    local sorted = false
+    for x = 1, #cards do
+        sorted = false
+        for y = 1, (cards - x) do
+            if cards[y].rank < cards[y + 1].rank then
+                tmp = cards[y]
+                cards[y] = cards[y + 1]
+                cards[y + 1] = tmp
+                sorted = true
+            end
+        end
+        if (sorted == false) then
+            break
+        end
+    end
+end
+
 -- This function was written by localthunk and slightly modified by me
 -- I plan to make more changes in the future
 function bootManager(Labal, next, progress)

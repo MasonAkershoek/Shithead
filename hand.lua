@@ -52,7 +52,7 @@ function Hand:setDeadZones()
 end
 
 function Hand:check(hand, topCard)
-    availableCards = 0
+    local availableCards = 0
     for x = 1, #hand do
         if topCard == 5 then
             if hand[x].rank <= topCard or ifIn(hand[x].rank, { 2, 5, 8, 10 }) then
@@ -80,7 +80,7 @@ function Hand:check(hand, topCard)
 end
 
 function Hand:checkHand(topCard)
-    availableCards = 0
+    local availableCards = 0
     if #self.cards > 0 then
         availableCards = self:check(self.cards, topCard)
     elseif #self.dockTop > 0 then
@@ -162,25 +162,6 @@ function Hand:addDockBottom(newCard)
     table.insert(self.dockBottom, newCard)
     self.dockBottom[#self.dockBottom]:setPos(nil, (self.pos.y - self.dockBottom[#self.dockBottom].size.y - 40))
     self.dockBottom[#self.dockBottom].active = false
-end
-
-function Hand:sortByRank()
-    local tmp = nil
-    local sorted = false
-    for x = 1, #self.cards do
-        sorted = false
-        for y = 1, (#self.cards - x) do
-            if self.cards[y].rank < self.cards[y + 1].rank then
-                tmp = self.cards[y]
-                self.cards[y] = self.cards[y + 1]
-                self.cards[y + 1] = tmp
-                sorted = true
-            end
-        end
-        if (sorted == false) then
-            break
-        end
-    end
 end
 
 function Hand:empty()
@@ -286,11 +267,17 @@ function CardArea.new(nx, ny, conf)
     self.config = conf or {}
     self.cards = {}
     self.children = {}
-    if self.config.deck then
-        self.area = 0
-    end
+    self.area = 0
     if self.config.player or self.config.opponent then
         self.children["dockTop"] = CardArea.new(0, 0)
         self.children["dockBottom"] = CardArea.new(0, 0)
     end
+end
+
+function CardArea:update(dt)
+
+end
+
+function CardArea:draw()
+
 end
