@@ -12,7 +12,7 @@ return {
    ["DIPLAYNUM"]=1,
    ["DISPLAY"]={3},
    ["CURRENTDISPLAY"]=1,
-   ["SCREENMODE"]="Borderless",
+   ["SCREENMODE"]="fullscreen",
 },
 -- Table: {3}
 {

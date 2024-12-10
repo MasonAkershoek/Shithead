@@ -51,8 +51,17 @@ function Game:setGlobals()
         SCREENVARIABLES = {
             SCREENMODE = "Borderless",
             DIPLAYNUM = 1,
+            VSYNC = 1,
+            DISPLAY = {
+                name = {},
+                resolutions = {}
+            },
             CURRENTDISPLAY = 1,
-            DISPLAY = {},
+            YOFFSET = 0,
+            SCREENSCALE = 1
+        },
+        SOUND = {
+            VOLUME = 100
         }
     }
 

@@ -153,7 +153,7 @@ end
 
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
-    --local mousex, mousey = push:toGame(mousex, mousey)
+    local mousex, mousey = toGame(mousex, mousey)
     if mousex > (self.pos.x - self:getWidth() / 2) and mousex < (self.pos.x + self:getWidth() / 2) then
         if mousey > (self.pos.y - self:getHeight() / 2) and mousey < (self.pos.y + self:getHeight() / 2) then
             if not self:checkDeadZoneMouseHover(mousex, mousey) then

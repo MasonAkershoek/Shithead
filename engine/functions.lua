@@ -88,8 +88,29 @@ function addCardToHand(card, hand)
 
 end
 
-function setScreenSettings()
+function initDisplay()
+    G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
+    logger:log("MAson", G.SETTINGS.SCREENVARIABLES.DIPLAYNUM)
+    for x=1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
+        table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.name, love.window.getDisplayName(x))
+        table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.name, love.window.getDesktopDimensions(x))
+    end
+    local winWidth, winHeight = love.window.getDesktopDimensions(G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY)
+    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = winWidth / _GAME_WIDTH
+    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - winHeight
+    logger:log("ScreenScale: ", G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    local windowArgs = {vsync=G.SETTINGS.SCREENVARIABLES.VSYNC, display=G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa=1}
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+    love.window.setMode(winWidth, winHeight, windowArgs)
+end
 
+function applyDisplaySettings()
+    
+end
+
+function toGame(x,y)
+    return (x * G.SETTINGS.SCREENVARIABLES.SCREENSCALE), (y * G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
 end
 
 function sortByRank(cards)
@@ -113,7 +134,7 @@ end
 
 -- This function was written by localthunk and slightly modified by me
 -- I plan to make more changes in the future
-function bootManager(Labal, next, progress)
+function bootManager(msg, progress)
     local w, h = love.window.getMode()
     love.graphics.push()
     love.graphics.clear(0, 0, 0, 1)
@@ -124,5 +145,5 @@ function bootManager(Labal, next, progress)
     love.graphics.rectangle('line', w / 2 - 150, h / 2 - 15, 300, 30)
     love.graphics.pop()
     love.graphics.present()
-    logger:log(Labal, " > ", next, " : ", progress)
+    logger:log(msg, " : ", progress)
 end

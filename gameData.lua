@@ -9,26 +9,39 @@ function Game.new()
 end
 
 function Game:setup()
-    bootManager("Start up", "Load settings", .3)
+    bootManager("Starting up", .1)
 
     -- Import settings
+    bootManager("Loading Settings", .2)
     local saveSet = table.load("settings.shit")
     os.remove("shithead.shit")
     if saveSet then
         self.SETTINGS.SCREENVARIABLES.SCREENMODE = saveSet.SCREENVARIABLES.SCREENMODE
         self.SETTINGS.SHOWFPS = saveSet.SHOWFPS
+        self.SETTINGS.SCREENVARIABLES.VSYNC = saveSet.SCREENVARIABLES.VSYNC
         if self.SETTINGS.SHOWFPS then
             MAKE_FPS_HUD()
         end
-        self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
+        if saveSet.SCREENVARIABLES.CURRENTDISPLAY <= love.window.getDisplayCount() then 
+            self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
+        end
     end
 
-    bootManager("Load Settings", "Load Graphics", .6)
+    bootManager("init Display", .3)
+    initDisplay()
+
+    bootManager("Loading Graphics",.4)
     self:getCardGraphics()
-    bootManager("Load Graphics", "Load Sounds", 1)
+
+    bootManager("Loading Sounds", .5)
     self:loadSounds()
-    startMainMenu()
-    logger:log("Number of UI: ", #G.UI.BOX)
+
+    bootManager("Loading Shader Scripts", .6)
+    self:loadShaders()
+
+    MAKE_MAIN_MENU_BUTTON_BOX()
+
+    bootManager("Done!", 1)
 end
 
 function Game:createGameObj()
@@ -86,6 +99,14 @@ function Game:getCardGraphics()
     end
 end
 
+function Game:loadShaders()
+    self.SHADERS = {}
+    local path = "shaders/"
+    for x, file in ipairs(love.filesystem.getDirectoryItems(path)) do
+        self.SHADERS[string.sub(file, 1, #file - 4)] = love.graphics.newShader(path .. file)
+    end
+end
+
 function Game:updateDisplay()
     local _, _, flags = love.window.getMode()
     if flags.display ~= self.SETTINGS.SCREENVARIABLES["CURRENTDISPLAY"] then
@@ -108,7 +129,10 @@ function Game:update(dt)
 end
 
 function Game:draw()
+    love.graphics.push()
+    love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
     love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
     drawList(G.UI.BOX)
+    love.graphics.pop()
 end
