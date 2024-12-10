@@ -95,13 +95,13 @@ function initDisplay()
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.name, love.window.getDesktopDimensions(x))
     end
     local winWidth, winHeight = love.window.getDesktopDimensions(G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY)
-    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = winWidth / _GAME_WIDTH
-    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - winHeight
+    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = 800 / _GAME_WIDTH
+    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - 600
     logger:log("ScreenScale: ", G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1, resizable=true }
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
-    love.window.setMode(winWidth, winHeight, windowArgs)
+    love.window.setMode(800, 600, windowArgs)
 end
 
 function applyDisplaySettings()
@@ -112,7 +112,7 @@ function applyDisplaySettings()
     local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
-    love.window.updateMode(winWidth, winHeight, windowArgs)
+    --love.window.updateMode(winWidth, winHeight, windowArgs)
 
 end
 
