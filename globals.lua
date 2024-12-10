@@ -49,7 +49,7 @@ function Game:setGlobals()
         PAUSED = false,
         ESCAPEMENUACTIVE = false,
         SCREENVARIABLES = {
-            SCREENMODE = "Borderless",
+            SCREENMODE = "fullscreen",
             DIPLAYNUM = 1,
             VSYNC = 1,
             DISPLAY = {

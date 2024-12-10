@@ -90,7 +90,6 @@ end
 
 function initDisplay()
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
-    logger:log("MAson", G.SETTINGS.SCREENVARIABLES.DIPLAYNUM)
     for x = 1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.name, love.window.getDisplayName(x))
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.name, love.window.getDesktopDimensions(x))
@@ -106,6 +105,14 @@ function initDisplay()
 end
 
 function applyDisplaySettings()
+    local winWidth, winHeight = love.window.getDesktopDimensions(G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY)
+    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = winWidth / _GAME_WIDTH
+    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - winHeight
+    logger:log("ScreenScale: ", G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+    love.window.updateMode(winWidth, winHeight, windowArgs)
 
 end
 

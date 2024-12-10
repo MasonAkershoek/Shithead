@@ -179,11 +179,16 @@ MAKE_FPS_HUD = function()
     t:setActive()
     logger:log(t.drawBox)
     t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addFunction(
         function(self)
+            local _, _, flags = love.window.getMode()
             self.children[1]:setText("FPS: " .. love.timer.getFPS())
             self.children[1]:setAlignment("center")
             self.children[1]:setWrap(self:getWidth())
+            self.children[2]:setText("Display: " .. flags.display)
+            self.children[2]:setAlignment("center")
+            self.children[2]:setWrap(self:getWidth())
         end
     )
     t:addFunction(

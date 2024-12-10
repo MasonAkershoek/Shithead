@@ -39,6 +39,8 @@ function Game:setup()
     bootManager("Loading Shader Scripts", .6)
     self:loadShaders()
 
+    MAKE_MAIN_MENU_BUTTON_BOX()
+
     bootManager("Done!", 1)
 end
 
@@ -118,6 +120,11 @@ function Game:updateDisplay()
 end
 
 function Game:update(dt)
+    local _, _, flags = love.window.getMode()
+    if flags.display ~= self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY then 
+        self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = flags.display
+        self.EVENTMANAGER:addEventToQueue(Event.new(function () applyDisplaySettings() end))
+    end 
     updateList(G.UI.BOX, dt)
     --self:updateDisplay()
     for _, func in ipairs(self.BUFFEREDFUNCS) do
