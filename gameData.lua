@@ -45,6 +45,7 @@ function Game:setup()
     START_MAIN_MENU()
 
     bootManager("Done!", 1)
+    table.save(self.SETTINGS, "settings.shit")
 end
 
 function Game:createGameObj()
@@ -110,32 +111,31 @@ function Game:update(dt)
 end
 
 function Game:draw()
-    -- love.graphics.push()
-    -- love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
-    -- love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
+    love.graphics.push()
+    --love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
-    -- love.graphics.setCanvas(self.drawSpace)
-    -- love.graphics.clear(lovecolors:getColor("BLUE"))
+    love.graphics.setCanvas(self.drawSpace)
+    love.graphics.clear()
 
-    -- drawList(G.CARDS)
-    -- drawList(G.UI.BOX)
+    drawList(G.CARDS)
+    drawList(G.UI.BOX)
 
-	-- local x, y = love.mouse.getPosition()
-	-- x,y = toGame(x,y)
-	-- love.graphics.setColor(lovecolors:getColor("BLUE"))
-	-- love.graphics.rectangle("fill", x, y, 10, 10)
-	-- love.graphics.setColor({ 1, 1, 1, 1 })
+	local x, y = love.mouse.getPosition()
+	x,y = toGame(x,y)
+	love.graphics.setColor(lovecolors:getColor("BLUE"))
+	love.graphics.rectangle("fill", x, y, 10, 10)
+	love.graphics.setColor({ 1, 1, 1, 1 })
 
-    -- love.graphics.setCanvas()
-    -- love.graphics.pop()
-    --love.graphics.scale()
+    love.graphics.setCanvas()
+    love.graphics.pop()
+    love.graphics.scale()
 
     local x,y,_ = love.window.getMode()
+    local centerx = x/2
+    local centery = y/2
+    local ugh = _GAME_WIDTH/2
+    local ughy = _GAME_HEIGHT/2
 
-    --love.graphics.draw(self.drawSpace, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,x/2,y/2)
-
-    logger:log("X: ",x/2, " Y: ", y)
-    love.graphics.setColor(lovecolors:getColor("YELLOW"))
-    love.graphics.rectangle("fill", (x/2)-100*G.SETTINGS.SCREENVARIABLES.SCREENSCALE,(x/2)-100*G.SETTINGS.SCREENVARIABLES.SCREENSCALE,200*G.SETTINGS.SCREENVARIABLES.SCREENSCALE,200*G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
-    love.graphics.setColor({ 1, 1, 1, 1 })
+    love.graphics.draw(self.drawSpace, centerx,centery,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,ugh,ughy)
 end

@@ -91,7 +91,7 @@ end
 function initDisplay()
     local width = _GAME_WIDTH
     local height = _GAME_HEIGHT
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1, resizable=true }
 
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
     for x = 1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
@@ -100,8 +100,8 @@ function initDisplay()
     end
 
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "windowed" or G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then
-        width = width --* .95
-        height = height --* .95
+        width = width * .95
+        height = height * .95
         if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     end
 
@@ -135,7 +135,8 @@ function applyDisplaySettings()
 end
 
 function toGame(x, y)
-    return (x / G.SETTINGS.SCREENVARIABLES.SCREENSCALE), (y / G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    local nx,ny,_ = love.window.getMode()
+    return (x / G.SETTINGS.SCREENVARIABLES.SCREENSCALE) - (_GAME_HEIGHT - ny), (y / G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
 end
 
 function sortByRank(cards)
