@@ -1,6 +1,8 @@
 GAME_VERSION = "0.0.6"
 
 function Game:setGlobals()
+    self.TILE = { "S", "H", "I", "T", "H", "E", "A", "D" }
+
     -- =================
     -- == Game States ==
     -- =================
@@ -53,8 +55,8 @@ function Game:setGlobals()
             DIPLAYNUM = 1,
             VSYNC = 1,
             DISPLAY = {
-                name = {},
-                resolutions = {}
+                NAMES = {},
+                RESOLUTIONS = {}
             },
             CURRENTDISPLAY = 1,
             YOFFSET = 0,
@@ -89,16 +91,17 @@ function Game:setGlobals()
     self.UI = {
         BOX = {}
     }
+    self.CARDS = {}
 
     self.CARDAREAS = {}
 
     self.BUFFEREDFUNCS = {}
 
-    -- self.EVENTMANAGER:on("play")
+    self.DRAWBUFF = {}
+
+
+
     self.EVENTMANAGER:addListener("quit", Event.new(function() G:quit() end))
-    -- self.EVENTMANAGER:on("playButton", function() G.playerPlayButton = true end)
-    -- self.EVENTMANAGER:on("setMainMenu", function() G.gamestate = "CLEANUP" end)
-    -- self.EVENTMANAGER:on("setCardTable", function() G:changeScreen(1) end)
     self.EVENTMANAGER:addListener("activateEscapeMenu",
         Event.new(
             function()

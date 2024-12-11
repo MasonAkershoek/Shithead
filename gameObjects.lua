@@ -255,6 +255,7 @@ function Moveable:move(dt)
             end
         end
     elseif not self.mouseMove then
+        self.movement:setVect(0, 0)
         self.pos:setVect(self.newPos.x, self.newPos.y)
         self.moving = false
     end

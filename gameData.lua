@@ -39,7 +39,7 @@ function Game:setup()
     bootManager("Loading Shader Scripts", .6)
     self:loadShaders()
 
-    MAKE_MAIN_MENU_BUTTON_BOX()
+    START_MAIN_MENU()
 
     bootManager("Done!", 1)
 end
@@ -121,11 +121,12 @@ end
 
 function Game:update(dt)
     local _, _, flags = love.window.getMode()
-    if flags.display ~= self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY then 
+    if flags.display ~= self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY then
         self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = flags.display
-        self.EVENTMANAGER:addEventToQueue(Event.new(function () applyDisplaySettings() end))
-    end 
+        self.EVENTMANAGER:addEventToQueue(Event.new(function() applyDisplaySettings() end))
+    end
     updateList(G.UI.BOX, dt)
+    updateList(G.CARDS, dt)
     --self:updateDisplay()
     for _, func in ipairs(self.BUFFEREDFUNCS) do
         func()
@@ -138,6 +139,7 @@ function Game:draw()
     love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
     love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
+    drawList(G.CARDS)
     drawList(G.UI.BOX)
     love.graphics.pop()
 end

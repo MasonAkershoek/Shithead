@@ -19,6 +19,9 @@ end
 function EventManager:addEventToQueue(event)
     if event.trigger == "after" and #self.queue > 0 then
         event.after = self.queue[#self.queue]
+    else
+        event.trigger = "imidiate"
+        event.timer:start()
     end
     table.insert(self.queue, event)
 end

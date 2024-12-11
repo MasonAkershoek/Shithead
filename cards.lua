@@ -1,13 +1,13 @@
 -- cards.lua
 
-Card = setmetatable({}, {__index = Sprite})
+Card = setmetatable({}, { __index = Sprite })
 Card.__index = Card
 
 math.randomseed(os.time())
 
 -- Card Class Constructor method
 function Card.new(newRank, newSuit, nx, ny)
-    local self = setmetatable(Sprite.new(nx,ny), Card)
+    local self = setmetatable(Sprite.new(nx, ny), Card)
 
     self.T = "Card"
 
@@ -36,25 +36,26 @@ function Card.new(newRank, newSuit, nx, ny)
     self:getCardFace()
     self.texture = self.cardBack
     self:initSprite()
-    self.darkenShader = G.darkenShader
-    self.darkenShader:send("darkness", 0.5)
+    --self.darkenShader = G.darkenShader
+    --self.darkenShader:send("darkness", 0.5)
     self.burnParticals = love.graphics.newParticleSystem(love.graphics.newImage("resources/graphics/fire.png"), 100)
 
-    -- Should be moved to cardpile 
+    -- Should be moved to cardpile
     self.burnParticals:setParticleLifetime(1, 2)
     self.burnParticals:setLinearAcceleration(100, -200, -100, 0)
     self.burnParticals:setColors(255, 255, 255, 255, 255, 255, 255, 0)
-    self.burnParticals:setSpeed(10,10)
-    self.burnParticals:setSpread( 2 )
-    self.burnParticals:setEmissionArea("uniform", (self.texture:getWidth()/2)*self.scale.x, (self.texture:getHeight()/2)*self.scale.y)
+    self.burnParticals:setSpeed(10, 10)
+    self.burnParticals:setSpread(2)
+    self.burnParticals:setEmissionArea("uniform", (self.texture:getWidth() / 2) * self.scale.x,
+        (self.texture:getHeight() / 2) * self.scale.y)
     self.burnParticals:setEmissionRate(2)
     -----------------------------------------------------------
-
+    table.insert(G.CARDS, self)
     return self
 end
 
 function Card:getCardFace()
-    -- Get The Coresponding image data from 
+    -- Get The Coresponding image data from
     self.cardFace = G.CARDGRAPHICS["CARDFACES"]["card" .. G.CARDSUITS[self.suit] .. tostring(self.rank)]
     if self.rank == 1 then self.rank = 14 end
 end
@@ -63,14 +64,14 @@ end
 function Card:onHover(dt)
     -- If the card is flipping instantly return
     if self.flipping then return end
-    
+
     if self:checkMouseHover() then
         if self.hoverFlag then
             self.scale.x = self.scale.x + .30
             self.scale.y = self.scale.y + .30
             self.hoverFlag = false
         else
-            if self.scale.x >= self.baseScale +.2 then
+            if self.scale.x >= self.baseScale + .2 then
                 self.scale.x = math.max(self.scale.x - (3.5 * dt), self.baseScale)
                 self.scale.y = math.max(self.scale.y - (3.5 * dt), self.baseScale)
             end
@@ -85,7 +86,7 @@ function Card:onHover(dt)
 end
 
 function Card:playSound()
-    TEsound.play(G.DEALSOUND, "static", {"deal"})
+    TEsound.play(G.SOUNDS["card1"], "static", { "deal" })
 end
 
 function Card:floatingAnimation(dt)
@@ -109,7 +110,7 @@ function Card:onSelect()
         if love.mouse.isDown(1) and not self.oldmousedown then
             if self.selected ~= false then
                 self:deSelect()
-            else 
+            else
                 self:select()
             end
         end
@@ -135,14 +136,11 @@ end
 function Card:startFlipping(fullFlip)
     fullFlip = fullFlip or false
     if fullFlip then
-        
+
     else
         self.flipping = true
-    
     end
-    
 end
-
 
 function Card:flipAnimation()
     if self.flipping then
@@ -185,63 +183,65 @@ end
 ]]
 
 function Card:op8(dt)
-    if self.rank == 8 then 
+    if self.rank == 8 then
         if self:checkMouseHover() and self.inCardPile then
-            if self.transparency > 0 then 
-                self.transparency = self.transparency - (.9 *dt)
+            if self.transparency > 0 then
+                self.transparency = self.transparency - (.9 * dt)
                 if self.transparency < 0 then self.transparency = 0 end
             end
         else
             if self.transparency < 1 then
-                self.transparency = self.transparency + (.9 *dt)
+                self.transparency = self.transparency + (.9 * dt)
                 if self.transparency > 1 then self.transparency = 1 end
-            end 
+            end
         end
     end
-
 end
 
 function Card:update(dt)
     if self.newSelectFlag then
         self.newSelectFlag = false
     end
-    self:onSelect() 
+    self:onSelect()
     self:onHover(dt)
     self:move(dt)
     self:floatingAnimation(dt)
     self:flipAnimation()
-    if self.fliped and self.rank==10 then
+    if self.fliped and self.rank == 10 then
         self.burnParticals:update(dt)
         self.burnParticals:setSizes(self.scale.x)
-        self.burnParticals:setEmissionArea("uniform", math.abs((self.texture:getWidth()/2)*self.scale.x), math.abs((self.texture:getHeight()/2)*self.scale.y))
+        self.burnParticals:setEmissionArea("uniform", math.abs((self.texture:getWidth() / 2) * self.scale.x),
+            math.abs((self.texture:getHeight() / 2) * self.scale.y))
     end
     self:op8(dt)
 end
 
 function Card:draw()
-    love.graphics.setColor({0,0,0,self.transparency - .5})
-    love.graphics.draw(self.texture, self.pos.x+7, self.pos.y+7, 0, self.scale.x, self.scale.y, (self.size.x/2), (self.size.y/2), self.skew.x, self.skew.y)
-    love.graphics.setColor({1,1,1,1})
+    love.graphics.setColor({ 0, 0, 0, self.transparency - .5 })
+    love.graphics.draw(self.texture, self.pos.x + 7, self.pos.y + 7, 0, self.scale.x, self.scale.y, (self.size.x / 2),
+        (self.size.y / 2), self.skew.x, self.skew.y)
+    love.graphics.setColor({ 1, 1, 1, 1 })
     if self.notPlayable then
-        love.graphics.setShader(self.darkenShader)
+        --love.graphics.setShader(self.darkenShader)
     end
-    love.graphics.setColor({1,1,1,self.transparency})
-    love.graphics.draw(self.texture, self.pos.x, self.pos.y, 0, self.scale.x, self.scale.y, (self.size.x/2), (self.size.y/2), self.skew.x, self.skew.y)
-    love.graphics.setColor({1,1,1,1})
+    love.graphics.setColor({ 1, 1, 1, self.transparency })
+    love.graphics.draw(self.texture, self.pos.x, self.pos.y, 0, self.scale.x, self.scale.y, (self.size.x / 2),
+        (self.size.y / 2), self.skew.x, self.skew.y)
+    love.graphics.setColor({ 1, 1, 1, 1 })
     love.graphics.setShader()
-    if self.fliped and self.rank==10 then
+    if self.fliped and self.rank == 10 then
         love.graphics.draw(self.burnParticals, self.pos.x, self.pos.y)
     end
 end
 
-Deck = setmetatable({}, {__index = Sprite})
+Deck = setmetatable({}, { __index = Sprite })
 Deck.__index = Deck
 
 Deck.usedCards = {}
 
 -- Deck Constructor class
 function Deck.new(nx, ny)
-    local self = setmetatable(Sprite.new(nx,ny), Deck)
+    local self = setmetatable(Sprite.new(nx, ny), Deck)
 
     self.T = "Deck"
 
@@ -255,10 +255,10 @@ end
 function Deck:shuffle()
     local tmp = {}
     local posIndex = 0
-    for x=1, 52 do
+    for x = 1, 52 do
         local tmpCard = self:getRandCard()
-        tmpCard:setPosImidiate(self.pos.x+posIndex, self.pos.y-posIndex)
-        table.insert(tmp,#tmp+1,tmpCard)
+        tmpCard:setPosImidiate(self.pos.x + posIndex, self.pos.y - posIndex)
+        table.insert(tmp, #tmp + 1, tmpCard)
         posIndex = posIndex + .5
     end
     self.cards = tmp
@@ -266,12 +266,12 @@ function Deck:shuffle()
 end
 
 -- This method generates all cards in the deck
-function Deck:buildDeck(x,y)
+function Deck:buildDeck(x, y)
     local tmp = {}
     local posIndex = 0
-    for i=1, 4 do
-        for j=1, 13 do
-            local newCard = Card.new(j,i, self.pos.x+posIndex, self.pos.y-posIndex)
+    for i = 1, 4 do
+        for j = 1, 13 do
+            local newCard = Card.new(j, i, self.pos.x + posIndex, self.pos.y - posIndex)
             newCard.mouseMoveable = false
             table.insert(tmp, newCard)
             posIndex = posIndex + .5
@@ -288,7 +288,6 @@ function Deck:addDiscard(newCard)
     end
     newCard:playSound()
     table.insert(self.discard, newCard)
-    
 end
 
 function Deck:getRandCard()
@@ -308,7 +307,7 @@ end
 
 function Deck:checkUsedCards(cardNum)
     if #self.usedCards > 0 then
-        for x=1, #self.usedCards do
+        for x = 1, #self.usedCards do
             if cardNum == self.usedCards[x] then
                 return true
             end
@@ -327,14 +326,14 @@ function Deck:update(dt)
     updateList(self.discard, dt)
 end
 
-CardPile = setmetatable({}, {__index = Node})
+CardPile = setmetatable({}, { __index = Node })
 CardPile.__index = CardPile
 
 function CardPile.new(nx, ny)
-    local self = setmetatable(Node.new(nx,ny), CardPile)
+    local self = setmetatable(Node.new(nx, ny), CardPile)
 
     self.T = "CardPile"
-    
+
     self.cards = {}
     return self
 end
@@ -373,11 +372,11 @@ function CardPile:getTopCard(index)
                     if index >= #self.cards then return 0 end
                 end
             else
-               return 0 
+                return 0
             end
-        end 
+        end
         return self.cards[#self.cards - index].rank
-    else 
+    else
         return 0
     end
 end

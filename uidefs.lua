@@ -177,7 +177,7 @@ MAKE_FPS_HUD = function()
         }
     )
     t:setActive()
-    logger:log(t.drawBox)
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addFunction(
@@ -189,6 +189,9 @@ MAKE_FPS_HUD = function()
             self.children[2]:setText("Display: " .. flags.display)
             self.children[2]:setAlignment("center")
             self.children[2]:setWrap(self:getWidth())
+            self.children[3]:setText("Queue: " .. #G.EVENTMANAGER.queue)
+            self.children[3]:setAlignment("center")
+            self.children[3]:setWrap(self:getWidth())
         end
     )
     t:addFunction(

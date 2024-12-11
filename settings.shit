@@ -1,11 +1,11 @@
 return {
 -- Table: {1}
 {
-   ["PAUSED"]=false,
    ["SHOWFPS"]=true,
+   ["DEBUGBOXACTIVE"]=false,
+   ["PAUSED"]=false,
    ["SOUND"]={2},
    ["SCREENVARIABLES"]={3},
-   ["DEBUGBOXACTIVE"]=false,
    ["ESCAPEMENUACTIVE"]=false,
 },
 -- Table: {2}
@@ -14,25 +14,36 @@ return {
 },
 -- Table: {3}
 {
-   ["SCREENSCALE"]=1,
-   ["YOFFSET"]=0,
    ["DIPLAYNUM"]=2,
-   ["SCREENMODE"]="borderless",
    ["DISPLAY"]={4},
-   ["CURRENTDISPLAY"]=2,
+   ["SCREENMODE"]="windowed",
+   ["YOFFSET"]=0,
+   ["CURRENTDISPLAY"]=1,
+   ["SCREENSCALE"]=1,
 },
 -- Table: {4}
 {
-   ["name"]={5},
-   ["resolutions"]={6},
+   ["NAMES"]={5},
+   ["RESOLUTIONS"]={6},
 },
 -- Table: {5}
 {
-   "eDP-1 14\"",
-   "DP-5 23\"",
-   [1920]=1080,
+   "VG252Q",
+   "DELL SE2219H",
 },
 -- Table: {6}
 {
+   {7},
+   {8},
+},
+-- Table: {7}
+{
+   1920,
+   1080,
+},
+-- Table: {8}
+{
+   1920,
+   1080,
 },
 }

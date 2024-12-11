@@ -6,7 +6,7 @@ _GAME_HEIGHT = 1080
 
 function love.conf(t)
     t.version = "11.5"
-    t.window.title = "Shithead!"
+    t.window.title = "Shithead"
     -- t.window.width = _GAME_WIDTH
     -- t.window.height = _GAME_HEIGHT
     --t.window.icon
