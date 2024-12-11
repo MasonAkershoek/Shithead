@@ -192,8 +192,7 @@ end
 function Moveable:mouseMoving()
     if self:checkMouseHover() and love.mouse.isDown(1) then
         local mx, my = love.mouse.getPosition()
-        local xOffset = 0
-        local yOffset = 0
+        mx,my = toGame(mx,my)
         --mx, my = push:toGame(mx, my)
         self:setPosImidiate(mx, my)
         self.mouseMove = true

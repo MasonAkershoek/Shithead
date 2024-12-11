@@ -169,11 +169,11 @@ end
 
 MAKE_FPS_HUD = function()
     local t = UIBox.new(
-        200,
+        400,
         100,
         {
             drawBox = false,
-            positions = { Vector.new(-200, 100), Vector.new(100, 100) }
+            positions = { Vector.new(-200, 100), Vector.new(200, 100) }
         }
     )
     t:setActive()
@@ -181,9 +181,13 @@ MAKE_FPS_HUD = function()
     t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
+    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     t:addFunction(
         function(self)
             local x, y, flags = love.window.getMode()
+            local mx,my = love.mouse.getPosition()
             self.children[1]:setText("FPS: " .. love.timer.getFPS())
             self.children[1]:setAlignment("center")
             self.children[1]:setWrap(self:getWidth())
@@ -193,9 +197,20 @@ MAKE_FPS_HUD = function()
             self.children[3]:setText("Queue: " .. #G.EVENTMANAGER.queue)
             self.children[3]:setAlignment("center")
             self.children[3]:setWrap(self:getWidth())
-            self.children[4]:setText("X,Y: "..x..y)
+            self.children[4]:setText("X,Y: "..x..", "..y)
             self.children[4]:setAlignment("center")
             self.children[4]:setWrap(self:getWidth())
+            self.children[5]:setText("mX,mY: "..mx..", "..my)
+            self.children[5]:setAlignment("center")
+            self.children[5]:setWrap(self:getWidth())
+            mx,my = toGame(mx,my)
+            self.children[6]:setText("SmX,SmY: "..math.floor(mx)..", "..math.floor(my))
+            self.children[6]:setAlignment("center")
+            self.children[6]:setWrap(self:getWidth())
+            self.children[7]:setText("Scale: "..G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+            self.children[7]:setAlignment("center")
+            self.children[7]:setWrap(self:getWidth())
+            
         end
     )
     t:addFunction(
