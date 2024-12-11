@@ -136,7 +136,17 @@ end
 
 function toGame(x, y)
     local nx,ny,_ = love.window.getMode()
-    return (x / G.SETTINGS.SCREENVARIABLES.SCREENSCALE) - (_GAME_HEIGHT - ny), (y / G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    local realCanvWidth = (_GAME_WIDTH * G.SETTINGS.SCREENVARIABLES.SCREENSCALE)/2
+    local realCanvHeight = (_GAME_HEIGHT * G.SETTINGS.SCREENVARIABLES.SCREENSCALE)/2
+    -- local topPadding = ((ny - realCanvHeight)/2)/G.SETTINGS.SCREENVARIABLES.SCREENSCALE
+    -- local leftPadd = ((nx - realCanvWidth)/2)/G.SETTINGS.SCREENVARIABLES.SCREENSCALE
+    -- logger:log("Screen Width: ", nx)
+    -- logger:log("Screen height: ", ny)
+    -- logger:log("Canv width: ", realCanvWidth)
+    -- logger:log("Canv hight: ", realCanvHeight)
+    -- logger:log("top: ", topPadding)
+    -- logger:log("Left: ", leftPadd)
+    return x + realCanvWidth,y + realCanvHeight
 end
 
 function sortByRank(cards)

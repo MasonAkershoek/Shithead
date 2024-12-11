@@ -116,7 +116,7 @@ function Game:draw()
     love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
     love.graphics.setCanvas(self.drawSpace)
-    love.graphics.clear()
+    love.graphics.clear(lovecolors:getColor("RED"))
 
     drawList(G.CARDS)
     drawList(G.UI.BOX)
