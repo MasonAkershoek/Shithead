@@ -50,18 +50,6 @@ function Game:createGameObj()
     }
 end
 
-function Game:nextTurn(flag)
-    if not flag then
-        self.turn = self.turn + 1
-        logger:log("Next Players Turn: " .. self.turn)
-    else
-        if self.turn > #self.cardTable.opa.opponents + 1 then
-            self.turn = 1
-            logger:log("Resetting Turn Counter: " .. self.turn)
-        end
-    end
-end
-
 function Game:quit()
     logger:log("Total Time Played:", G.mainTimePassed)
     logger:close()
@@ -107,24 +95,8 @@ function Game:loadShaders()
     end
 end
 
-function Game:updateDisplay()
-    local _, _, flags = love.window.getMode()
-    if flags.display ~= self.SETTINGS.SCREENVARIABLES["CURRENTDISPLAY"] then
-        self.SCREENVARIABLES["CURRENTDISPLAY"] = flags.display
-        self.SCREENVARIABLES["SCREENSIZE"].x, self.SCREENVARIABLES["SCREENSIZE"].y = love.window.getDesktopDimensions(
-            flags.display)
-        push:setupScreen(G.SCREENVARIABLES["GAMEDEMENTIONS"].x, G.SCREENVARIABLES["GAMEDEMENTIONS"].y,
-            G.SCREENVARIABLES["SCREENSIZE"].x, G.SCREENVARIABLES["SCREENSIZE"].y,
-            { fullscreen = G.SCREENVARIABLES["FULLSCREEN"], resizable = false, canvas = false, pixelperfect = false, stretched = false })
-    end
-end
-
 function Game:update(dt)
-    local _, _, flags = love.window.getMode()
-    if flags.display ~= self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY then
-        self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = flags.display
-        self.EVENTMANAGER:addEventToQueue(Event.new(function() applyDisplaySettings() end))
-    end
+    applyDisplaySettings()
     updateList(G.UI.BOX, dt)
     updateList(G.CARDS, dt)
     --self:updateDisplay()

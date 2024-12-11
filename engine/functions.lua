@@ -89,28 +89,45 @@ function addCardToHand(card, hand)
 end
 
 function initDisplay()
+    local width = _GAME_WIDTH
+    local height = _GAME_HEIGHT
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
+
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
     for x = 1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.NAMES, love.window.getDisplayName(x))
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.RESOLUTIONS, { love.window.getDesktopDimensions(x) })
     end
-    local winWidth, winHeight = love.window.getDesktopDimensions(G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY)
-    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = winWidth / _GAME_WIDTH
-    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - winHeight
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1, resizable = true }
+
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "windowed" or G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then
+        width = width * .95
+        height = height * .95
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
+    end
+
+    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
+    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
-    love.window.setMode(winWidth, winHeight, windowArgs)
+    love.window.setMode(width, height, windowArgs)
 end
 
 function applyDisplaySettings()
-    local winWidth, winHeight = love.window.getDesktopDimensions(G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY)
-    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = winWidth / _GAME_WIDTH
-    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - winHeight
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
-    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
-    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
-    --love.window.updateMode(winWidth, winHeight, windowArgs)
+    local width,height,flags = love.window.getMode()
+    local windowMode = "windowed"
+    if flags.borderless == true then windowMode = "borderless" end
+    if flags.fullscreen == true then windowMode = "fullscreen" end
+    local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY}
+
+    G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
+    G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
+
+    if windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE then
+        G.SETTINGS.SCREENVARIABLES.SCREENMODE = windowMode
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+        love.window.updateMode(width,height,windowArgs)
+    end
 end
 
 function toGame(x, y)
