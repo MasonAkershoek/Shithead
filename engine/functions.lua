@@ -100,8 +100,8 @@ function initDisplay()
     end
 
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "windowed" or G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then
-        width = width * .95
-        height = height * .95
+        width = width --* .95
+        height = height --* .95
         if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     end
 
@@ -109,6 +109,7 @@ function initDisplay()
     G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+    logger:log("MAS", width)
     love.window.setMode(width, height, windowArgs)
 end
 
@@ -120,7 +121,10 @@ function applyDisplaySettings()
     local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY}
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
+    local yScale = height / _GAME_HEIGHT
     G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
+
+    if yScale < G.SETTINGS.SCREENVARIABLES.SCREENSCALE then G.SETTINGS.SCREENVARIABLES.SCREENSCALE = yScale end
 
     if windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE then
         G.SETTINGS.SCREENVARIABLES.SCREENMODE = windowMode

@@ -11,6 +11,9 @@ end
 function Game:setup()
     bootManager("Starting up", .1)
 
+    -- Canves
+    self.drawSpace = love.graphics.newCanvas(_GAME_WIDTH, _GAME_HEIGHT)
+
     -- Import settings
     bootManager("Loading Settings", .2)
     local saveSet = table.load("settings.shit")
@@ -107,11 +110,32 @@ function Game:update(dt)
 end
 
 function Game:draw()
-    love.graphics.push()
-    love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
-    love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
+    -- love.graphics.push()
+    -- love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    -- love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
-    drawList(G.CARDS)
-    drawList(G.UI.BOX)
-    love.graphics.pop()
+    -- love.graphics.setCanvas(self.drawSpace)
+    -- love.graphics.clear(lovecolors:getColor("BLUE"))
+
+    -- drawList(G.CARDS)
+    -- drawList(G.UI.BOX)
+
+	-- local x, y = love.mouse.getPosition()
+	-- x,y = toGame(x,y)
+	-- love.graphics.setColor(lovecolors:getColor("BLUE"))
+	-- love.graphics.rectangle("fill", x, y, 10, 10)
+	-- love.graphics.setColor({ 1, 1, 1, 1 })
+
+    -- love.graphics.setCanvas()
+    -- love.graphics.pop()
+    --love.graphics.scale()
+
+    local x,y,_ = love.window.getMode()
+
+    --love.graphics.draw(self.drawSpace, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,x/2,y/2)
+
+    logger:log("X: ",x/2, " Y: ", y)
+    love.graphics.setColor(lovecolors:getColor("YELLOW"))
+    love.graphics.rectangle("fill", (x/2)-100*G.SETTINGS.SCREENVARIABLES.SCREENSCALE,(x/2)-100*G.SETTINGS.SCREENVARIABLES.SCREENSCALE,200*G.SETTINGS.SCREENVARIABLES.SCREENSCALE,200*G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    love.graphics.setColor({ 1, 1, 1, 1 })
 end
