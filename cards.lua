@@ -258,6 +258,7 @@ function Deck:shuffle()
     for x=1, 52 do
         local tmpCard = self:getRandCard()
         tmpCard:setPosImidiate(self.pos.x+posIndex, self.pos.y-posIndex)
+        tmpCard.mouseMoveable = true
         table.insert(tmp,#tmp+1,tmpCard)
         posIndex = posIndex + .5
     end
