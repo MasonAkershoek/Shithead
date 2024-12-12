@@ -91,7 +91,7 @@ end
 function initDisplay()
     local width = _GAME_WIDTH
     local height = _GAME_HEIGHT
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1 }
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1, resizable=true }
 
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
     for x = 1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
@@ -109,6 +109,7 @@ function initDisplay()
     G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+    logger:log("MAS", width)
     love.window.setMode(width, height, windowArgs)
 end
 
@@ -120,7 +121,10 @@ function applyDisplaySettings()
     local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY}
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
+    local yScale = height / _GAME_HEIGHT
     G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
+
+    if yScale < G.SETTINGS.SCREENVARIABLES.SCREENSCALE then G.SETTINGS.SCREENVARIABLES.SCREENSCALE = yScale end
 
     if windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE then
         G.SETTINGS.SCREENVARIABLES.SCREENMODE = windowMode
@@ -130,8 +134,16 @@ function applyDisplaySettings()
     end
 end
 
+mama = 100
+
 function toGame(x, y)
-    return (x / G.SETTINGS.SCREENVARIABLES.SCREENSCALE), (y / G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
+    local w,h,_ = love.window.getMode()
+    local scale = G.SETTINGS.SCREENVARIABLES.SCREENSCALE
+    local canvWidth = _GAME_WIDTH * scale
+    local canvHeight = _GAME_HEIGHT * scale
+    local xpad = (w-canvWidth)
+    local ypad = (h-canvHeight)
+    return (x/scale)-xpad/(scale*2), (y/scale)-ypad/(scale*2)
 end
 
 function sortByRank(cards)

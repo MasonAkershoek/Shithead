@@ -192,8 +192,7 @@ end
 function Moveable:mouseMoving()
     if self:checkMouseHover() and love.mouse.isDown(1) then
         local mx, my = love.mouse.getPosition()
-        local xOffset = 0
-        local yOffset = 0
+        mx,my = toGame(mx,my)
         --mx, my = push:toGame(mx, my)
         self:setPosImidiate(mx, my)
         self.mouseMove = true
@@ -234,7 +233,7 @@ function Moveable:move(dt)
     if self.mouseMoveable then
         self:mouseMoving()
     end
-    if self.moveFlag then
+    if self.moveFlag or self.pos.x ~= self.newPos.x or self.pos.y ~= self.newPos.y then
         local dirx = self.newPos.x - self.pos.x
         local diry = self.newPos.y - self.pos.y
         self.distance = math.sqrt((dirx ^ 2) + (diry ^ 2))

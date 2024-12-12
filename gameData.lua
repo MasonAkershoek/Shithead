@@ -11,6 +11,9 @@ end
 function Game:setup()
     bootManager("Starting up", .1)
 
+    -- Canves
+    self.drawSpace = love.graphics.newCanvas(_GAME_WIDTH, _GAME_HEIGHT)
+
     -- Import settings
     bootManager("Loading Settings", .2)
     local saveSet = table.load("settings.shit")
@@ -29,6 +32,8 @@ function Game:setup()
 
     bootManager("init Display", .3)
     initDisplay()
+    love.graphics.setDefaultFilter("nearest","nearest",2)
+    love.graphics.setLineStyle("rough")
 
     bootManager("Loading Graphics", .4)
     self:getCardGraphics()
@@ -42,6 +47,7 @@ function Game:setup()
     START_MAIN_MENU()
 
     bootManager("Done!", 1)
+    table.save(self.SETTINGS, "settings.shit")
 end
 
 function Game:createGameObj()
@@ -75,15 +81,15 @@ function Game:getCardGraphics()
     local cardBackPath = "resources/graphics/cards/cardBacks"
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardBackPath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDBACKS"][imageName] = love.graphics.newImage(cardBackPath .. "/" .. file)
+        self.CARDGRAPHICS["CARDBACKS"][imageName] = love.graphics.newImage(cardBackPath .. "/" .. file,{mipmaps = true, dpiscale = 1})
     end
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardFacePath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDFACES"][imageName] = love.graphics.newImage(cardFacePath .. "/" .. file)
+        self.CARDGRAPHICS["CARDFACES"][imageName] = love.graphics.newImage(cardFacePath .. "/" .. file,{mipmaps = true, dpiscale = 1})
     end
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardLetterkPath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file)
+        self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file,{mipmaps = true, dpiscale = 1})
     end
 end
 
@@ -107,11 +113,27 @@ function Game:update(dt)
 end
 
 function Game:draw()
-    love.graphics.push()
-    love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
     love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
+
+    love.graphics.setCanvas(self.drawSpace)
+    love.graphics.clear()
 
     drawList(G.CARDS)
     drawList(G.UI.BOX)
-    love.graphics.pop()
+
+	local x, y = love.mouse.getPosition()
+	x,y = toGame(x,y)
+	love.graphics.setColor(lovecolors:getColor("BLUE"))
+	love.graphics.rectangle("fill", x-5, y-5, 10, 10)
+	love.graphics.setColor({ 1, 1, 1, 1 })
+
+    love.graphics.setCanvas()
+
+    local x,y,_ = love.window.getMode()
+    local centerx = x/2
+    local centery = y/2
+    local ugh = _GAME_WIDTH/2
+    local ughy = _GAME_HEIGHT/2
+
+    love.graphics.draw(self.drawSpace, centerx,centery,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,ugh,ughy)
 end

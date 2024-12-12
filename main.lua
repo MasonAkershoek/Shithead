@@ -209,9 +209,4 @@ end
 
 function love.draw()
 	G:draw()
-	local x, y = love.mouse.getPosition()
-	--x,y = toGame(x,y)
-	love.graphics.setColor(lovecolors:getColor("BLUE"))
-	love.graphics.rectangle("fill", x, y, 10, 10)
-	love.graphics.setColor({ 1, 1, 1, 1 })
 end
