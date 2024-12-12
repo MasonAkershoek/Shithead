@@ -32,6 +32,8 @@ function Game:setup()
 
     bootManager("init Display", .3)
     initDisplay()
+    love.graphics.setDefaultFilter("nearest","nearest",2)
+    love.graphics.setLineStyle("rough")
 
     bootManager("Loading Graphics", .4)
     self:getCardGraphics()
@@ -79,15 +81,15 @@ function Game:getCardGraphics()
     local cardBackPath = "resources/graphics/cards/cardBacks"
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardBackPath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDBACKS"][imageName] = love.graphics.newImage(cardBackPath .. "/" .. file)
+        self.CARDGRAPHICS["CARDBACKS"][imageName] = love.graphics.newImage(cardBackPath .. "/" .. file,{mipmaps = true, dpiscale = 1})
     end
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardFacePath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDFACES"][imageName] = love.graphics.newImage(cardFacePath .. "/" .. file)
+        self.CARDGRAPHICS["CARDFACES"][imageName] = love.graphics.newImage(cardFacePath .. "/" .. file,{mipmaps = true, dpiscale = 1})
     end
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardLetterkPath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file)
+        self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file,{mipmaps = true, dpiscale = 1})
     end
 end
 
@@ -111,12 +113,10 @@ function Game:update(dt)
 end
 
 function Game:draw()
-    love.graphics.push()
-    --love.graphics.scale(G.SETTINGS.SCREENVARIABLES.SCREENSCALE, G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
     love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
     love.graphics.setCanvas(self.drawSpace)
-    love.graphics.clear(lovecolors:getColor("RED"))
+    love.graphics.clear()
 
     drawList(G.CARDS)
     drawList(G.UI.BOX)
@@ -128,8 +128,6 @@ function Game:draw()
 	love.graphics.setColor({ 1, 1, 1, 1 })
 
     love.graphics.setCanvas()
-    love.graphics.pop()
-    love.graphics.scale()
 
     local x,y,_ = love.window.getMode()
     local centerx = x/2
