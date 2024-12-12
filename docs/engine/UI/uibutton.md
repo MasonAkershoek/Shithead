@@ -2,8 +2,7 @@
 ---
 **UIButton** 
 ### Usage
-```UIButton.new(x,y,w,h,args)```
-MAson
+
 
 ### Parameters
 | Parameter Name | Definition |
