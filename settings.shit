@@ -2,11 +2,11 @@ return {
 -- Table: {1}
 {
    ["ESCAPEMENUACTIVE"]=false,
-   ["SHOWFPS"]=true,
+   ["DEBUGBOXACTIVE"]=false,
    ["PAUSED"]=false,
    ["SOUND"]={2},
    ["SCREENVARIABLES"]={3},
-   ["DEBUGBOXACTIVE"]=false,
+   ["SHOWFPS"]=true,
 },
 -- Table: {2}
 {
