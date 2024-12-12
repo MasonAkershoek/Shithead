@@ -285,6 +285,7 @@ function UILabel:setAlignment(alignment)
     self.textGraphics:setf(self.text, self.size.x, self.alignment)
 end
 
+-- Depreciate
 function UILabel:setWidthAndHeight()
     self.size.x = self.textGraphics:getWidth()
     self.size.y = self.textGraphics:getHeight()
@@ -305,7 +306,7 @@ function UIButton.new(x, y, w, h, args)
 
     self.T = "UIButton"
 
-    self.action = args.action or nil
+    self.action = args.action or function () logger:log("Empty Function") end
     self.color = args.color or "RED"
     self.text = args.text or "Empty!"
     self.textGraphics = UILabel.new(self.pos.x, self.pos.y, args.textFontSize, { text = self.text, alignment = "center" })
@@ -383,7 +384,7 @@ function UITextField.new(x, y, w, h, fontSize, args)
     self.selected = false
     self.maxLen = args.maxLen or 10
     self.color = args.color or "WHITE"
-    self.textColor = args.textColor or "WHITE"
+    self.textColor = args.textColor or "BLACK"
     -- Text Field Text
     self.text = {}
     self.textGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = self.textColor })
@@ -402,11 +403,10 @@ function UITextField.new(x, y, w, h, fontSize, args)
     self.tmpTextGraphics:setWrap(self.size.x)
 
     -- Text Field Label Properties
-    self.label = {
-        showLabel = args.showLabel or false,
-        position = args.lablePos or "left",
-        text = args.lableText or "Empty!"
-    }
+    self.showLabel = args.showLabel or false
+    self.labelPos = args.lablePos or "left"
+    self.labelAlignment = args.labelAlignment or "center"
+    self.labalGraphics = UILabel.new(0, 0, self.fontSize, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = "LIGHTGRAY" })
     return self
 end
 
