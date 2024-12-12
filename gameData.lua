@@ -47,7 +47,6 @@ function Game:setup()
     START_MAIN_MENU()
 
     bootManager("Done!", 1)
-    table.save(self.SETTINGS, "settings.shit")
 end
 
 function Game:createGameObj()

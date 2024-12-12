@@ -200,6 +200,7 @@ function love.keypressed(key, scancode, isrepeat)
 	end
 end
 
+
 function love.update(dt)
 	G:update(dt)
 	G.EVENTMANAGER:update(dt)

@@ -99,10 +99,9 @@ function initDisplay()
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.RESOLUTIONS, { love.window.getDesktopDimensions(x) })
     end
 
-    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "windowed" or G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "windowed" then
         width = width * .95
         height = height * .95
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
     end
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH

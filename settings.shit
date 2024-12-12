@@ -1,26 +1,26 @@
 return {
 -- Table: {1}
 {
-   ["DEBUGBOXACTIVE"]=false,
-   ["PAUSED"]=false,
    ["ESCAPEMENUACTIVE"]=false,
    ["SHOWFPS"]=true,
-   ["SCREENVARIABLES"]={2},
-   ["SOUND"]={3},
+   ["PAUSED"]=false,
+   ["SOUND"]={2},
+   ["SCREENVARIABLES"]={3},
+   ["DEBUGBOXACTIVE"]=false,
 },
 -- Table: {2}
+{
+   ["VOLUME"]=100,
+},
+-- Table: {3}
 {
    ["CURRENTDISPLAY"]=1,
    ["DIPLAYNUM"]=2,
    ["DISPLAY"]={4},
-   ["SCREENSCALE"]=1,
-   ["SCREENMODE"]="fullscreen",
-   ["YOFFSET"]=0,
+   ["SCREENSCALE"]=0.94166666666667,
+   ["SCREENMODE"]="windowed",
+   ["YOFFSET"]=63,
    ["VSYNC"]=1,
-},
--- Table: {3}
-{
-   ["VOLUME"]=100,
 },
 -- Table: {4}
 {
