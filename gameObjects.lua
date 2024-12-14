@@ -283,7 +283,6 @@ end
 function Sprite:initSprite()
     self.size.x = (self.texture:getWidth())
     self.size.y = (self.texture:getHeight())
-    --self.texture:setFilter("linear", "linear", 1)
 end
 
 function Sprite:draw()

@@ -91,7 +91,7 @@ end
 function initDisplay()
     local width = _GAME_WIDTH
     local height = _GAME_HEIGHT
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 1, resizable=true }
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 16, resizable=true }
 
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
     for x = 1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
