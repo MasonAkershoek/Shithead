@@ -478,3 +478,64 @@ function UITextField:draw()
         self.textGraphics:draw()
     end
 end
+
+UISlider = setmetatable({}, { __index = UINode })
+UISlider.__index = UISlider
+
+function UISlider.new(x,y,w,h,args)
+    local args = args or {}
+    local self = setmetatable(UINode.new(x, y, w, h, args), UISlider)
+
+    -- Slider visuals
+    self.sliderColor = args.color or "RED"
+    self.bgColor = args.bgColor or "WHITE"
+    self.borderColor = args.borderColor or "LIGHTGRAY"
+
+    -- Slider value
+    self.sliderValue = 1
+
+    -- Slider drawables
+    self.showLabel = args.showLabel or false
+    self.labelPos = args.lablePos or "left"
+    self.labelAlignment = args.labelAlignment or "center"
+    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = "LIGHTGRAY" }) end
+
+
+    return self
+end
+
+function UISlider:mouseClick()
+    local gmx,_ = love.mouse.getPosition()
+    local mx,_ = toGame(gmx,1)
+    if self:checkMouseHover() then
+        if love.mouse.isDown(1) then
+            local val = ((mx - self:getPos("centerleft").x) / self.size.x)
+            if val > 1 then self.sliderValue = 1 return end
+            if val < 0 then self.sliderValue = 0 return end
+            self.sliderValue = val
+        end
+    end
+end
+
+function UISlider:getValue()
+    return self.sliderValue
+end
+
+function UISlider:update(dt)
+    self:mouseClick()
+end
+
+function UISlider:draw()
+    -- Draw Background
+    love.graphics.rectangle('fill', self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x, self.size.y, self.size.x*.05, self.size.y*.5, 16)
+
+    -- Draw Slider
+    love.graphics.setColor(lovecolors:getColor(self.sliderColor))
+    if self.sliderValue > 0 then love.graphics.rectangle('fill', self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x*self.sliderValue, self.size.y, self.size.x*.05, self.size.y*.5, 16) end
+
+    -- Draw border
+    love.graphics.setColor(lovecolors:getColor(self.borderColor))
+    love.graphics.setLineWidth(3)
+    love.graphics.rectangle('line', self.pos.x-((self.size.x)/2), self.pos.y-((self.size.y)/2), self.size.x, self.size.y, self.size.x*.05, self.size.y*.5,16)
+    love.graphics.setColor({1,1,1,1})
+end

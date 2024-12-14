@@ -32,7 +32,8 @@ function Game:setup()
 
     bootManager("init Display", .3)
     initDisplay()
-    love.graphics.setDefaultFilter("nearest","nearest",2)
+    love.graphics.setDefaultFilter("nearest","linear",10)
+    logger:log(love.graphics.getDefaultFilter())
     love.graphics.setLineStyle("rough")
 
     bootManager("Loading Graphics", .4)
@@ -47,6 +48,10 @@ function Game:setup()
     START_MAIN_MENU()
 
     bootManager("Done!", 1)
+
+    TEsound.playLooping(self.SOUNDS["music2"],"static","main")
+
+    tmp = UISlider.new(960,540, 500,30)
 end
 
 function Game:createGameObj()
@@ -96,7 +101,8 @@ function Game:loadShaders()
     self.SHADERS = {}
     local path = "shaders/"
     for x, file in ipairs(love.filesystem.getDirectoryItems(path)) do
-        self.SHADERS[string.sub(file, 1, #file - 4)] = love.graphics.newShader(path .. file)
+        self.SHADERS[string.sub(file, 1, #file - 5)] = love.graphics.newShader(path .. file)
+        logger:log(string.sub(file, 1, #file - 5))
     end
 end
 
@@ -109,6 +115,7 @@ function Game:update(dt)
         func()
     end
     self.BUFFEREDFUNCS = {}
+    tmp:update(dt)
 end
 
 function Game:draw()
@@ -126,6 +133,8 @@ function Game:draw()
 	love.graphics.rectangle("fill", x-5, y-5, 10, 10)
 	love.graphics.setColor({ 1, 1, 1, 1 })
 
+    tmp:draw()
+
     love.graphics.setCanvas()
 
     local x,y,_ = love.window.getMode()
@@ -135,4 +144,5 @@ function Game:draw()
     local ughy = _GAME_HEIGHT/2
 
     love.graphics.draw(self.drawSpace, centerx,centery,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,ugh,ughy)
+    love.graphics.setShader()
 end

@@ -1,22 +1,22 @@
 return {
 -- Table: {1}
 {
-   ["SCREENVARIABLES"]={2},
-   ["ESCAPEMENUACTIVE"]=true,
    ["SHOWFPS"]=true,
+   ["SCREENVARIABLES"]={2},
    ["DEBUGBOXACTIVE"]=false,
-   ["PAUSED"]=true,
+   ["PAUSED"]=false,
    ["SOUND"]={3},
+   ["ESCAPEMENUACTIVE"]=false,
 },
 -- Table: {2}
 {
+   ["SCREENMODE"]="windowed",
    ["VSYNC"]=1,
    ["CURRENTDISPLAY"]=1,
-   ["DIPLAYNUM"]=3,
+   ["DIPLAYNUM"]=1,
    ["DISPLAY"]={4},
-   ["SCREENSCALE"]=1,
-   ["YOFFSET"]=0,
-   ["SCREENMODE"]="fullscreen",
+   ["SCREENSCALE"]=0.95,
+   ["YOFFSET"]=54,
 },
 -- Table: {3}
 {
@@ -24,32 +24,18 @@ return {
 },
 -- Table: {4}
 {
-   ["RESOLUTIONS"]={5},
-   ["NAMES"]={6},
+   ["NAMES"]={5},
+   ["RESOLUTIONS"]={6},
 },
 -- Table: {5}
 {
-   {7},
-   {8},
-   {9},
+   "100012590",
 },
 -- Table: {6}
 {
-   "eDP-1 14\"",
-   "DP-5 27\"",
-   "DP-6 23\"",
+   {7},
 },
 -- Table: {7}
-{
-   1920,
-   1200,
-},
--- Table: {8}
-{
-   1920,
-   1080,
-},
--- Table: {9}
 {
    1920,
    1080,
