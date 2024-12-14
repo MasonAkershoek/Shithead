@@ -45,6 +45,10 @@ function Node:getHeight()
     return (self.size.y * self.scale.y)
 end
 
+function Node:getSize()
+    return Vector.new(self.size.x, self.size.y)
+end
+
 -- Parent Child relationship functions
 function Node:addChildren(newChild, tag)
     newChild:setParent(self)

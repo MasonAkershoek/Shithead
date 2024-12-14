@@ -15,6 +15,7 @@ function START_MAIN_MENU()
                     tmp:setPos(500, 200)
                     tmp:playSound()
                     tmp.mouseMoveable = true
+                    table.insert(G.tmp.cards,tmp)
                 end,
                 {
                     trigger = "after",
@@ -23,6 +24,5 @@ function START_MAIN_MENU()
             )
         )
     end
-    logger:log("MAMA: ", #G.EVENTMANAGER.queue)
     G.EVENTMANAGER:addEventToQueue(Event.new(MAKE_MAIN_MENU_BUTTON_BOX, { trigger = "after", delay = .5 }))
 end

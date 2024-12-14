@@ -17,7 +17,6 @@ function Game:setup()
     -- Import settings
     bootManager("Loading Settings", .2)
     local saveSet = table.load("settings.shit")
-    os.remove("shithead.shit")
     if saveSet then
         self.SETTINGS.SCREENVARIABLES.SCREENMODE = saveSet.SCREENVARIABLES.SCREENMODE
         self.SETTINGS.SHOWFPS = saveSet.SHOWFPS
@@ -29,10 +28,11 @@ function Game:setup()
             self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
         end
     end
+    os.remove("shithead.shit")
 
     bootManager("init Display", .3)
     initDisplay()
-    love.graphics.setDefaultFilter("nearest","linear",10)
+    love.graphics.setDefaultFilter("linear","linear",10)
     logger:log(love.graphics.getDefaultFilter())
     love.graphics.setLineStyle("rough")
 
@@ -45,13 +45,16 @@ function Game:setup()
     bootManager("Loading Shader Scripts", .6)
     self:loadShaders()
 
+    self.tmp = CardArea.new(960,540,1000,{})
+
     START_MAIN_MENU()
 
     bootManager("Done!", 1)
 
     TEsound.playLooping(self.SOUNDS["music2"],"static","main")
 
-    tmp = UISlider.new(960,540, 500,30)
+    --tmp = UISlider.new(960,540, 500,30)
+
 end
 
 function Game:createGameObj()
@@ -115,7 +118,7 @@ function Game:update(dt)
         func()
     end
     self.BUFFEREDFUNCS = {}
-    tmp:update(dt)
+    self.tmp:update(dt)
 end
 
 function Game:draw()
@@ -133,7 +136,7 @@ function Game:draw()
 	love.graphics.rectangle("fill", x-5, y-5, 10, 10)
 	love.graphics.setColor({ 1, 1, 1, 1 })
 
-    tmp:draw()
+    self.tmp:draw()
 
     love.graphics.setCanvas()
 

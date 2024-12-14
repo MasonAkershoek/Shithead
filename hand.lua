@@ -259,25 +259,29 @@ function Hand:update(dt)
     updateList(self.dockTop, dt)
 end
 
-CardArea = setmetatable({}, { __index = Moveable })
+CardArea = setmetatable({}, { __index = UINode })
 CardArea.__index = CardArea
 
-function CardArea.new(nx, ny, conf)
-    local self = setmetatable(Moveable.new(nx, ny), CardArea)
-    self.config = conf or {}
+function CardArea.new(nx, ny, w, args)
+    local self = setmetatable(UINode.new(nx, ny, w, 200), CardArea)
+    self.args = args or {}
     self.cards = {}
     self.children = {}
-    self.area = 0
-    if self.config.player or self.config.opponent then
-        self.children["dockTop"] = CardArea.new(0, 0)
-        self.children["dockBottom"] = CardArea.new(0, 0)
-    end
+    self.type = args.type or "deck"
+
+    return self
 end
 
 function CardArea:update(dt)
-
+    HAlign(self, self.cards, false, {spaceEvenly=true, allowOverlap=true})
+    setDeadZones(self.cards)
+    updateList(self.cards, dt)
 end
 
 function CardArea:draw()
-
+    if self.type == "player" or self.type == "playerDock" then
+        love.graphics.setColor({ 0, 0, 0, .3 })
+        love.graphics.rectangle("fill", self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x, 200, 20, 20)
+        love.graphics.setColor({ 1, 1, 1, 1 })
+    end
 end

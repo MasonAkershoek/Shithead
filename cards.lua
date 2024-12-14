@@ -227,9 +227,6 @@ function Card:draw()
         love.graphics.setShader(G.SHADERS["darkcard"])
     end
     love.graphics.setColor({ 1, 1, 1, self.transparency })
-    love.graphics.setShader(G.SHADERS["antialias"])
-    G.SHADERS["antialias"]:send('smoothing', .05)
-    G.SHADERS["antialias"]:send("texSize", {self.texture:getWidth(), self.texture:getHeight()})
     love.graphics.draw(self.texture, self.pos.x, self.pos.y, 0, self.scale.x, self.scale.y, (self.size.x / 2),
         (self.size.y / 2), self.skew.x, self.skew.y)
     love.graphics.setColor({ 1, 1, 1, 1 })

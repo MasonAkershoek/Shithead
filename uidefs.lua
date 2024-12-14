@@ -157,6 +157,7 @@ MAKE_MAIN_MENU_BUTTON_BOX = function()
         }
     )
     t:setActive()
+    logger:log("Button Box Size:", t.size.x)
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Play", color = "DARKERBLUE", action = "play" }))
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Multiplayer", color = "DARKERYELLOW" }))
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Options", color = "DARKERGREEN" }))

@@ -1,18 +1,10 @@
----@diagnostic disable: undefined-field
--- MsUI (Mason's simple User Interface) a UI Library for Love2D
--- @author Mason Akershoek (masonakershoek@gmail.com)
+-- UI.lua
 
 --- This objects serves as a base object for all other UIObjects and shouldnt ever be used as standalone
 UINode = setmetatable({}, { __index = Moveable })
 UINode.__index = UINode
 
---- Object Constructor for the UINode Object
----@param x integer "X Position of the Node"
----@param y integer "Y Position of the Node"
----@param w integer "Width of the Node"
----@param h integer "Height of the Node"
----@param args table "This table contains extra options for any of the UI objects"
----@return table "Returns a UINode Object"
+
 function UINode.new(x, y, w, h, args)
     local args = args or {}
     local self = setmetatable(Moveable.new(x, y, false), UINode)
@@ -186,7 +178,7 @@ function UIBox:update(dt)
     for _, func in ipairs(self.functions) do
         func(self)
     end
-    if self.alignment == "Vertical" then self:VAlign(10) else self:HAlign() end
+    if self.alignment == "Vertical" then self:VAlign(10) else HAlign(self, self.children, true, {spaceEvenly=true, allowOverlap=false}) end
     self:move(dt)
     for item = 1, #self.children do
         if self.children[item].T == "UIButton" then

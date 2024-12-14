@@ -2,10 +2,6 @@
 -- functions.lua
 
 -- A simple function for checking if a value is contained in a list
-
---- This function checks to see if a value <value> is inside a given table
----@param value any
----@param list table
 function ifIn(value, list)
     for x = 1, #list do
         if value == list[x] then
@@ -16,7 +12,6 @@ function ifIn(value, list)
 end
 
 --- Takes in a table of objects that all contain a draw function and calls them in the order they appear in the list
----@param list table
 function drawList(list)
     if #list ~= 0 then
         for x = 1, #list do
@@ -26,8 +21,6 @@ function drawList(list)
 end
 
 --- Takes in a table of objects that all contain an update function and calls them in the order they appear in the list
----@param list table
----@param dt integer
 function updateList(list, dt)
     if #list ~= 0 then
         for x = 1, #list do
@@ -37,9 +30,6 @@ function updateList(list, dt)
 end
 
 --- Takes two vectors and calculates the distance between them
----@param newPos Vector
----@param currentPos Vector
----@return integer
 function calcDistance(newPos, currentPos)
     local dirx = newPos.x - currentPos.x
     local diry = newPos.y - currentPos.y
@@ -49,9 +39,6 @@ end
 -- Move somewhere else, This function is to spesific to shithead to be in this file
 
 --- This function checkks if a given card rank is a special card
----@param pCardRank any
----@param tCardRank any
----@return boolean
 function checkCard(pCardRank, tCardRank)
     if ifIn(pCardRank, { 2, 5, 8, 10 }) then
         return true
@@ -65,8 +52,6 @@ function checkCard(pCardRank, tCardRank)
 end
 
 --- This function sorts throiugh key presses to pass only the values requested
----@param keyPress string
----@return string
 function convertKeyPress(keyPress)
     if #keyPress == 1 then
         return keyPress
@@ -76,6 +61,7 @@ function convertKeyPress(keyPress)
     return ""
 end
 
+-- Removes self from a given table
 function removeSelf(obj, tbl)
     for x, y in ipairs(tbl) do
         if y == obj then
@@ -83,6 +69,7 @@ function removeSelf(obj, tbl)
         end
     end
 end
+
 
 function addCardToHand(card, hand)
 
@@ -133,8 +120,7 @@ function applyDisplaySettings()
     end
 end
 
-mama = 100
-
+-- Coverts the mouse position to the scaled canves 
 function toGame(x, y)
     local w,h,_ = love.window.getMode()
     local scale = G.SETTINGS.SCREENVARIABLES.SCREENSCALE
@@ -145,6 +131,7 @@ function toGame(x, y)
     return (x/scale)-xpad/(scale*2), (y/scale)-ypad/(scale*2)
 end
 
+-- sorts a given list of cards by rank
 function sortByRank(cards)
     local tmp = nil
     local sorted = false
@@ -160,6 +147,67 @@ function sortByRank(cards)
         end
         if (sorted == false) then
             break
+        end
+    end
+end
+
+function setDeadZones(items)
+    if #items > 1 then
+        for x = #items, 2, -1 do
+            local deadZone = {}
+            deadZone.t1 = items[x]:getPos("centerleft")
+            deadZone.t2 = items[x - 1]:getPos("centerright")
+            if deadZone.t1.x > deadZone.t2.x then
+                items[x - 1]:setDeadZone(nil)
+            end
+            items[x - 1]:setDeadZone(deadZone)
+        end
+    end
+end
+
+-- Horizontaly align a given table of objects
+function HAlign(container, items, immediate, args)
+    local args = args or {}
+    local immediate = immediate or false
+    local allowOverlap = args.allowOverlap or false
+    local spaceEvenly = args.spaceEvenly or false
+    local padding = args.padding or 0
+    local objPadding = args.objPadding or 0
+
+    if not container then logger:lot("No container supplyed!") return end
+    if not items then logger:log("No table of items supplyed!") return end
+    if #items == 0 then logger:log("Table supplyed is empty.") return end
+
+    local pos = container:getPos("centerleft")
+    local size = container:getSize()
+
+    local xpoints = 0
+    local nextPoint = 0
+    xpoints = ((size.x) / (#items))
+    nextPoint = pos.x + xpoints/2
+    for x = 1, #items do
+        if not immediate then
+            items[x]:setPos((nextPoint), pos.y)
+        else
+            items[x]:setPosImidiate((nextPoint), pos.y)
+        end
+        nextPoint = nextPoint + xpoints
+    end
+end
+
+-- Virticly align a given table of objects
+function VAlign(items, padding, i)
+    padding = padding or 0
+    if #items > 0 then
+        local nextPoint = (self.pos.y - self.area)
+        for x = 1, #items do
+            nextPoint = nextPoint + ((items[x].size.y / 2) * items[x].baseScale)
+            if not i then
+                items[x]:setPos(self.pos.x, nextPoint)
+            else
+                items[x]:setPosImidiate(self.pos.x, nextPoint)
+            end
+            nextPoint = ((nextPoint + ((items[x].size.y / 2) * items[x].baseScale)) + padding)
         end
     end
 end
