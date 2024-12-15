@@ -1,6 +1,8 @@
 function START_MAIN_MENU()
     G.MAJORSTATE = G.MAJORSTATES.MAINMENU
     G.MINORSTATE = G.MINORSTATES.MAININTRO
+    local menuArea = CardArea.new(960, 540, 1100, {})
+    table.insert(G.CARDAREAS, menuArea)
     for letter = 1, #G.TILE do
         G.EVENTMANAGER:addEventToQueue(
             Event.new(
@@ -15,7 +17,7 @@ function START_MAIN_MENU()
                     tmp:setPos(500, 200)
                     tmp:playSound()
                     tmp.mouseMoveable = true
-                    table.insert(G.tmp.cards,tmp)
+                    table.insert(G.CARDAREAS[1].cards, tmp)
                 end,
                 {
                     trigger = "after",

@@ -1,26 +1,26 @@
 return {
 -- Table: {1}
 {
-   ["DEBUGBOXACTIVE"]=false,
-   ["PAUSED"]=false,
-   ["SOUND"]={2},
-   ["SCREENVARIABLES"]={3},
    ["SHOWFPS"]=true,
    ["ESCAPEMENUACTIVE"]=false,
+   ["SCREENVARIABLES"]={2},
+   ["DEBUGBOXACTIVE"]=false,
+   ["PAUSED"]=false,
+   ["SOUND"]={3},
 },
 -- Table: {2}
 {
-   ["VOLUME"]=100,
-},
--- Table: {3}
-{
+   ["DISPLAY"]={4},
+   ["SCREENSCALE"]=0.95,
    ["SCREENMODE"]="windowed",
-   ["SCREENSCALE"]=0.49010416666667,
+   ["YOFFSET"]=54,
    ["VSYNC"]=1,
    ["CURRENTDISPLAY"]=1,
    ["DIPLAYNUM"]=1,
-   ["DISPLAY"]={4},
-   ["YOFFSET"]=-70,
+},
+-- Table: {3}
+{
+   ["VOLUME"]=100,
 },
 -- Table: {4}
 {
@@ -33,11 +33,11 @@ return {
 },
 -- Table: {6}
 {
-   "eDP-1 14\"",
+   "100012590",
 },
 -- Table: {7}
 {
    1920,
-   1200,
+   1080,
 },
 }

@@ -45,24 +45,22 @@ function Game:setup()
     bootManager("Loading Shader Scripts", .6)
     self:loadShaders()
 
-    self.tmp = CardArea.new(960,540,1000,{})
-
     START_MAIN_MENU()
 
     bootManager("Done!", 1)
 
     TEsound.playLooping(self.SOUNDS["music2"],"static","main")
-
-    --tmp = UISlider.new(960,540, 500,30)
-
+    MAKE_OPTIONS_MENU()
 end
 
 function Game:createGameObj()
     local game = {
         turn = 0,
+        opponents = {}
     }
 end
 
+-- Quit the game
 function Game:quit()
     logger:log("Total Time Played:", G.mainTimePassed)
     logger:close()
@@ -70,6 +68,7 @@ function Game:quit()
     love.event.quit()
 end
 
+-- Load all game sounds
 function Game:loadSounds()
     self.SOUNDS = {}
     local soundPath = "resources/music/"
@@ -78,6 +77,7 @@ function Game:loadSounds()
     end
 end
 
+-- Load all game graphics
 function Game:getCardGraphics()
     self.CARDGRAPHICS = {}
     self.CARDGRAPHICS["CARDFACES"] = {}
@@ -100,6 +100,7 @@ function Game:getCardGraphics()
     end
 end
 
+-- Load Game Shaders
 function Game:loadShaders()
     self.SHADERS = {}
     local path = "shaders/"
@@ -113,12 +114,13 @@ function Game:update(dt)
     applyDisplaySettings()
     updateList(G.UI.BOX, dt)
     updateList(G.CARDS, dt)
-    --self:updateDisplay()
+    for _,area in pairs(G.CARDAREAS) do 
+        area:update(dt)
+    end
     for _, func in ipairs(self.BUFFEREDFUNCS) do
         func()
     end
     self.BUFFEREDFUNCS = {}
-    self.tmp:update(dt)
 end
 
 function Game:draw()
@@ -127,6 +129,9 @@ function Game:draw()
     love.graphics.setCanvas(self.drawSpace)
     love.graphics.clear()
 
+    for _,area in pairs(G.CARDAREAS) do 
+        area:draw()
+    end
     drawList(G.CARDS)
     drawList(G.UI.BOX)
 
@@ -136,16 +141,10 @@ function Game:draw()
 	love.graphics.rectangle("fill", x-5, y-5, 10, 10)
 	love.graphics.setColor({ 1, 1, 1, 1 })
 
-    self.tmp:draw()
-
     love.graphics.setCanvas()
 
     local x,y,_ = love.window.getMode()
-    local centerx = x/2
-    local centery = y/2
-    local ugh = _GAME_WIDTH/2
-    local ughy = _GAME_HEIGHT/2
 
-    love.graphics.draw(self.drawSpace, centerx,centery,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,ugh,ughy)
+    love.graphics.draw(self.drawSpace, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,_GAME_WIDTH/2,_GAME_HEIGHT/2)
     love.graphics.setShader()
 end

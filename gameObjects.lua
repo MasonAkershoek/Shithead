@@ -169,6 +169,16 @@ function Node:checkMouseHover()
     return false
 end
 
+function Node:isInside(x,y)
+    if x > (self.pos.x - self:getWidth() / 2) and x < (self.pos.x + self:getWidth() / 2) then
+        if y > (self.pos.y - self:getHeight() / 2) and y < (self.pos.y + self:getHeight() / 2) then
+            return true
+        end
+        return false
+    end
+    return false
+end
+
 -- Moveable Object
 ----------------------------------------------
 Moveable = setmetatable({}, { __index = Node })

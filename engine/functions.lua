@@ -169,7 +169,6 @@ end
 function HAlign(container, items, immediate, args)
     local args = args or {}
     local immediate = immediate or false
-    local allowOverlap = args.allowOverlap or false
     local spaceEvenly = args.spaceEvenly or false
     local padding = args.padding or 0
     local objPadding = args.objPadding or 0
@@ -183,31 +182,59 @@ function HAlign(container, items, immediate, args)
 
     local xpoints = 0
     local nextPoint = 0
-    xpoints = ((size.x) / (#items))
-    nextPoint = pos.x + xpoints/2
+    if spaceEvenly then
+        xpoints = ((size.x) / (#items))
+        nextPoint = pos.x + xpoints/2
+    else
+        nextPoint = (pos.x + items[1]:getWidth()/2) + padding
+    end
     for x = 1, #items do
         if not immediate then
             items[x]:setPos((nextPoint), pos.y)
         else
             items[x]:setPosImidiate((nextPoint), pos.y)
         end
-        nextPoint = nextPoint + xpoints
+        if not spaceEvenly and items[x+1] then
+            nextPoint = ((nextPoint + items[x]:getWidth()/2) + (items[x+1]:getWidth()/2)) + objPadding
+        else
+            nextPoint = nextPoint + xpoints
+        end
     end
 end
 
 -- Virticly align a given table of objects
-function VAlign(items, padding, i)
-    padding = padding or 0
-    if #items > 0 then
-        local nextPoint = (self.pos.y - self.area)
-        for x = 1, #items do
-            nextPoint = nextPoint + ((items[x].size.y / 2) * items[x].baseScale)
-            if not i then
-                items[x]:setPos(self.pos.x, nextPoint)
-            else
-                items[x]:setPosImidiate(self.pos.x, nextPoint)
-            end
-            nextPoint = ((nextPoint + ((items[x].size.y / 2) * items[x].baseScale)) + padding)
+function VAlign(container, items, immediate, args)
+    local args = args or {}
+    local immediate = immediate or false
+    local spaceEvenly = args.spaceEvenly or false
+    local padding = args.padding or 0
+    local objPadding = args.objPadding or 0
+
+    if not container then logger:lot("No container supplyed!") return end
+    if not items then logger:log("No table of items supplyed!") return end
+    if #items == 0 then logger:log("Table supplyed is empty.") return end
+
+    local pos = container:getPos("centertop")
+    local size = container:getSize()
+
+    local xpoints = 0
+    local nextPoint = 0
+    if spaceEvenly then
+        xpoints = ((size.y) / (#items))
+        nextPoint = pos.y + xpoints/2
+    else
+        nextPoint = (pos.y + items[1]:getHeight()/2) + padding
+    end
+    for x = 1, #items do
+        if not immediate then
+            items[x]:setPos(pos.x, nextPoint)
+        else
+            items[x]:setPosImidiate(pos.x, nextPoint)
+        end
+        if not spaceEvenly and items[x+1] then
+            nextPoint = ((nextPoint + items[x]:getHeight()/2) + (items[x+1]:getHeight()/2)) + objPadding
+        else
+            nextPoint = nextPoint + xpoints
         end
     end
 end

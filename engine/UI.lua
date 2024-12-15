@@ -78,6 +78,7 @@ function UINode:drawShadow()
     love.graphics.setColor(lovecolors:getColor("BLACK", .5))
     love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2) + 5, self.pos.y - (self.size.y / 2) + 5, self.size.x,
         self.size.y, self.radius, self.radius)
+    love.graphics.setColor({1,1,1,1})
 end
 
 function UINode:drawBorder(color)
@@ -178,10 +179,10 @@ function UIBox:update(dt)
     for _, func in ipairs(self.functions) do
         func(self)
     end
-    if self.alignment == "Vertical" then self:VAlign(10) else HAlign(self, self.children, true, {spaceEvenly=true, allowOverlap=false}) end
+    if self.alignment == "Vertical" then VAlign(self, self.children, true, {spaceEvenly=false, padding=20, objPadding=20}) else HAlign(self, self.children, true, {spaceEvenly=true}) end
     self:move(dt)
     for item = 1, #self.children do
-        if self.children[item].T == "UIButton" then
+        if self.children[item].T ~= "UILabel" then
             self.children[item]:update(dt)
         end
     end
@@ -284,6 +285,10 @@ function UILabel:setWidthAndHeight()
 end
 
 function UILabel:draw()
+    if self.showShadow then
+        love.graphics.setColor(lovecolors:getColor("BLACK",.5))
+        love.graphics.draw(self.textGraphics, self.pos.x+3, self.pos.y+3, 0, 1, 1, self.size.x / 2, self.size.y / 2)
+    end
     love.graphics.setColor(lovecolors:getColor(self.color))
     love.graphics.draw(self.textGraphics, self.pos.x, self.pos.y, 0, 1, 1, self.size.x / 2, self.size.y / 2)
 end
@@ -488,9 +493,9 @@ function UISlider.new(x,y,w,h,args)
 
     -- Slider drawables
     self.showLabel = args.showLabel or false
-    self.labelPos = args.lablePos or "left"
+    self.labelPos = args.labelPos or "left"
     self.labelAlignment = args.labelAlignment or "center"
-    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = "LIGHTGRAY" }) end
+    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize or 20, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = args.textColor or "LIGHTGRAY" }) end
 
 
     return self
@@ -518,7 +523,54 @@ function UISlider:update(dt)
 end
 
 function UISlider:draw()
+    -- Draw Shadow
+    self:drawShadow()
+
+    -- Draw Label
+    if self.showLabel then
+        local w,h = self.labalGraphics:getWidth(), self.labalGraphics:getHeight()
+        local x,y = 0,0
+
+        if self.labelPos == "left" then
+            x = (self:getPos("centerleft").x - (w/2)) - 10
+            y = self.pos.y
+            
+        elseif self.labelPos == "top" then
+            if self.labelAlignment == "center" then
+                x = self.pos.x
+                y = (self:getPos("centertop").y - (h/2) - 10)
+            elseif self.labelAlignment == "left" then
+                x = self:getPos("centerleft").x + (w/2)
+                y = (self:getPos("centertop").y - (h/2) - 10)
+            else
+                x = self:getPos("centerright").x - (w/2)
+                y = (self:getPos("centertop").y - (h/2) - 10)
+            end
+        elseif self.labelPos == "bottom" then
+            if self.labelAlignment == "center" then
+                x = self.pos.x
+                y = (self:getPos("centerbottom").y + (h/2) + 10)
+            elseif self.labelAlignment == "left" then
+                x = self:getPos("centerleft").x + (w/2)
+                y = (self:getPos("centerbottom").y + (h/2) + 10)
+            else
+                x = self:getPos("centerright").x - (w/2)
+                y = (self:getPos("centerbottom").y + (h/2) + 10)
+            end
+        else
+            x = (self:getPos("centerright").x + (w/2)) + 10
+            y = self.pos.y
+        end
+
+        if self.labelPos == "top" or self.labelPos == "bottom" then
+            
+        end
+        self.labalGraphics:setPosImidiate(x,y)
+        self.labalGraphics:draw()
+    end
+
     -- Draw Background
+    love.graphics.setColor(lovecolors:getColor(self.bgColor))
     love.graphics.rectangle('fill', self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x, self.size.y, self.size.x*.05, self.size.y*.5, 16)
 
     -- Draw Slider

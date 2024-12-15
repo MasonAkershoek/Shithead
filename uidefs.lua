@@ -91,7 +91,7 @@ end
 MAKE_ESC_MENU = function()
     local t = UIBox.new(
         400,
-        700,
+        500,
         {
             radius = 10,
             padding = 10,
@@ -164,10 +164,6 @@ MAKE_MAIN_MENU_BUTTON_BOX = function()
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Quit", color = "DARKERRED", action = "quit" }))
 end
 
-MAKE_INTRO_CARDS = function()
-
-end
-
 MAKE_FPS_HUD = function()
     local t = UIBox.new(
         400,
@@ -178,13 +174,9 @@ MAKE_FPS_HUD = function()
         }
     )
     t:setActive()
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
-    t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
+    for x=0, 6 do
+        t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
+    end
     t:addFunction(
         function(self)
             local x, y, flags = love.window.getMode()
@@ -224,4 +216,21 @@ MAKE_FPS_HUD = function()
             end)
         end
     )
+end
+
+MAKE_OPTIONS_MENU = function ()
+    local t = UIBox.new(
+        1000,
+        500,
+        {
+            positions = {Vector.new(960,-200), Vector.new(960,540)},
+            alignment = "Vertical"
+        }
+    )
+    t:setActive()
+    t:addChildren(UILabel.new(0,0,50,{alignment="center", text="Options"}))
+    t:addChildren(UISlider.new(0,0,600,30,{showLabel=true, labelPos="top", labelText="Volume", labelColor="WHITE"}))
+    t:addFunction(function (self)
+        TEsound.volume("main",self.children[2]:getValue())
+    end)
 end
