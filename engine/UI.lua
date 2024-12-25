@@ -93,12 +93,6 @@ UIBox.__index = UIBox
     object to take to make the movment feel more fluid
 ]]
 
---- Class: UIBox
---- Constructor method for the UIBox class
----@param w integer
----@param h integer
----@param args table ["position[1-2].x/y", "alignment", "content", "positions", "borderSize", "color"]
----@return UIBox
 function UIBox.new(w, h, args)
     local args = args or {}
     local x = args.positions[1].x or 0
@@ -113,6 +107,7 @@ function UIBox.new(w, h, args)
     self.active = false
     self.borderSize = args.borderSize or 10
     self.padding = args.padding or 0
+    self.objPadding = args.objPadding or 0
     self.borderColor = args.borderColor or "LIGHTGRAY"
     self.color = args.color or "DARKGRAY"
     self.drawBox = args.drawBox
@@ -137,37 +132,6 @@ function UIBox:setActive()
     self.changed = true
 end
 
-function UIBox:HAlign()
-    local flag = true
-    local tmpWidth = 0
-    local sizeOffset = 400
-    tmpHeight = 0
-    if #self.children > 0 then
-        local xpoints = (((self.size.x - sizeOffset) + (self.size.x - (self.borderSize / 2) - sizeOffset)) / (#self.children + 1))
-        local nextPoint = (self.pos.x + sizeOffset - self.size.x)
-        for x = 1, #self.children do
-            if flag then
-                self.children[x]:setPosImidiate((xpoints + nextPoint), self.pos.y)
-            else
-                self.children[x]:setPosImidiate((xpoints + nextPoint))
-            end
-            nextPoint = nextPoint + xpoints
-        end
-    end
-end
-
-function UIBox:VAlign(padding)
-    padding = padding or 00
-    if #self.children > 0 then
-        local nextPoint = (self.pos.y - self.size.y / 2) + 10
-        for x = 1, #self.children do
-            nextPoint = nextPoint + ((self.children[x].size.y / 2) * self.children[x].baseScale)
-            self.children[x]:setPosImidiate(self.pos.x, nextPoint)
-            nextPoint = ((nextPoint + ((self.children[x].size.y / 2) * self.children[x].baseScale)) + padding)
-        end
-    end
-end
-
 --[[
     change update list to allow the passing of arguments
     for all contents of the UIBox there update functions need have a pointer to there parent function
@@ -179,7 +143,7 @@ function UIBox:update(dt)
     for _, func in ipairs(self.functions) do
         func(self)
     end
-    if self.alignment == "Vertical" then VAlign(self, self.children, true, {spaceEvenly=false, padding=20, objPadding=20}) else HAlign(self, self.children, true, {spaceEvenly=true}) end
+    if self.alignment == "Vertical" then VAlign(self, self.children, true, {spaceEvenly=false, padding=self.padding, objPadding=self.objPadding}) else HAlign(self, self.children, true, {spaceEvenly=true}) end
     self:move(dt)
     for item = 1, #self.children do
         if self.children[item].T ~= "UILabel" then
@@ -501,6 +465,22 @@ function UISlider.new(x,y,w,h,args)
     return self
 end
 
+function UISlider:getHeight()
+    if self.labelPos == "top" or self.labelPos == "bottom" then
+        return self.size.y + self.labalGraphics:getHeight() + 20
+    else
+        return self.size.y
+    end
+end
+
+function UISlider:getWidth()
+    if self.labelPos == "left" or self.labelPos == "right" then
+        return self.size.x + self.labalGraphics:getWidth() + 20
+    else
+        return self.size.x
+    end
+end
+
 function UISlider:mouseClick()
     local gmx,_ = love.mouse.getPosition()
     local mx,_ = toGame(gmx,1)
@@ -560,10 +540,6 @@ function UISlider:draw()
         else
             x = (self:getPos("centerright").x + (w/2)) + 10
             y = self.pos.y
-        end
-
-        if self.labelPos == "top" or self.labelPos == "bottom" then
-            
         end
         self.labalGraphics:setPosImidiate(x,y)
         self.labalGraphics:draw()

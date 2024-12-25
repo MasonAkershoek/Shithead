@@ -49,6 +49,7 @@ function Game:setGlobals()
         SHOWFPS = false,
         DEBUGBOXACTIVE = false,
         PAUSED = false,
+        OPTIONSACTIVE = false,
         ESCAPEMENUACTIVE = false,
         SCREENVARIABLES = {
             SCREENMODE = "fullscreen",
@@ -111,6 +112,7 @@ function Game:setGlobals()
             end
         )
     )
+    self.EVENTMANAGER:addListener("showOptions", Event.new(function() setUpOptionsMenu() end))
     -- self.EVENTMANAGER:on("makeWinBox", function()
     --     G.SETTINGS.paused = true
     --     MAKE_WIN_BOX()

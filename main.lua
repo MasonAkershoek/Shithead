@@ -191,7 +191,11 @@ function love.keypressed(key, scancode, isrepeat)
 	end
 	if key == "escape" and not G.SETTINGS.ESCAPEMENUACTIVE then
 		G.KEYBOARDMANAGER:clearBuff()
-		G.EVENTMANAGER:emit("activateEscapeMenu")
+		if not G.SETTINGS.OPTIONSACTIVE then
+			G.EVENTMANAGER:emit("activateEscapeMenu")
+		else
+			setUpOptionsMenu()
+		end
 	end
 	if key == "f3" and not G.SETTINGS.SHOWFPS then
 		G.KEYBOARDMANAGER:clearBuff()

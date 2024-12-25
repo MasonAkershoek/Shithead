@@ -23,7 +23,7 @@ end
 --- Takes in a table of objects that all contain an update function and calls them in the order they appear in the list
 function updateList(list, dt)
     if #list ~= 0 then
-        for x = 1, #list do
+        for x = #list, 1, -1 do
             list[x]:update(dt)
         end
     end
@@ -236,6 +236,17 @@ function VAlign(container, items, immediate, args)
         else
             nextPoint = nextPoint + xpoints
         end
+    end
+end
+
+function setUpOptionsMenu()
+    if G.SETTINGS.OPTIONSACTIVE then
+        G.SETTINGS.OPTIONSACTIVE = false
+        G.SETTINGS.PAUSED = false
+    else
+        G.SETTINGS.OPTIONSACTIVE = true
+        G.SETTINGS.PAUSED = true
+        MAKE_OPTIONS_MENU()
     end
 end
 
