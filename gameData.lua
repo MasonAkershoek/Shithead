@@ -32,7 +32,7 @@ function Game:setup()
 
     bootManager("init Display", .3)
     initDisplay()
-    love.graphics.setDefaultFilter("linear","linear",10)
+    love.graphics.setDefaultFilter("nearest","linear",10)
     logger:log(love.graphics.getDefaultFilter())
     love.graphics.setLineStyle("rough")
 
@@ -50,7 +50,7 @@ function Game:setup()
     bootManager("Done!", 1)
 
     TEsound.playLooping(self.SOUNDS["music2"],"static","main")
-    MAKE_OPTIONS_MENU()
+    --MAKE_OPTIONS_MENU()
 end
 
 function Game:createGameObj()

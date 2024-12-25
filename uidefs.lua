@@ -97,13 +97,14 @@ MAKE_ESC_MENU = function()
             padding = 10,
             borderSize = 10,
             alignment = "Vertical",
-            positions = { Vector.new(_GAME_WIDTH / 2, -200), Vector.new(_GAME_WIDTH / 2, _GAME_HEIGHT / 2) }
+            positions = { Vector.new(_GAME_WIDTH / 2, -200), Vector.new(_GAME_WIDTH / 2, _GAME_HEIGHT / 2) },
+            objPadding = 20
         }
     )
     t:setActive()
     t:addChildren(UILabel.new(0, 0, 50, { alignment = "center", text = "Menu" }))
     t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu" }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "options" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "showOptions" }))
     t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit" }))
     t:addFunction(
         function(self)
@@ -112,37 +113,13 @@ MAKE_ESC_MENU = function()
                 G.SETTINGS.PAUSED = false
                 removeSelf(self, G.UI.BOX)
             end
+            if G.SETTINGS.OPTIONSACTIVE then
+                G.SETTINGS.ESCAPEMENUACTIVE = false
+                removeSelf(self, G.UI.BOX)
+            end
         end
     )
 end
-
--- UIDefinitions for the Main Menu
-
--- Definition for Demo Box
--- DemoDef = {
---     radius = 10,
---     padding = 10,
---     borderSize = 10,
---     alignment = "Horizontal",
---     positions = { Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2, -200), Vector.new(G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2, 200) },
---     contents = { UILabel.new(
---         G.SCREENVARIABLES["GAMEDEMENTIONS"].x / 2,
---         G.SCREENVARIABLES["GAMEDEMENTIONS"].y / 2,
---         20,
---         {
---             alignment = "center",
---             text = "Thank you for play testing Shithead! " ..
---                 "This is the first play test release " ..
---                 "of the game so expect some bugs and " ..
---                 "missing features. Please feel free to " ..
---                 "send me any ideas for fetures that you " ..
---                 "would like to see in the game or " ..
---                 "problems you encounter during your test " ..
---                 "\n\nThanks - Mason"
---         }
---     )
---     }
--- }
 
 MAKE_MAIN_MENU_BUTTON_BOX = function()
     local t = UIBox.new(
@@ -160,7 +137,7 @@ MAKE_MAIN_MENU_BUTTON_BOX = function()
     logger:log("Button Box Size:", t.size.x)
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Play", color = "DARKERBLUE", action = "play" }))
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Multiplayer", color = "DARKERYELLOW" }))
-    t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Options", color = "DARKERGREEN" }))
+    t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Options", color = "DARKERGREEN", action="showOptions" }))
     t:addChildren(UIButton.new(-100, -100, 200, 100, { radius = 10, text = "Quit", color = "DARKERRED", action = "quit" }))
 end
 
@@ -224,7 +201,8 @@ MAKE_OPTIONS_MENU = function ()
         500,
         {
             positions = {Vector.new(960,-200), Vector.new(960,540)},
-            alignment = "Vertical"
+            alignment = "Vertical",
+            objPadding = 20
         }
     )
     t:setActive()
@@ -232,5 +210,10 @@ MAKE_OPTIONS_MENU = function ()
     t:addChildren(UISlider.new(0,0,600,30,{showLabel=true, labelPos="top", labelText="Volume", labelColor="WHITE"}))
     t:addFunction(function (self)
         TEsound.volume("main",self.children[2]:getValue())
+    end)
+    t:addFunction(function (self)
+        if not G.SETTINGS.OPTIONSACTIVE then
+            removeSelf(self, G.UI.BOX)
+        end
     end)
 end
