@@ -98,16 +98,18 @@ MAKE_ESC_MENU = function()
             borderSize = 10,
             alignment = "Vertical",
             positions = { Vector.new(_GAME_WIDTH / 2, -200), Vector.new(_GAME_WIDTH / 2, _GAME_HEIGHT / 2) },
-            objPadding = 20
+            objPadding = 20, 
+            stopOnPause=false
         }
     )
     t:setActive()
     t:addChildren(UILabel.new(0, 0, 50, { alignment = "center", text = "Menu" }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu" }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "showOptions" }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit" }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu", stopOnPause=false }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "showOptions", stopOnPause=false }))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit", stopOnPause=false }))
     t:addFunction(
         function(self)
+            logger:log("GG")
             if G.SETTINGS.ESCAPEMENUACTIVE and G.KEYBOARDMANAGER:getLastKeyPress() == "escape" then
                 G.SETTINGS.ESCAPEMENUACTIVE = false
                 G.SETTINGS.PAUSED = false
@@ -202,12 +204,13 @@ MAKE_OPTIONS_MENU = function ()
         {
             positions = {Vector.new(960,-200), Vector.new(960,540)},
             alignment = "Vertical",
-            objPadding = 20
+            objPadding = 20,
+            stopOnPause=false
         }
     )
     t:setActive()
-    t:addChildren(UILabel.new(0,0,50,{alignment="center", text="Options"}))
-    t:addChildren(UISlider.new(0,0,600,30,{showLabel=true, labelPos="top", labelText="Volume", labelColor="WHITE", sliderValue=G.SETTINGS.SOUND.VOLUME/100}))
+    t:addChildren(UILabel.new(0,0,50,{alignment="center", text="Options", stopOnPause=false}))
+    t:addChildren(UISlider.new(0,0,600,30,{showLabel=true, labelPos="top", labelText="Volume", labelColor="WHITE", sliderValue=G.SETTINGS.SOUND.VOLUME/100, stopOnPause=false}))
     t:addFunction(function (self)
         G.SETTINGS.SOUND.VOLUME = self.children[2]:getValue() * 100
         TEsound.volume("main",self.children[2]:getValue())

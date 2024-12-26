@@ -201,6 +201,9 @@ function Card:op8(dt)
 end
 
 function Card:update(dt)
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     if self.newSelectFlag then
         self.newSelectFlag = false
     end
@@ -219,6 +222,9 @@ function Card:update(dt)
 end
 
 function Card:draw()
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     love.graphics.setColor({ 0, 0, 0, self.transparency - .5 })
     love.graphics.draw(self.texture, self.pos.x + 7, self.pos.y + 7, 0, self.scale.x, self.scale.y, (self.size.x / 2),
         (self.size.y / 2), self.skew.x, self.skew.y)

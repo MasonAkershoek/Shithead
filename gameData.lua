@@ -13,6 +13,7 @@ function Game:setup()
 
     -- Canves
     self.drawSpace = love.graphics.newCanvas(_GAME_WIDTH, _GAME_HEIGHT)
+    self.pauseCanves = love.graphics.newCanvas(_GAME_WIDTH, _GAME_HEIGHT)
 
     -- Import settings
     bootManager("Loading Settings", .2)
@@ -126,8 +127,13 @@ end
 function Game:draw()
     love.graphics.setBackgroundColor(lovecolors:getColor("BGCOLOR"))
 
-    love.graphics.setCanvas(self.drawSpace)
-    love.graphics.clear()
+    if G.SETTINGS.PAUSED then
+        love.graphics.setCanvas(self.pauseCanves)
+        love.graphics.clear(lovecolors:getColor("BLACK",.5))
+    else
+        love.graphics.setCanvas(self.drawSpace)
+        love.graphics.clear()
+    end
 
     for _,area in pairs(G.CARDAREAS) do 
         area:draw()
@@ -144,7 +150,9 @@ function Game:draw()
     love.graphics.setCanvas()
 
     local x,y,_ = love.window.getMode()
-
     love.graphics.draw(self.drawSpace, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,_GAME_WIDTH/2,_GAME_HEIGHT/2)
+    if G.SETTINGS.PAUSED then
+        love.graphics.draw(self.pauseCanves, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,_GAME_WIDTH/2,_GAME_HEIGHT/2)
+    end
     love.graphics.setShader()
 end

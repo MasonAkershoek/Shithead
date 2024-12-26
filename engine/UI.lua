@@ -24,6 +24,8 @@ function UINode.new(x, y, w, h, args)
     self.shadowOffset = 10
     self.shadowPos = Vector.new(self.pos.x + self.shadowOffset, self.pos.y + self.shadowOffset)
     self.showShadow = args.showShadow or true
+
+    if args.stopOnPause == false then self.stopOnPause = false end
     return self
 end
 
@@ -140,6 +142,9 @@ end
 
 ]]
 function UIBox:update(dt)
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     for _, func in ipairs(self.functions) do
         func(self)
     end
@@ -167,6 +172,9 @@ function UIBox:update(dt)
 end
 
 function UIBox:draw()
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     if self.drawBox then
         if self.showShadow then
             self:drawShadow()
@@ -249,6 +257,9 @@ function UILabel:setWidthAndHeight()
 end
 
 function UILabel:draw()
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     if self.showShadow then
         love.graphics.setColor(lovecolors:getColor("BLACK",.5))
         love.graphics.draw(self.textGraphics, self.pos.x+3, self.pos.y+3, 0, 1, 1, self.size.x / 2, self.size.y / 2)
@@ -305,6 +316,9 @@ function UIButton:onSelect()
 end
 
 function UIButton:update(dt)
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     self:onHover()
     self:onSelect()
     self.clickTimer:update(dt)
@@ -312,6 +326,9 @@ function UIButton:update(dt)
 end
 
 function UIButton:draw()
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     if self.showShadow then
         self:drawShadow()
     end
@@ -411,6 +428,9 @@ function UITextField:showCursor()
 end
 
 function UITextField:update(dt)
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     self:select()
     if self.selected and G.KEYBOARDMANAGER.keyPressFlag then
         local key = convertKeyPress(G.KEYBOARDMANAGER:getLastKeyPress())
@@ -419,6 +439,9 @@ function UITextField:update(dt)
 end
 
 function UITextField:draw()
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     if self.showShadow then
         self:drawShadow()
     end
@@ -499,10 +522,16 @@ function UISlider:getValue()
 end
 
 function UISlider:update(dt)
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     self:mouseClick()
 end
 
 function UISlider:draw()
+    if self.stopOnPause and G.SETTINGS.PAUSED then
+        return
+    end
     -- Draw Shadow
     self:drawShadow()
 

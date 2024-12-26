@@ -65,6 +65,7 @@ end
 
 function Node:setParent(newParent)
     self.parent = newParent
+    self.stopOnPause = self.parent.stopOnPause
 end
 
 function Node:removeParent()
@@ -200,6 +201,7 @@ function Moveable.new(nx, ny, mouseMoveable)
     self.moveFlag = false
     self.moving = false
     self.mouseMove = false
+    self.stopOnPause = true
     return self
 end
 
@@ -339,111 +341,5 @@ function Vector:checkDistance(otherVect, space)
         end
     else
         return false
-    end
-end
-
--- HboxContainer
-----------------------------------------------
-HboxContainer = setmetatable({}, { __index = Moveable })
-
-HboxContainer.__index = HboxContainer
-
-function HboxContainer.new(nx, ny, bgBox)
-    bgBox = bgBox or false
-    local self = setmetatable(Moveable.new(nx, ny), HboxContainer)
-
-    self.T = "HboxContainer"
-
-    self.area = 0
-    self.baseScale = 1
-    self.boxFlag = bgBox
-    self.borderBox = nil
-    self.itemsMoving = false
-    return self
-end
-
-function HboxContainer:getWidth()
-    return self.size.x / 2 + self.area
-end
-
-function HboxContainer:updatePos(items, flag, i)
-    flag = flag or false
-    tmpWidth = 0
-    tmpHeight = 0
-    if self.borderBox ~= nil then
-        self.borderBox:setPos(self.pos.x, self.pos.y)
-    end
-    if #items > 0 then
-        local xpoints = ((self.area + self.area) / (#items + 1))
-        local nextPoint = (self.pos.x - self.area)
-        for x = 1, #items do
-            if not i then
-                if flag then
-                    items[x]:setPos((xpoints + nextPoint), self.pos.y)
-                else
-                    items[x]:setPos((xpoints + nextPoint))
-                end
-            else
-                if flag then
-                    items[x]:setPosImidiate((xpoints + nextPoint), self.pos.y)
-                else
-                    items[x]:setPosImidiate((xpoints + nextPoint))
-                end
-            end
-            nextPoint = nextPoint + xpoints
-            tmpWidth = tmpWidth + items[x]:getWidth()
-            if items[x]:getHeight() > tmpHeight then
-                tmpHeight = items[x]:getHeight()
-            end
-        end
-        self.size.x = tmpWidth
-        self.size.y = tmpHeight
-    end
-end
-
-function HboxContainer:checkMoving(items)
-    for _, card in ipairs(items) do
-        if card.moving then
-            return false
-        end
-    end
-    return true
-end
-
-function HboxContainer:update(dt)
-    self:move(dt)
-    if self.borderBox ~= nil then
-        self.borderBox:update(dt)
-    end
-end
-
--- VboxContainer1
----------------------------------------------------------------------------------------------
-VboxContainer = setmetatable({}, { __index = Moveable })
-
-VboxContainer.__index = VboxContainer
-
-function VboxContainer.new(nx, ny)
-    local self = setmetatable(Moveable.new(nx, ny), VboxContainer)
-
-    self.T = "VboxContainer"
-
-    self.area = 0
-    return self
-end
-
-function VboxContainer:updatePos(items, padding, i)
-    padding = padding or 0
-    if #items > 0 then
-        local nextPoint = (self.pos.y - self.area)
-        for x = 1, #items do
-            nextPoint = nextPoint + ((items[x].size.y / 2) * items[x].baseScale)
-            if not i then
-                items[x]:setPos(self.pos.x, nextPoint)
-            else
-                items[x]:setPosImidiate(self.pos.x, nextPoint)
-            end
-            nextPoint = ((nextPoint + ((items[x].size.y / 2) * items[x].baseScale)) + padding)
-        end
     end
 end
