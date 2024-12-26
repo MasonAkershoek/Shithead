@@ -453,13 +453,13 @@ function UISlider.new(x,y,w,h,args)
     self.borderColor = args.borderColor or "LIGHTGRAY"
 
     -- Slider value
-    self.sliderValue = 1
+    self.sliderValue = args.sliderValue or 1
 
     -- Slider drawables
     self.showLabel = args.showLabel or false
     self.labelPos = args.labelPos or "left"
     self.labelAlignment = args.labelAlignment or "center"
-    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize or 20, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = args.textColor or "LIGHTGRAY" }) end
+    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize or 20, { alignment = self.labelAlignment, text = args.labelText or "Empty!", color = args.textColor or "LIGHTGRAY" }) end
 
 
     return self
