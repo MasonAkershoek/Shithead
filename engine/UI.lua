@@ -7,7 +7,7 @@ UINode.__index = UINode
 
 function UINode.new(x, y, w, h, args)
     local args = args or {}
-    local self = setmetatable(Moveable.new(x, y, false), UINode)
+    local self = setmetatable(Moveable.new(x, y, false, args), UINode)
 
     self.T = "UINode"
 
@@ -19,13 +19,18 @@ function UINode.new(x, y, w, h, args)
     self.internalPadding = args.internalPadding or 0
     self.showBorder = args.showBorder or true
     self.changed = false
+    if args.stopOnPause == false then self.stopOnPause = false else self.stopOnPause = true end
 
     -- Shadow
     self.shadowOffset = 10
     self.shadowPos = Vector.new(self.pos.x + self.shadowOffset, self.pos.y + self.shadowOffset)
     self.showShadow = args.showShadow or true
 
-    if args.stopOnPause == false then self.stopOnPause = false end
+    if self.parent then
+        if self.parent.stopOnPause == false then
+            self.stopOnPause = false
+        end
+    end
     return self
 end
 
@@ -104,7 +109,6 @@ function UIBox.new(w, h, args)
     self.T = "UIBox"
 
     self.alignment = args.alignment or "Vertical"
-    self.functions = args.functions or {}
     self.positions = args.positions or { Vector.new(0, 0), Vector.new(0, 0) }
     self.active = false
     self.borderSize = args.borderSize or 10
@@ -114,12 +118,10 @@ function UIBox.new(w, h, args)
     self.color = args.color or "DARKGRAY"
     self.drawBox = args.drawBox
     if self.drawBox ~= false then self.drawBox = true end
-    table.insert(G.UI.BOX, self)
+    if not self.parent then
+        table.insert(G.UI.BOX, self)
+    end
     return self
-end
-
-function UIBox:addFunction(newFunction)
-    table.insert(self.functions, newFunction)
 end
 
 function UIBox:setActive()
@@ -149,7 +151,9 @@ function UIBox:update(dt)
         func(self)
     end
     if self.alignment == "Vertical" then VAlign(self, self.children, true, {spaceEvenly=false, padding=self.padding, objPadding=self.objPadding}) else HAlign(self, self.children, true, {spaceEvenly=true}) end
-    self:move(dt)
+    if not self.parent then
+        self:move(dt)
+    end
     for item = 1, #self.children do
         if self.children[item].T ~= "UILabel" then
             self.children[item]:update(dt)
@@ -162,10 +166,12 @@ function UIBox:update(dt)
                 self.children[item]:setWrap(self.size.x - (self.borderSize * 2) - (self.padding * 2))
             end
         end
-        if self.active then
-            self:setPos(self.positions[2].x, self.positions[2].y)
-        else
-            self:setPos(self.positions[1].x, self.positions[1].y)
+        if not self.parent then
+            if self.active then
+                self:setPos(self.positions[2].x, self.positions[2].y)
+            else
+                self:setPos(self.positions[1].x, self.positions[1].y)
+            end
         end
         self.changed = false
     end
@@ -281,7 +287,7 @@ function UIButton.new(x, y, w, h, args)
     self.action = args.action or function () logger:log("Empty Function") end
     self.color = args.color or "RED"
     self.text = args.text or "Empty!"
-    self.textGraphics = UILabel.new(self.pos.x, self.pos.y, args.textFontSize, { text = self.text, alignment = "center" })
+    self.textGraphics = UILabel.new(self.pos.x, self.pos.y, args.textFontSize, { text = self.text, alignment = "center", stopOnPause = self.stopOnPause })
     self.oldmousedown = ""
     self.clickTimer = Timer.new(.2)
     self.clickTimer:stopTimer()
@@ -318,6 +324,9 @@ end
 function UIButton:update(dt)
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
+    end
+    for _, func in ipairs(self.functions) do
+        func(self)
     end
     self:onHover()
     self:onSelect()
@@ -365,7 +374,7 @@ function UITextField.new(x, y, w, h, fontSize, args)
     self.textColor = args.textColor or "BLACK"
     -- Text Field Text
     self.text = {}
-    self.textGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = self.textColor })
+    self.textGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = self.textColor, stopOnPause=self.stopOnPause })
     self.textGraphics:setPosImidiate(self.pos.x, self.pos.y)
 
     -- Border stuff
@@ -375,7 +384,7 @@ function UITextField.new(x, y, w, h, fontSize, args)
 
     -- Temporary Text for Field
     self.tmpText = args.tmpText or ""
-    self.tmpTextGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = "LIGHTGRAY" })
+    self.tmpTextGraphics = UILabel.new(0, 0, self.fontSize, { alignment = "left", text = "", color = "LIGHTGRAY", stopOnPause=self.stopOnPause  })
     self.tmpTextGraphics:setPosImidiate(self.pos.x, self.pos.y)
     self.tmpTextGraphics:setText(self.tmpText)
     self.tmpTextGraphics:setWrap(self.size.x)
@@ -384,7 +393,7 @@ function UITextField.new(x, y, w, h, fontSize, args)
     self.showLabel = args.showLabel or false
     self.labelPos = args.lablePos or "left"
     self.labelAlignment = args.labelAlignment or "center"
-    self.labalGraphics = UILabel.new(0, 0, self.fontSize, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = "LIGHTGRAY" })
+    self.labalGraphics = UILabel.new(0, 0, self.fontSize, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = "LIGHTGRAY", stopOnPause=self.stopOnPause  })
     return self
 end
 
@@ -482,7 +491,7 @@ function UISlider.new(x,y,w,h,args)
     self.showLabel = args.showLabel or false
     self.labelPos = args.labelPos or "left"
     self.labelAlignment = args.labelAlignment or "center"
-    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize or 20, { alignment = self.labelAlignment, text = args.labelText or "Empty!", color = args.textColor or "LIGHTGRAY" }) end
+    if self.showLabel then self.labalGraphics = UILabel.new(0, 0, args.labelFontSize or 20, { alignment = self.labelAlignment, text = args.labelText or "Empty!", color = args.textColor or "LIGHTGRAY", stopOnPause=self.stopOnPause  }) end
 
 
     return self

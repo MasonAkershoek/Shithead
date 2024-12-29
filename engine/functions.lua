@@ -86,24 +86,24 @@ function initDisplay()
         table.insert(G.SETTINGS.SCREENVARIABLES.DISPLAY.RESOLUTIONS, { love.window.getDesktopDimensions(x) })
     end
 
-    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "windowed" then
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.WINDOWED then
         width = width * .95
         height = height * .95
     end
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
     G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
-    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
-    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then windowArgs.borderless = true end
+    if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then windowArgs.fullscreen = true end
     logger:log("MAS", width)
     love.window.setMode(width, height, windowArgs)
 end
 
 function applyDisplaySettings()
     local width,height,flags = love.window.getMode()
-    local windowMode = "windowed"
-    if flags.borderless == true then windowMode = "borderless" end
-    if flags.fullscreen == true then windowMode = "fullscreen" end
+    local windowMode = G.SCREENMODES.WINDOWED
+    if flags.borderless == true then windowMode = G.SCREENMODES.BORDERLESS end
+    if flags.fullscreen == true then windowMode = G.SCREENMODES.FULLSCREEN end
     local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY}
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
@@ -114,8 +114,8 @@ function applyDisplaySettings()
 
     if windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE then
         G.SETTINGS.SCREENVARIABLES.SCREENMODE = windowMode
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "borderless" then windowArgs.borderless = true end
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == "fullscreen" then windowArgs.fullscreen = true end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then windowArgs.borderless = true end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then windowArgs.fullscreen = true end
         love.window.updateMode(width,height,windowArgs)
     end
 end

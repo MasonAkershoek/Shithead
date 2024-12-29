@@ -1,40 +1,40 @@
 return {
 -- Table: {1}
 {
-   ["OPTIONSACTIVE"]=false,
-   ["PAUSED"]=true,
    ["SCREENVARIABLES"]={2},
+   ["PAUSED"]=false,
    ["SHOWFPS"]=true,
-   ["DEBUGBOXACTIVE"]=false,
    ["SOUND"]={3},
-   ["ESCAPEMENUACTIVE"]=true,
+   ["ESCAPEMENUACTIVE"]=false,
+   ["OPTIONSACTIVE"]=false,
+   ["DEBUGBOXACTIVE"]=false,
 },
 -- Table: {2}
 {
-   ["SCREENSCALE"]=1,
-   ["SCREENMODE"]="fullscreen",
-   ["YOFFSET"]=0,
    ["VSYNC"]=1,
    ["CURRENTDISPLAY"]=1,
    ["DIPLAYNUM"]=1,
    ["DISPLAY"]={4},
+   ["SCREENSCALE"]=0.95,
+   ["YOFFSET"]=54,
+   ["SCREENMODE"]=2,
 },
 -- Table: {3}
 {
-   ["VOLUME"]=100,
+   ["VOLUME"]=99.833333333333,
 },
 -- Table: {4}
 {
-   ["NAMES"]={5},
-   ["RESOLUTIONS"]={6},
+   ["RESOLUTIONS"]={5},
+   ["NAMES"]={6},
 },
 -- Table: {5}
 {
-   "100012590",
+   {7},
 },
 -- Table: {6}
 {
-   {7},
+   "100012590",
 },
 -- Table: {7}
 {

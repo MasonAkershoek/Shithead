@@ -103,13 +103,12 @@ MAKE_ESC_MENU = function()
         }
     )
     t:setActive()
-    t:addChildren(UILabel.new(0, 0, 50, { alignment = "center", text = "Menu" }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu", stopOnPause=false }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "showOptions", stopOnPause=false }))
-    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit", stopOnPause=false }))
+    t:addChildren(UILabel.new(0, 0, 50, { alignment = "center", text = "Menu", parent=t}))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Main Menu", color = "RED", action = "mainmenu", parent=t}))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Options", color = "RED", action = "showOptions", parent=t}))
+    t:addChildren(UIButton.new(0, 0, 200, 100, { radius = 10, text = "Quit", color = "RED", action = "quit", parent=t}))
     t:addFunction(
         function(self)
-            logger:log("GG")
             if G.SETTINGS.ESCAPEMENUACTIVE and G.KEYBOARDMANAGER:getLastKeyPress() == "escape" then
                 G.SETTINGS.ESCAPEMENUACTIVE = false
                 G.SETTINGS.PAUSED = false
@@ -153,7 +152,7 @@ MAKE_FPS_HUD = function()
         }
     )
     t:setActive()
-    for x=0, 6 do
+    for x=0, 8 do
         t:addChildren(UILabel.new(0, 0, 20, { alignment = "center" }))
     end
     t:addFunction(
@@ -182,6 +181,12 @@ MAKE_FPS_HUD = function()
             self.children[7]:setText("Scale: "..G.SETTINGS.SCREENVARIABLES.SCREENSCALE)
             self.children[7]:setAlignment("center")
             self.children[7]:setWrap(self:getWidth())
+            self.children[8]:setText("Major State: "..G.MAJORSTATE)
+            self.children[8]:setAlignment("center")
+            self.children[8]:setWrap(self:getWidth())
+            self.children[9]:setText("Minor State: "..G.MINORSTATE)
+            self.children[9]:setAlignment("center")
+            self.children[9]:setWrap(self:getWidth())
             
         end
     )
@@ -211,6 +216,33 @@ MAKE_OPTIONS_MENU = function ()
     t:setActive()
     t:addChildren(UILabel.new(0,0,50,{alignment="center", text="Options", stopOnPause=false}))
     t:addChildren(UISlider.new(0,0,600,30,{showLabel=true, labelPos="top", labelText="Volume", labelColor="WHITE", sliderValue=G.SETTINGS.SOUND.VOLUME/100, stopOnPause=false}))
+    local v = UIBox.new(
+        400,
+        50,
+        {
+            positions = {Vector.new(0,0), Vector.new(0,0)},
+            alignment = "Horizontal",
+            objPadding = 20,
+            stopOnPause=false,
+            parent = t,
+            drawBox = false
+        }
+    )
+    local leftButton = UIButton.new(0,0,50,80,{text="<", color="DARKERBLUE", action="displaymodeleft", parent=v})
+    local displayButton = UIButton.new(0,0,200,80,{text="Borderless", color="DARKERBLUE", action="", parent=v})
+    displayButton:addFunction(
+        function (self)
+            local modes = {"Fullscreen", "Windowed", "Borderless"}
+            self:setText(modes[G.SETTINGS.SCREENVARIABLES.SCREENMODE])
+        end
+    )
+    local rightButton = UIButton.new(0,0,50,80,{text=">", color="DARKERBLUE", action="displaymoderight", parent=v})
+
+
+    v:addChildren(leftButton)
+    v:addChildren(displayButton)
+    v:addChildren(rightButton)
+    t:addChildren(v)
     t:addFunction(function (self)
         G.SETTINGS.SOUND.VOLUME = self.children[2]:getValue() * 100
         TEsound.volume("main",self.children[2]:getValue())

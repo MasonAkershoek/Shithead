@@ -1,7 +1,7 @@
 function START_MAIN_MENU()
     G.MAJORSTATE = G.MAJORSTATES.MAINMENU
     G.MINORSTATE = G.MINORSTATES.MAININTRO
-    local menuArea = CardArea.new(960, 540, 1100, {})
+    local menuArea = CardArea.new(960, 540, 1100, {cards = G.MAINMENUDATA.TITLECARDS})
     table.insert(G.CARDAREAS, menuArea)
     G.EVENTMANAGER:addEventToQueue(Event.new(function () logger:log("Wait a moment to start the splash") end,{delay=1}))
     for letter = 1, #G.TILE do
@@ -18,7 +18,7 @@ function START_MAIN_MENU()
                     tmp:setPos(500, 200)
                     tmp:playSound()
                     tmp.mouseMoveable = true
-                    table.insert(G.CARDAREAS[1].cards, tmp)
+                    table.insert(G.MAINMENUDATA.TITLECARDS, tmp)
                 end,
                 {
                     trigger = "after",
@@ -28,4 +28,12 @@ function START_MAIN_MENU()
         )
     end
     G.EVENTMANAGER:addEventToQueue(Event.new(MAKE_MAIN_MENU_BUTTON_BOX, { trigger = "after", delay = .5 }))
+    G.EVENTMANAGER:addEventToQueue(Event.new(function () G.MINORSTATE = G.MINORSTATES.MAINMENUIDLE end, {trigger="after"}))
+end
+
+function EXIT_MAIN_MENU()
+    G.MAJORSTATE = G.MAJORSTATES.MAINMENU
+    G.MINORSTATE = G.MINORSTATES.MAINEXIT
+    G.EVENTMANAGER:addEventToQueue(Event.new(MAKE_MAIN_MENU_BUTTON_BOX, { trigger = "after", delay = .5 }))
+    G.EVENTMANAGER:addEventToQueue(Event.new(function () G.MINORSTATE = G.MINORSTATES.MAINMENUIDLE end, {trigger="after"}))
 end

@@ -29,6 +29,12 @@ function Game:setGlobals()
         CLEANUP = 10,
     }
 
+    self.SCREENMODES = {
+        FULLSCREEN = 1,
+        WINDOWED = 2,
+        BORDERLESS = 3
+    }
+
     -- ============
     -- == Timers ==
     -- ============
@@ -52,7 +58,7 @@ function Game:setGlobals()
         OPTIONSACTIVE = false,
         ESCAPEMENUACTIVE = false,
         SCREENVARIABLES = {
-            SCREENMODE = "fullscreen",
+            SCREENMODE = self.SCREENMODES.FULLSCREEN,
             DIPLAYNUM = 1,
             VSYNC = 1,
             DISPLAY = {
@@ -100,6 +106,15 @@ function Game:setGlobals()
 
     self.DRAWBUFF = {}
 
+    -- =================
+    -- == Screen Data ==
+    -- =================
+    self.MAINMENUDATA = {}
+    self.MAINMENUDATA.TITLECARDS = {}
+
+    self.GAMETABLE = {}
+    self.GAMETABLE.GAME = {}
+
 
 
     self.EVENTMANAGER:addListener("quit", Event.new(function() G:quit() end))
@@ -111,6 +126,22 @@ function Game:setGlobals()
                 MAKE_ESC_MENU()
             end
         )
+    )
+    self.EVENTMANAGER:addListener("displaymodeleft",
+        Event.new(function ()
+            G.SETTINGS.SCREENVARIABLES.SCREENMODE = G.SETTINGS.SCREENVARIABLES.SCREENMODE - 1
+            if G.SETTINGS.SCREENVARIABLES.SCREENMODE < 1 then
+                G.SETTINGS.SCREENVARIABLES.SCREENMODE = 3
+            end
+        end)
+    )
+    self.EVENTMANAGER:addListener("displaymoderight",
+        Event.new(function ()
+            G.SETTINGS.SCREENVARIABLES.SCREENMODE = G.SETTINGS.SCREENVARIABLES.SCREENMODE + 1
+            if G.SETTINGS.SCREENVARIABLES.SCREENMODE > 3 then
+                G.SETTINGS.SCREENVARIABLES.SCREENMODE = 1
+            end
+        end)
     )
     self.EVENTMANAGER:addListener("showOptions", Event.new(function() setUpOptionsMenu() end))
     -- self.EVENTMANAGER:on("makeWinBox", function()

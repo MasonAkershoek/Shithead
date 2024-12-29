@@ -9,9 +9,10 @@ Node.__index = Node
 --- Constructer method for the Node class
 ---@param nx integer
 ---@param ny integer
-function Node.new(nx, ny)
-    nx = nx or 0
-    ny = ny or 0
+function Node.new(nx, ny, args)
+    local nx = nx or 0
+    local ny = ny or 0
+    local args = args or {}
 
     local self = setmetatable({}, Node)
 
@@ -27,8 +28,11 @@ function Node.new(nx, ny)
     self.rotation = 0
 
     -- Parent/Children pointers
-    self.parent = nil
+    self.parent = args.parent or nil
     self.children = {}
+
+    -- Added functions
+    self.functions = args.functions or {}
 
     -- Object Flags
     self.hoverFlag = false
@@ -70,6 +74,10 @@ end
 
 function Node:removeParent()
     self:setParent(nil)
+end
+
+function Node:addFunction(newFunction)
+    table.insert(self.functions, newFunction)
 end
 
 function Node:getPos(pos)
@@ -185,9 +193,9 @@ end
 Moveable = setmetatable({}, { __index = Node })
 Moveable.__index = Moveable
 
-function Moveable.new(nx, ny, mouseMoveable)
+function Moveable.new(nx, ny, mouseMoveable, args)
     local mouseMoveable = mouseMoveable or false
-    local self = setmetatable(Node.new(nx, ny), Moveable)
+    local self = setmetatable(Node.new(nx, ny, args), Moveable)
 
     self.T = "Moveable"
 

@@ -22,6 +22,7 @@ function Game:setup()
         self.SETTINGS.SCREENVARIABLES.SCREENMODE = saveSet.SCREENVARIABLES.SCREENMODE
         self.SETTINGS.SHOWFPS = saveSet.SHOWFPS
         self.SETTINGS.SCREENVARIABLES.VSYNC = saveSet.SCREENVARIABLES.VSYNC
+        self.SETTINGS.SOUND.VOLUME = saveSet.SOUND.VOLUME
         if self.SETTINGS.SHOWFPS then
             MAKE_FPS_HUD()
         end
@@ -51,7 +52,7 @@ function Game:setup()
     bootManager("Done!", 1)
 
     TEsound.playLooping(self.SOUNDS["music2"],"static","main")
-    --MAKE_OPTIONS_MENU()
+    TEsound.volume("main", self.SETTINGS.SOUND.VOLUME/100)
 end
 
 function Game:createGameObj()

@@ -263,10 +263,10 @@ CardArea = setmetatable({}, { __index = UINode })
 CardArea.__index = CardArea
 
 function CardArea.new(nx, ny, w, args)
-    local self = setmetatable(UINode.new(nx, ny, w, 200), CardArea)
-    self.args = args or {}
-    self.cards = {}
-    self.children = {}
+    local self = setmetatable(UINode.new(nx, ny, w, 200, args), CardArea)
+    local args = args or {}
+
+    self.cards = args.cards or {}
     self.type = args.type or "deck"
 
     return self
