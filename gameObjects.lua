@@ -5,10 +5,6 @@
 Node = {}
 Node.__index = Node
 
---- Class: Node
---- Constructer method for the Node class
----@param nx integer
----@param ny integer
 function Node.new(nx, ny, args)
     local nx = nx or 0
     local ny = ny or 0
@@ -67,6 +63,12 @@ function Node:removeChild(tag)
     table.remove(self.children[tag])
 end
 
+function Node:updateChildren(dt)
+    for _,child in ipairs(self.children) do
+        child:update(dt)
+    end
+end
+
 function Node:setParent(newParent)
     self.parent = newParent
     self.stopOnPause = self.parent.stopOnPause
@@ -78,6 +80,12 @@ end
 
 function Node:addFunction(newFunction)
     table.insert(self.functions, newFunction)
+end
+
+function Node:updateFunctions()
+    for _, func in ipairs(self.functions) do
+        func(self)
+    end
 end
 
 function Node:getPos(pos)
@@ -188,6 +196,14 @@ function Node:isInside(x,y)
     return false
 end
 
+function Node:update(dt)
+    return
+end
+
+function Node:draw()
+    return
+end
+
 -- Moveable Object
 ----------------------------------------------
 Moveable = setmetatable({}, { __index = Node })
@@ -202,9 +218,7 @@ function Moveable.new(nx, ny, mouseMoveable, args)
     self.newPos = Vector.new(nx, ny)
     self.movement = Vector.new(0, 0)
     self.distance = 0
-    self.HCenter = {}
-    self.HCenter.x = 0
-    self.HCenter.y = 0
+    self.HCenter = Vector.new(0,0)
     self.mouseMoveable = mouseMoveable
     self.moveFlag = false
     self.moving = false

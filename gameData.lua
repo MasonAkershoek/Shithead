@@ -24,7 +24,7 @@ function Game:setup()
         self.SETTINGS.SCREENVARIABLES.VSYNC = saveSet.SCREENVARIABLES.VSYNC
         self.SETTINGS.SOUND.VOLUME = saveSet.SOUND.VOLUME
         if self.SETTINGS.SHOWFPS then
-            MAKE_FPS_HUD()
+            --MAKE_FPS_HUD()
         end
         if saveSet.SCREENVARIABLES.CURRENTDISPLAY <= love.window.getDisplayCount() then
             self.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY = saveSet.SCREENVARIABLES.CURRENTDISPLAY
@@ -35,7 +35,6 @@ function Game:setup()
     bootManager("init Display", .3)
     initDisplay()
     love.graphics.setDefaultFilter("nearest","linear",10)
-    logger:log(love.graphics.getDefaultFilter())
     love.graphics.setLineStyle("rough")
 
     bootManager("Loading Graphics", .4)
@@ -108,7 +107,6 @@ function Game:loadShaders()
     local path = "shaders/"
     for x, file in ipairs(love.filesystem.getDirectoryItems(path)) do
         self.SHADERS[string.sub(file, 1, #file - 5)] = love.graphics.newShader(path .. file)
-        logger:log(string.sub(file, 1, #file - 5))
     end
 end
 
@@ -135,6 +133,8 @@ function Game:draw()
         love.graphics.setCanvas(self.drawSpace)
         love.graphics.clear()
     end
+
+    self.UI.ROOT:draw()
 
     for _,area in pairs(G.CARDAREAS) do 
         area:draw()

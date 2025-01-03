@@ -96,7 +96,9 @@ function Game:setGlobals()
     -- == Instances ==
     -- ===============
     self.UI = {
-        BOX = {}
+        ROOT = UIArea.new(0,0,_GAME_WIDTH,_GAME_HEIGHT,11,11, {isRoot=true}),
+        BOX = {},
+        NODES = {}
     }
     self.CARDS = {}
 
@@ -115,8 +117,13 @@ function Game:setGlobals()
     self.GAMETABLE = {}
     self.GAMETABLE.GAME = {}
 
+    -- ==========
+    -- == Misc ==
+    -- ==========
 
-
+    -- ==================
+    -- == Events Setup ==
+    -- ==================
     self.EVENTMANAGER:addListener("quit", Event.new(function() G:quit() end))
     self.EVENTMANAGER:addListener("activateEscapeMenu",
         Event.new(

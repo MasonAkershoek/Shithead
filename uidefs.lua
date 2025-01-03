@@ -144,11 +144,12 @@ end
 
 MAKE_FPS_HUD = function()
     local t = UIBox.new(
+        2,
+        2,
         400,
         100,
         {
             drawBox = false,
-            positions = { Vector.new(-200, 100), Vector.new(200, 100) }
         }
     )
     t:setActive()

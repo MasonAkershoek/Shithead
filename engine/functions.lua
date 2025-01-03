@@ -70,6 +70,10 @@ function removeSelf(obj, tbl)
     end
 end
 
+function addToDrawBuff(obj)
+    table.insert(G.DRAWBUFF, obj)
+end
+
 
 function addCardToHand(card, hand)
 
@@ -78,6 +82,7 @@ end
 function initDisplay()
     local width = _GAME_WIDTH
     local height = _GAME_HEIGHT
+    local screenx, screeny = love.window.getDesktopDimensions()
     local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 16, resizable=true }
 
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
@@ -87,24 +92,24 @@ function initDisplay()
     end
 
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.WINDOWED then
-        width = width * .95
-        height = height * .95
+        width = screenx * .80
+        height = screeny * .80
     end
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
     G.SETTINGS.SCREENVARIABLES.YOFFSET = _GAME_HEIGHT - height
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then windowArgs.borderless = true end
     if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then windowArgs.fullscreen = true end
-    logger:log("MAS", width)
     love.window.setMode(width, height, windowArgs)
 end
 
 function applyDisplaySettings()
     local width,height,flags = love.window.getMode()
     local windowMode = G.SCREENMODES.WINDOWED
+    local screenx, screeny = love.window.getDesktopDimensions()
     if flags.borderless == true then windowMode = G.SCREENMODES.BORDERLESS end
     if flags.fullscreen == true then windowMode = G.SCREENMODES.FULLSCREEN end
-    local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY}
+    local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, msaa = 16, resizable=true, fullscreen=false, borderless=false}
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
     local yScale = height / _GAME_HEIGHT
@@ -112,10 +117,14 @@ function applyDisplaySettings()
 
     if yScale < G.SETTINGS.SCREENVARIABLES.SCREENSCALE then G.SETTINGS.SCREENVARIABLES.SCREENSCALE = yScale end
 
+    logger:log(windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE)
     if windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE then
-        G.SETTINGS.SCREENVARIABLES.SCREENMODE = windowMode
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then windowArgs.borderless = true end
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then windowArgs.fullscreen = true end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.WINDOWED then
+            width = screenx * .80
+            height = screeny * .80
+        end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then windowArgs.borderless = true windowArgs.fullscreen = false end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then windowArgs.fullscreen = true windowArgs.borderless = false end
         love.window.updateMode(width,height,windowArgs)
     end
 end

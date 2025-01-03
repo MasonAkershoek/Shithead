@@ -1,5 +1,67 @@
 -- UI.lua
 
+UIArea = {}
+UIArea.__index = UIArea
+
+function UIArea.new(x, y, w, h, hPoints, vPoints, args)
+    local args = args or {}
+    local self = setmetatable({}, UIArea)
+
+    self.T = "UIArea"
+
+    -- Points
+    if (hPoints % 2) == 0 then error("Horizontal Points Must Be Odd") end
+    if (vPoints % 2) == 0 then error("Vertical Points Must Be Odd") end
+    self.hPoints = hPoints or 1
+    self.vPoints = vPoints or 1
+    self.hCenter = (hPoints+1)/2
+    self.vCenter = (vPoints+1)/2
+    self.offScreenLeft = Vector.new(-200,(_GAME_HEIGHT/2))
+    self.offScreenTop = Vector.new((_GAME_WIDTH/2),-200)
+    self.offScreenRight = Vector.new(_GAME_WIDTH+200,(_GAME_HEIGHT/2))
+    self.offScreenBottom = Vector.new((_GAME_WIDTH/2),_GAME_HEIGHT+200)
+
+    self:makePoints(x,y,w,h)
+
+    -- config
+    self.isRoot = args.isRoot or false
+    logger:log(self.points[1][1])
+
+    return self
+end
+
+function UIArea:makePoints(xPos,yPos,w,h)
+    self.points = {}
+    local hSpace = (w / (self.hPoints-1))
+    local vSpace = (h / (self.vPoints-1))
+    for y=0, self.vPoints-1 do
+        local tmp = {}
+        for x=0, self.hPoints-1 do
+            table.insert(tmp, Vector.new((x * hSpace)+xPos, (y * vSpace)+yPos))
+        end
+        table.insert(self.points, tmp)
+    end
+end
+
+function UIArea:clearChildren()
+    self.children = {}
+end
+
+function UIArea:convertPoint(point)
+    return self.points[point.y][point.x]
+end
+
+function UIArea:draw()
+    if not _RELESE_MODE then
+        for x=1, #self.points do
+            for y=1, #self.points[x] do
+                love.graphics.setColor(lovecolors:getColor("WHITE"))
+                love.graphics.rectangle("fill", self.points[x][y].x-5, self.points[x][y].y-5, 10, 10)
+            end
+        end
+    end
+end
+
 --- This objects serves as a base object for all other UIObjects and shouldnt ever be used as standalone
 UINode = setmetatable({}, { __index = Moveable })
 UINode.__index = UINode
@@ -7,24 +69,22 @@ UINode.__index = UINode
 
 function UINode.new(x, y, w, h, args)
     local args = args or {}
-    local self = setmetatable(Moveable.new(x, y, false, args), UINode)
+    local absPos = G.UI.ROOT:convertPoint(Vector.new(x, y))
+    local self = setmetatable(Moveable.new(absPos.x, absPos.y, false, args), UINode)
 
     self.T = "UINode"
 
-    self.size = Vector.new(w, h)
-    self.centerPoint = nil
+    -- Config
+    self.config = args.config or {}
 
-    -- Setting UI Elements attrabutes
-    self.radius = args.radius or 0
-    self.internalPadding = args.internalPadding or 0
-    self.showBorder = args.showBorder or true
+    -- UINode Positioning
+    self.UIAreaPoint = Vector.new(x,y)
+
+
     self.changed = false
-    if args.stopOnPause == false then self.stopOnPause = false else self.stopOnPause = true end
-
-    -- Shadow
-    self.shadowOffset = 10
-    self.shadowPos = Vector.new(self.pos.x + self.shadowOffset, self.pos.y + self.shadowOffset)
-    self.showShadow = args.showShadow or true
+    if args.stopOnPause == false then
+         self.stopOnPause = false else self.stopOnPause = true 
+    end
 
     if self.parent then
         if self.parent.stopOnPause == false then
@@ -34,147 +94,51 @@ function UINode.new(x, y, w, h, args)
     return self
 end
 
---- Gets The X Position of the UINode
----@return integer
-function UINode:getX()
-    return self.pos.x
+function UINode:setUIPoint(x,y)
+    self.UIAreaPoint = Vector.new(x,y)
 end
 
---- Gets The Y Position of the UINode
---- @return integer
-function UINode:getY()
-    return self.pos.y
-end
-
--- Move to UIBox class
-function UINode:setPadding(value)
-    self.internalPadding = value or 0
-end
-
-function UINode:getPadding()
-    return self.internalPadding
-end
-
-function UINode:getWidth()
-    return self.size.x
-end
-
-function UINode:setWidth(value)
-    self.size.x = value or 0
-    self.changed = true
-end
-
-function UINode:getHeight()
-    return self.size.y
-end
-
-function UINode:setHeight(value)
-    self.size.y = value or 0
-    self.changed = true
-end
-
-function UINode:setRadius(value)
-    self.radius = value or 0
-end
-
-function UINode:getRadius()
-    return self.radius
-end
-
-function UINode:drawShadow()
-    love.graphics.setColor(lovecolors:getColor("BLACK", .5))
-    love.graphics.rectangle("fill", self.pos.x - (self.size.x / 2) + 5, self.pos.y - (self.size.y / 2) + 5, self.size.x,
-        self.size.y, self.radius, self.radius)
-    love.graphics.setColor({1,1,1,1})
-end
-
-function UINode:drawBorder(color)
+function UINode:getFromUIPos()
+    self.pos = self.parent:convertPoint(self.UIAreaPoint)
 end
 
 -- UIBox class definition
 UIBox = setmetatable({}, { __index = UINode })
 UIBox.__index = UIBox
 
---[[
-    Add an over shoot to the move function that allows you to specify an amout of over shoot for the
-    object to take to make the movment feel more fluid
-]]
-
-function UIBox.new(w, h, args)
+function UIBox.new(x, y, w, h, args)
     local args = args or {}
-    local x = args.positions[1].x or 0
-    local y = args.positions[1].y or 0
     local self = setmetatable(UINode.new(x, y, w, h, args), UIBox)
 
     self.T = "UIBox"
 
-    self.alignment = args.alignment or "Vertical"
-    self.positions = args.positions or { Vector.new(0, 0), Vector.new(0, 0) }
-    self.active = false
-    self.borderSize = args.borderSize or 10
-    self.padding = args.padding or 0
-    self.objPadding = args.objPadding or 0
-    self.borderColor = args.borderColor or "LIGHTGRAY"
-    self.color = args.color or "DARKGRAY"
-    self.drawBox = args.drawBox
-    if self.drawBox ~= false then self.drawBox = true end
-    if not self.parent then
-        table.insert(G.UI.BOX, self)
-    end
+    -- Positioning
+    self.UIArea = UIArea.new(args.rows, args.cols)
+
+    -- Config
+    self.config = args.config
+    table.insert(G.UI.BOX, self)
     return self
 end
 
-function UIBox:setActive()
-    self.moving = true
-    if self.active then
-        logger:log("UIBox Set Inactive")
-        self.active = false
-    else
-        logger:log("UIBox Set Active")
-        self.active = true
-    end
-    self.changed = true
-end
-
---[[
-    change update list to allow the passing of arguments
-    for all contents of the UIBox there update functions need have a pointer to there parent function
-    add a variable to the UINode called changed that is set anytime a function that changes the dementions/pos
-    of a ui object happens and then resets at the end of the update function
-
-]]
 function UIBox:update(dt)
+    -- Set self.pos from the converted UIArea Point
+    self:getFromUIPos()
+
+    -- Check to see if the UINode should pause when game paused
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
     end
-    for _, func in ipairs(self.functions) do
-        func(self)
-    end
-    if self.alignment == "Vertical" then VAlign(self, self.children, true, {spaceEvenly=false, padding=self.padding, objPadding=self.objPadding}) else HAlign(self, self.children, true, {spaceEvenly=true}) end
+
+    -- Run Functions
+    self:updateFunctions()
+
     if not self.parent then
         self:move(dt)
     end
-    for item = 1, #self.children do
-        if self.children[item].T ~= "UILabel" then
-            self.children[item]:update(dt)
-        end
-    end
-    if self.changed then
-        for item = 1, #self.children do
-            if self.children[item].T == "UILabel" then
-                --self.contents[item]:update()
-                self.children[item]:setWrap(self.size.x - (self.borderSize * 2) - (self.padding * 2))
-            end
-        end
-        if not self.parent then
-            if self.active then
-                self:setPos(self.positions[2].x, self.positions[2].y)
-            else
-                self:setPos(self.positions[1].x, self.positions[1].y)
-            end
-        end
-        self.changed = false
-    end
+
+    addToDrawBuff(self)
+    self:updateChildren(dt)
 end
 
 function UIBox:draw()
@@ -203,12 +167,7 @@ end
 UILabel = setmetatable({}, { __index = UINode })
 UILabel.__index = UILabel
 
---- Class UILabel
---- Constructer for a UILabel
----@param x integer
----@param y integer
----@param fontSize integer
----@param args table "Posable arguments [text, widthLimit, alignment, color]"
+
 function UILabel.new(x, y, fontSize, args)
     local locArgs = args or {}
     local self = setmetatable(UINode.new(x, y, 0, 0, args), UILabel)
@@ -225,6 +184,7 @@ function UILabel.new(x, y, fontSize, args)
     self.wdithLimit = locArgs.widthLimit or self.textGraphics:getWidth() or 10
     self.textGraphics:setf(self.text, self.wdithLimit, self.alignment)
     self:setWidthAndHeight()
+    table.insert(G.UI.NODES, self)
     return self
 end
 
@@ -262,6 +222,12 @@ function UILabel:setWidthAndHeight()
     self.size.y = self.textGraphics:getHeight()
 end
 
+function UILabel:update()
+    -- Set self.pos from the converted UIArea Point
+    self:getFromUIPos()
+    addToDrawBuff(self)
+end
+
 function UILabel:draw()
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
@@ -291,6 +257,7 @@ function UIButton.new(x, y, w, h, args)
     self.oldmousedown = ""
     self.clickTimer = Timer.new(.2)
     self.clickTimer:stopTimer()
+    table.insert(G.UI.NODES, self)
     return self
 end
 
@@ -304,6 +271,8 @@ end
 
 function UIButton:setText(newText)
     self.textGraphics:setText(newText)
+    self.textGraphics:setAlignment("center")
+    self.textGraphics:setWrap(self.size.x)
 end
 
 function UIButton:onSelect()
@@ -322,16 +291,21 @@ function UIButton:onSelect()
 end
 
 function UIButton:update(dt)
+    -- Set self.pos from the converted UIArea Point
+    self:getFromUIPos()
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
     end
     for _, func in ipairs(self.functions) do
         func(self)
     end
+
+
     self:onHover()
     self:onSelect()
     self.clickTimer:update(dt)
     if self.clickTimer:isExpired() then self.clickTimer:stopTimer() end
+    addToDrawBuff(self)
 end
 
 function UIButton:draw()
@@ -394,6 +368,7 @@ function UITextField.new(x, y, w, h, fontSize, args)
     self.labelPos = args.lablePos or "left"
     self.labelAlignment = args.labelAlignment or "center"
     self.labalGraphics = UILabel.new(0, 0, self.fontSize, { alignment = self.labelAlignment, text = args.lableText or "Empty!", color = "LIGHTGRAY", stopOnPause=self.stopOnPause  })
+    table.insert(G.UI.NODES, self)
     return self
 end
 
@@ -437,6 +412,8 @@ function UITextField:showCursor()
 end
 
 function UITextField:update(dt)
+    -- Set self.pos from the converted UIArea Point
+    self:getFromUIPos()
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
     end
@@ -445,6 +422,7 @@ function UITextField:update(dt)
         local key = convertKeyPress(G.KEYBOARDMANAGER:getLastKeyPress())
         if key == "backspace" then self:backSpace() else self:addText(key) end
     end
+    addToDrawBuff(self)
 end
 
 function UITextField:draw()
@@ -531,6 +509,8 @@ function UISlider:getValue()
 end
 
 function UISlider:update(dt)
+    -- Set self.pos from the converted UIArea Point
+    self:getFromUIPos()
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
     end
