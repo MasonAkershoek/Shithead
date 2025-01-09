@@ -25,6 +25,7 @@ function Hand:getCardsList()
     for x = 1, #self.cards do
         table.insert(cardList, { self.cards[x].rank, self.cards[x].suit })
     end
+    
     return cardList
 end
 
