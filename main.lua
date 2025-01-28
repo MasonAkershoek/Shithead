@@ -11,7 +11,7 @@ require "engine.logger"
 require "librarys.mlib.lovecolors"
 require "librarys.mlib.mmen"
 require "engine.functions"
-require "gameObjects"
+require "engine.base_objects"
 require "gameData"
 require "engine.UI"
 require "engine.event"
@@ -23,7 +23,7 @@ require "cardtable"
 require "globals"
 require "uidefs"
 require "librarys.tableSave"
-require "engine.state_functions"
+require "state_functions"
 
 local utf8 = require("utf8")
 
