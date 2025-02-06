@@ -23,6 +23,8 @@ function Node.new(nx, ny, args)
         skewy = 0,
         rotation = 0
     }
+
+    -- Transformation in the nodes local space
     self._localTransform = 
     {
         x = 0,
@@ -33,6 +35,10 @@ function Node.new(nx, ny, args)
         skewy = 0,
         rotation = 0
     }
+
+    self._size = Vector.new(0,0)
+
+    -- Zone of the Node where mouse hover will not be trigered
     self._deadZone = nil
 
     -- Node States
@@ -41,7 +47,8 @@ function Node.new(nx, ny, args)
         active = true,
         visible = true,
         paused = false,
-        hovered = false
+        hovered = false,
+        stopOnPause = false
     }
 
     -- Parent/Children pointers
@@ -56,15 +63,15 @@ end
 
 -- Width and height getters
 function Node:getWidth()
-    return (self.size.x * self.scale.x)
+    return (self._size.x * self._localTransform.scalex)
 end
 
 function Node:getHeight()
-    return (self.size.y * self.scale.y)
+    return (self._size.y * self._localTransform.scaley)
 end
 
 function Node:getSize()
-    return Vector.new(self.size.x, self.size.y)
+    return Vector.new(self._localTransform.scalex, self._localTransform.scaley)
 end
 
 -- Parent Child relationship functions
@@ -112,28 +119,28 @@ function Node:getPos(pos)
     if pos == "center" then
         return self.pos
     elseif pos == "topleft" then
-        ret.x = (self.pos.x - ((self.size.x * self.scale.x) / 2))
+        ret.x = (self._globalTransform.x - ((self.size.x * self.scale.x) / 2))
         ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
     elseif pos == "topright" then
-        ret.x = (self.pos.x + ((self.size.x * self.scale.x) / 2))
+        ret.x = (self._globalTransform.x + ((self.size.x * self.scale.x) / 2))
         ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
     elseif pos == "bottomleft" then
-        ret.x = (self.pos.x - ((self.size.x * self.scale.x) / 2))
+        ret.x = (self._globalTransform.x - ((self.size.x * self.scale.x) / 2))
         ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
     elseif pos == "bottomright" then
-        ret.x = (self.pos.x + ((self.size.x * self.scale.x) / 2))
+        ret.x = (self._globalTransform.x + ((self.size.x * self.scale.x) / 2))
         ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
     elseif pos == "centerleft" then
-        ret.x = (self.pos.x - ((self.size.x * self.scale.x) / 2))
+        ret.x = (self._globalTransform.x - ((self.size.x * self.scale.x) / 2))
         ret.y = self.pos.y
     elseif pos == "centerright" then
-        ret.x = (self.pos.x + ((self.size.x * self.scale.x) / 2))
+        ret.x = (self._globalTransform.x + ((self.size.x * self.scale.x) / 2))
         ret.y = self.pos.y
     elseif pos == "centertop" then
-        ret.x = self.pos.x
+        ret.x = self._globalTransform.x
         ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
     elseif pos == "centerbottom" then
-        ret.x = self.pos.x
+        ret.x = self._globalTransform.x
         ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
     end
     return ret
