@@ -1,4 +1,5 @@
 # UIBox
+### Inheritance - [Node](engine/base/node.md) > [Moveable](engine/base/movable.md) > [UINode](engine/UI/uinode.md)
 ---
 **UIBox** is the base for every UI object in the game. It contains logic that most of the UI objects need to function properly. It should never be instanciated on its own.
 

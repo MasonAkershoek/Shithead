@@ -1,4 +1,5 @@
 # UITextField
+### Inheritance - [Node](engine/base/node.md) > [Moveable](engine/base/movable.md) > [UINode](engine/UI/uinode.md)
 ---
 **UITextField** allows for geting typed user input in the game
 ### Usage

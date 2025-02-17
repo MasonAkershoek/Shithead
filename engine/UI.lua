@@ -9,6 +9,8 @@ function UIArea.new(x, y, w, h, hPoints, vPoints, args)
 
     self.T = "UIArea"
 
+    self._Conf = args.conf or {}
+
     -- Points
     if (hPoints % 2) == 0 then error("Horizontal Points Must Be Odd") end
     if (vPoints % 2) == 0 then error("Vertical Points Must Be Odd") end

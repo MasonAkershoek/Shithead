@@ -74,6 +74,25 @@ function addToDrawBuff(obj)
     table.insert(G.DRAWBUFF, obj)
 end
 
+function isWithinRange(point1, point2, space)
+    if point1.x > (point2.x-space) and point1.x < (point2.x+space) then
+        if point1.y > (point2.y-space) and point1.y < (point2.y+space) then
+            return true
+        else
+            return false
+        end
+    else
+        return false
+    end
+end
+
+-- if p1.x > (p2.x-space) and p1.x < (p2.x+space) then
+--     if p1.y > (p2.y - space) and p1.y < (p2.y+space) then
+--            return true
+--     end
+-- else
+--     return false
+--end
 
 function addCardToHand(card, hand)
 

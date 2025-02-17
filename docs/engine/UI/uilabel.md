@@ -1,4 +1,5 @@
 # UILabel
+### Inheritance - [Node](engine/base/node.md) > [Moveable](engine/base/movable.md) > [UINode](engine/UI/uinode.md)
 ---
 **UILabel** Is a text container for any text that needs to be displayed in the game it allows for self text wraping.
 

@@ -4,74 +4,71 @@ Node = {}
 Node.__index = Node
 
 function Node.new(nx, ny, args)
-    local nx = nx or 0
-    local ny = ny or 0
-    local args = args or {}
-
     local self = setmetatable({}, Node)
 
     self.T = "Node"
 
-    -- Node Position and tansformations
-    self._globalTransform = 
-    {
-        x = 0,
-        y = 0,
-        scalex = 1,
-        scaley = 1,
-        skewx = 0,
-        skewy = 0,
-        rotation = 0
-    }
+    self._Args = args or {}
+
+    self._Conf = args.conf or {}
 
     -- Transformation in the nodes local space
-    self._localTransform = 
+    self._Transform = 
     {
-        x = 0,
-        y = 0,
-        scalex = 1,
-        scaley = 1,
-        skewx = 0,
-        skewy = 0,
-        rotation = 0
+        x = args.T.x or nx or 0,
+        y = args.T.y or ny or 0,
+        w = args.T.w or 0,
+        h = args.T.h or 0,
+        r = args.T.r or 0,
+        sx = args.T.sx or 1,
+        sy = args.T.sy or 1,
+        skx = args.T.skx or 0,
+        sky = args.T.sky or 0
     }
 
-    self._size = Vector.new(0,0)
+    self._ClickOffset = Vector.new(0,0)
 
     -- Zone of the Node where mouse hover will not be trigered
-    self._deadZone = nil
+    self._DeadZone = nil
 
     -- Node States
-    self._states = 
+    self._States = 
     {
-        active = true,
         visible = true,
         paused = false,
-        hovered = false,
-        stopOnPause = false
+        clicked = {is=false, can=true},
+        drag = {is=false, can=true},
+        hovered = {is=false, can=true},
     }
 
     -- Parent/Children pointers
-    self._parent = args.parent or nil
-    self._children = {}
+    self._Parent = args.parent or nil
+    self._Children = {}
 
     -- Added functions
-    self._functions = args.functions or {}
+    self._Functions = args.functions or {}
 
     return self
 end
 
 -- Width and height getters
 function Node:getWidth()
-    return (self._size.x * self._localTransform.scalex)
+    return (self._Transform.w * self._Transform.scale)
 end
 
 function Node:getHeight()
-    return (self._size.y * self._localTransform.scaley)
+    return (self._Transform.w * self._Transform.scale)
 end
 
-function Node:getSize()
-    return Vector.new(self._localTransform.scalex, self._localTransform.scaley)
+function Node:setSize(nw, nh)
+    local nw = nw or nil
+    local nh = nh or nil
+    if nw then
+        self._Transform.w = nw
+    end
+    if nh then
+        self._Transform.h = nh
+    end
 end
 
 -- Parent Child relationship functions
@@ -84,8 +81,15 @@ function Node:addChildren(newChild, tag)
     end
 end
 
-function Node:removeChild(tag)
-    table.remove(self.children[tag])
+function Node:removeChild(child, tag)
+    if tag then
+        table.remove(self.children[tag])
+        return
+    end
+    if child then
+        removeSelf(child, self.children)
+        return
+    end
 end
 
 function Node:updateChildren(dt)
@@ -100,6 +104,7 @@ function Node:setParent(newParent)
 end
 
 function Node:removeParent()
+    removeSelf(self, self.parent.children)
     self:setParent(nil)
 end
 
@@ -116,32 +121,42 @@ end
 function Node:getPos(pos)
     local pos = pos or "center"
     local ret = Vector.new()
+
     if pos == "center" then
-        return self.pos
+        ret.x = self._Transform.x 
+        ret.y = self._Transform.y
+
     elseif pos == "topleft" then
-        ret.x = (self._globalTransform.x - ((self.size.x * self.scale.x) / 2))
-        ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
+        ret.x = (self._Transform.x - ((self._Transform.w * self._Transform.scale) / 2))
+        ret.y = (self._Transform.y - ((self._Transform.h * self._Transform.scale) / 2))
+
     elseif pos == "topright" then
-        ret.x = (self._globalTransform.x + ((self.size.x * self.scale.x) / 2))
-        ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
+        ret.x = (self._Transform.x + ((self._Transform.w * self._Transform.scale) / 2))
+        ret.y = (self._Transform.y - ((self._Transform.h * self._Transform.scale) / 2))
+
     elseif pos == "bottomleft" then
-        ret.x = (self._globalTransform.x - ((self.size.x * self.scale.x) / 2))
-        ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
+        ret.x = (self._Transform.x - ((self._Transform.w * self._Transform.scale) / 2))
+        ret.y = (self._Transform.y + ((self._Transform.h * self._Transform.scale) / 2))
+
     elseif pos == "bottomright" then
-        ret.x = (self._globalTransform.x + ((self.size.x * self.scale.x) / 2))
-        ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
+        ret.x = (self._Transform.x + ((self._Transform.w * self._Transform.scale) / 2))
+        ret.y = (self._Transform.y + ((self._Transform.h * self._Transform.scale) / 2))
+
     elseif pos == "centerleft" then
-        ret.x = (self._globalTransform.x - ((self.size.x * self.scale.x) / 2))
-        ret.y = self.pos.y
+        ret.x = (self._Transform.x - ((self._Transform.w * self._Transform.scale) / 2))
+        ret.y = self._Transform.y
+
     elseif pos == "centerright" then
-        ret.x = (self._globalTransform.x + ((self.size.x * self.scale.x) / 2))
-        ret.y = self.pos.y
+        ret.x = (self._Transform.x + ((self._Transform.w * self._Transform.scale) / 2))
+        ret.y = self._Transform.y
+
     elseif pos == "centertop" then
-        ret.x = self._globalTransform.x
-        ret.y = (self.pos.y - ((self.size.y * self.scale.y) / 2))
+        ret.x = self._Transform.x
+        ret.y = (self._Transform.y - ((self._Transform.h * self._Transform.scale) / 2))
+
     elseif pos == "centerbottom" then
-        ret.x = self._globalTransform.x
-        ret.y = (self.pos.y + ((self.size.y * self.scale.y) / 2))
+        ret.x = self._Transform.x
+        ret.y = (self._Transform.y + ((self._Transform.h * self._Transform.scale) / 2))
     end
     return ret
 end
@@ -150,42 +165,22 @@ function Node:setDeadZone(deadZone)
     self.deadZone = deadZone
 end
 
-function Node:setScale(nxs, nys)
-    nxs = nxs or nil
-    nys = nys or nil
-    if nxs ~= nil then
-        self.scale.x = nxs
-        self.baseScale = nxs
-    end
-    if nys ~= nil then
-        self.scale.y = nys
-        self.baseScale = nys
-    end
-end
-
-function Node:setSkew(nxs, nys)
-    nxs = nxs or nil
-    nys = nys or nil
-    if nxs ~= nil then
-        self.skew.x = nxs
-    end
-    if nys ~= nil then
-        self.skew.y = nys
-    end
+function Node:setScale(newScale)
+    self._Transform.scale = newScale
 end
 
 function Node:setPos(nx, ny)
     nx = nx or nil
     ny = ny or nil
     if nx ~= nil then
-        self.pos.x = nx
+        self._Transform.x = nx
     end
     if ny ~= nil then
-        self.pos.y = ny
+        self._Transform.y = ny
     end
 end
 
-function Node:checkDeadZoneMouseHover(mx, my)
+function Node:checkDeadZone(mx, my)
     -- Check the dead Zone
     if self.deadZone ~= nil then
         if mx > self.deadZone.t1.x and mx < self.deadZone.t2.x then
@@ -200,9 +195,9 @@ end
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
     local mousex, mousey = toGame(mousex, mousey)
-    if mousex > (self.pos.x - self:getWidth() / 2) and mousex < (self.pos.x + self:getWidth() / 2) then
-        if mousey > (self.pos.y - self:getHeight() / 2) and mousey < (self.pos.y + self:getHeight() / 2) then
-            if not self:checkDeadZoneMouseHover(mousex, mousey) then
+    if mousex > (self._Transform.x - self:getWidth() / 2) and mousex < (self._Transform.x + self:getWidth() / 2) then
+        if mousey > (self._Transform.y - self:getHeight() / 2) and mousey < (self._Transform.y + self:getHeight() / 2) then
+            if not self:checkDeadZone(mousex, mousey) then
                 return true
             end
         end
@@ -212,8 +207,8 @@ function Node:checkMouseHover()
 end
 
 function Node:isInside(x,y)
-    if x > (self.pos.x - self:getWidth() / 2) and x < (self.pos.x + self:getWidth() / 2) then
-        if y > (self.pos.y - self:getHeight() / 2) and y < (self.pos.y + self:getHeight() / 2) then
+    if x > (self._Transform.x - self:getWidth() / 2) and x < (self._Transform.x + self:getWidth() / 2) then
+        if y > (self._Transform.y - self:getHeight() / 2) and y < (self._Transform.y + self:getHeight() / 2) then
             return true
         end
         return false
@@ -234,21 +229,26 @@ end
 Moveable = setmetatable({}, { __index = Node })
 Moveable.__index = Moveable
 
-function Moveable.new(nx, ny, mouseMoveable, args)
-    local mouseMoveable = mouseMoveable or false
+function Moveable.new(nx, ny, args)
     local self = setmetatable(Node.new(nx, ny, args), Moveable)
 
     self.T = "Moveable"
 
-    self.newPos = Vector.new(nx, ny)
-    self.movement = Vector.new(0, 0)
-    self.distance = 0
-    self.HCenter = Vector.new(0,0)
-    self.mouseMoveable = mouseMoveable
-    self.moveFlag = false
-    self.moving = false
-    self.mouseMove = false
-    self.stopOnPause = true
+    -- Used to tell the movable object how to move this can include position, scale and rotation
+    self._NextTransform = 
+    {
+        complete = false,
+        x = 0,
+        y = 0,
+        r = 0,
+        scale = 1
+    }
+
+    self._States.move = {is=false, can=true}
+    self._States.mouseMoveable = {is=false, can=true}
+    self._MovementVector = Vector.new(0, 0)
+    self._DistanceToDest = 0
+    self._Speed = args.speed
     return self
 end
 
@@ -264,38 +264,33 @@ function Moveable:mouseMoving()
     end
 end
 
-function Moveable:setPos(nx, ny)
-    if not self.mouseMove then
-        nx = nx or nil
-        ny = ny or nil
-        if nx ~= nil then
-            self.newPos.x = nx
-            self.moveFlag = true
-            self.moving = true
-        end
-        if ny ~= nil then
-            self.newPos.y = ny
-            self.moveFlag = true
-            self.moving = true
-        end
-    end
+-- Updated setPos
+function Moveable:moveTo(x,y,s,r)
+    self._NextTransform.x = x or self._Transform.x
+    self._NextTransform.y = y or self._Transform.y
+    self._NextTransform.s = s or self._Transform.scale
+    self._NextTransform.r = r or self._Transform.r
+    self._NextTransform.complete = false
 end
 
-function Moveable:setPosImidiate(nx, ny)
-    nx = nx or nil
-    ny = ny or nil
-    if nx ~= nil then
-        self.pos.x = nx
-    end
-    if ny ~= nil then
-        self.pos.y = ny
-    end
-end
-
+-- Needs Refactoring
 function Moveable:move(dt)
-    if self.mouseMoveable then
-        self:mouseMoving()
+
+    -- New Method Logic
+    if ~self._NextTransform.complete and self._MovementVector.x == 0 then
+        local dirx = self._NextTransform.x - self._Transform.x
+        local diry = self._NextTransform.y - self._Transform.y
+        local distance = math.sqrt((dirx^2) + (diry^2))
+        local normx = dirx / self.distance
+        local normy = diry / self.distance
+        self._MovementVector.setVect(normx, normy)
     end
+    count = 0
+    while ~isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y)) and ~self._States.drag.is and count < (self._Speed * dt) do
+        
+    end
+
+    -- Old method logic
     if self.moveFlag or self.pos.x ~= self.newPos.x or self.pos.y ~= self.newPos.y then
         local dirx = self.newPos.x - self.pos.x
         local diry = self.newPos.y - self.pos.y
@@ -328,30 +323,38 @@ end
 Sprite = setmetatable({}, { __index = Moveable })
 Sprite.__index = Sprite
 
-function Sprite.new(nx, ny, mouseMoveable, newTexture)
-    newTexture = newTexture or nil
-    local self = setmetatable(Moveable.new(nx, ny, mouseMoveable), Sprite)
+function Sprite.new(nx, ny, newTexture)
+    local self = setmetatable(Moveable.new(nx, ny), Sprite)
 
     self.T = "Sprite"
 
     if newTexture ~= nil then
-        self.texture = love.graphics.newImage(newTexture)
+        self:setSprite(newTexture)
     else
-        self.texture = nil
+        self._Texture = nil
     end
-    self.transparency = 1
+    self._Opac = 1
     return self
 end
 
+function Sprite:setSprite(newTexture)
+    if type(newTexture) == "string" then
+        self._Texture = love.graphics.newTexture(newTexture)
+    else
+        self._Texture = newTexture
+    end
+    self:initSprite()
+end
+
 function Sprite:initSprite()
-    self.size.x = (self.texture:getWidth())
-    self.size.y = (self.texture:getHeight())
+    self._Transform.w = (self.texture:getWidth())
+    self._Transform.h = (self.texture:getHeight())
 end
 
 function Sprite:draw()
-    love.graphics.setColor({ 1, 1, 1, self.transparency })
-    love.graphics.draw(self.texture, self.pos.x, self.pos.y, self.rotation, self.scale.x, self.scale.y, self.size.x / 2,
-        self.size.y / 2)
+    love.graphics.setColor({ 1, 1, 1, self._Opac })
+    love.graphics.draw(self._Texture, self._Transform.x, self._Transform.y, self._Transform.r, self._Transform.scale, self._Transform.scale, self._Transform.w / 2,
+        self._Transform.h / 2)
 end
 
 -- Vector2 Object
@@ -385,9 +388,18 @@ function Vector:checkDistance(otherVect, space)
     if self.x > (otherVect.x - space) and self.x < (otherVect.x + space) then
         if self.y > (otherVect.y - space) and self.y < (otherVect.y + space) then
             return true
+        else
+            return false
         end
     else
         return false
     end
 end
 
+-- if p1.x > (p2.x-space) and p1.x < (p2.x+space) then
+--     if p1.y > (p2.y - space) and p1.y < (p2.y+space) then
+--            return true
+--     end
+-- else
+--     return false
+--end
