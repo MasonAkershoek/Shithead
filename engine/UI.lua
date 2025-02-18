@@ -101,7 +101,9 @@ function UINode:setUIPoint(x,y)
 end
 
 function UINode:getFromUIPos()
-    self.pos = self.parent:convertPoint(self.UIAreaPoint)
+    local pos = self.parent:convertPoint(self.UIAreaPoint)
+    self._Transform.x = pos.x
+    self._Transform.y = pos.y
 end
 
 -- UIBox class definition

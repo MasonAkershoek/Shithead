@@ -112,7 +112,6 @@ function Game:setGlobals()
     -- == Screen Data ==
     -- =================
     self.MAINMENUDATA = {}
-    self.MAINMENUDATA.TITLECARDS = {}
 
     self.GAMETABLE = {}
     self.GAMETABLE.GAME = {}

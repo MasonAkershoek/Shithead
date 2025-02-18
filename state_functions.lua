@@ -18,7 +18,7 @@ function START_MAIN_MENU()
                     tmp:setPos(500, 200)
                     tmp:playSound()
                     tmp.mouseMoveable = true
-                    table.insert(G.MAINMENUDATA.TITLECARDS, tmp)
+                    menuArea:addChildren(tmp)
                 end,
                 {
                     trigger = "after",

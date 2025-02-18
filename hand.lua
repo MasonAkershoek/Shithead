@@ -30,12 +30,12 @@ function Hand:getCardsList()
 end
 
 function Hand:addCardToHand(newCard)
-    if not newCard.fliped then
-        newCard.flipping = true
-    end
-    newCard:setPos(nil, self.pos.y)
-    newCard:playSound()
-    table.insert(self.cards, newCard)
+    -- if not newCard.fliped then
+    --     newCard.flipping = true
+    -- end
+    -- newCard:setPos(nil, .y)
+    -- newCard:playSound()
+    -- table.insert(self.cards, newCard)
 end
 
 function Hand:setDeadZones()
@@ -267,23 +267,24 @@ function CardArea.new(nx, ny, w, args)
     local self = setmetatable(UINode.new(nx, ny, args), CardArea)
     local args = args or {}
 
-    self.size = Vector.new(w, 200)
-    self.cards = args.cards or {}
+    self:setSize(w,200)
     self.type = args.type or "deck"
     table.insert(G.CARDAREAS, self)
     return self
 end
 
 function CardArea:update(dt)
-    HAlign(self, self.cards, false, {spaceEvenly=true, allowOverlap=true})
-    setDeadZones(self.cards)
-    updateList(self.cards, dt)
+    HAlign(self, self._Children, false, {spaceEvenly=true, allowOverlap=true})
+    setDeadZones(self._Children)
+    updateList(self._Children, dt)
+    self:setGlobalPos()
 end
 
 function CardArea:draw()
     if self.type == "player" or self.type == "playerDock" then
         love.graphics.setColor({ 0, 0, 0, .3 })
-        love.graphics.rectangle("fill", self.pos.x-(self.size.x/2), self.pos.y-(self.size.y/2), self.size.x, 200, 20, 20)
+        love.graphics.rectangle("fill", self._GlobalTransform.x-(self._Transform.w), self._GlobalTransform.y-(self._Transform.h), self._Transform.w, 200, 20, 20)
         love.graphics.setColor({ 1, 1, 1, 1 })
     end
+    if not _RELESE_MODE then self:drawBoundingRect() end
 end

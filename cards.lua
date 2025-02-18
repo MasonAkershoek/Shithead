@@ -25,35 +25,33 @@ function Card.new(newRank, newSuit, nx, ny)
         inPile = false,
         selected = {is=false, can=true},
         flipped = {is=false, can=true}, -- For refrance flipped = true means the card is face down
+        flipping = false
     }
 
     -- Function Variables
     self.oldmousedown = ""
-    self.flipFlag = false
-    self.floatFlag = true
-    self.hoverFlag = true
     self.newSelectFlag = false
 
     -- Card Image
-    self._Sprite = 
+    self._Faces = 
     {
         cardBack = love.graphics.newImage("resources/graphics/cards/cardBacks/cardBack1.png")
     }
     self:getCardFace()
-    self.texture = self.cardBack
+    self:setSprite(self._Faces.cardBack)
     self:initSprite()
 
-    self.burnParticals = love.graphics.newParticleSystem(love.graphics.newImage("resources/graphics/fire.png"), 100)
+    -- self.burnParticals = love.graphics.newParticleSystem(love.graphics.newImage("resources/graphics/fire.png"), 100)
 
     -- Should be moved to cardpile
-    self.burnParticals:setParticleLifetime(1, 2)
-    self.burnParticals:setLinearAcceleration(100, -200, -100, 0)
-    self.burnParticals:setColors(255, 255, 255, 255, 255, 255, 255, 0)
-    self.burnParticals:setSpeed(10, 10)
-    self.burnParticals:setSpread(2)
-    self.burnParticals:setEmissionArea("uniform", (self.texture:getWidth() / 2) * self._Transform.scale,
-        (self.texture:getHeight() / 2) * self._Transform.scale)
-    self.burnParticals:setEmissionRate(2)
+    -- self.burnParticals:setParticleLifetime(1, 2)
+    -- self.burnParticals:setLinearAcceleration(100, -200, -100, 0)
+    -- self.burnParticals:setColors(255, 255, 255, 255, 255, 255, 255, 0)
+    -- self.burnParticals:setSpeed(10, 10)
+    -- self.burnParticals:setSpread(2)
+    -- self.burnParticals:setEmissionArea("uniform", (self.texture:getWidth() / 2) * self._Transform.scale,
+    --     (self.texture:getHeight() / 2) * self._Transform.scale)
+    -- self.burnParticals:setEmissionRate(2)
     -----------------------------------------------------------
     table.insert(G.CARDS, self)
 
@@ -71,34 +69,14 @@ end
 
 function Card:getCardFace()
     -- Get The Coresponding image data from
-    self._Sprite.cardFace = G.CARDGRAPHICS["CARDFACES"]["card" .. G.CARDSUITS[self._Identity.suit] .. tostring(self._Identity.rank)]
+    self._Faces.cardFace = G.CARDGRAPHICS["CARDFACES"]["card" .. G.CARDSUITS[self._Identity.suit] .. tostring(self._Identity.rank)]
     if self._Identity.rank == 1 then self._Identity.rank = 14 end
 end
 
 -- This function need to be reworked to not use base scale and also work with delta time
 -- This method handles the logic for hovering over the cards
 function Card:onHover(dt)
-    -- If the card is flipping instantly return
-    if self.flipping then return end
 
-    if self:checkMouseHover() then
-        if self.hoverFlag then
-            self._Transform.scale = self._Transform.scale + .30
-            self._Transform.scale = self._Transform.scale + .30
-            self.hoverFlag = false
-        else
-            if self._Transform.scale >= self.baseScale + .2 then
-                self._Transform.scale = math.max(self._Transform.scale - (3.5 * dt), self.baseScale)
-                self._Transform.scale = math.max(self._Transform.scale - (3.5 * dt), self.baseScale)
-            end
-        end
-    elseif self._Transform.scale ~= self.baseScale then
-        if self._Transform.scale > self.baseScale then
-            self._Transform.scale = math.max(self._Transform.scale - (3.5 * dt), self.baseScale)
-            self._Transform.scale = math.max(self._Transform.scale - (3.5 * dt), self.baseScale)
-        end
-        if self._Transform.scale == self.baseScale then self.hoverFlag = true end
-    end
 end
 
 function Card:playSound()
@@ -148,28 +126,7 @@ end
 
 -- Needs major work to dynamicly change with chanch of pos and remove base scale
 function Card:flipAnimation()
-    if self.flipping then
-        if self.flipFlag then
-            self._Transform.scale = self._Transform.scale + (5 * love.timer.getDelta())
-            if self._Transform.scale >= self.baseScale then
-                self:setScale(self.baseScale, self.baseScale)
-                self.flipping = false
-                self.flipFlag = false
-            end
-        else
-            self._Transform.scale = self._Transform.scale - (5 * love.timer.getDelta())
-            if self._Transform.scale <= 0 then
-                self.flipFlag = true
-                if self.fliped then
-                    self.fliped = false
-                    self.texture = self.cardBack
-                else
-                    self.fliped = true
-                    self.texture = self.cardFace
-                end
-            end
-        end
-    end
+
 end
 
 function Card:op8(dt)
@@ -200,33 +157,34 @@ function Card:update(dt)
     self:move(dt)
     self:floatingAnimation(dt)
     self:flipAnimation()
-    if not self._CardStates.flipped.is and self.rank == 10 then
-        self.burnParticals:update(dt)
-        self.burnParticals:setSizes(self._Transform.scale)
-        self.burnParticals:setEmissionArea("uniform", math.abs((self.texture:getWidth() / 2) * self._Transform.scale),
-            math.abs((self.texture:getHeight() / 2) * self._Transform.scale))
-    end
+    -- if not self._CardStates.flipped.is and self.rank == 10 then
+    --     self.burnParticals:update(dt)
+    --     self.burnParticals:setSizes(self._Transform.scale)
+    --     self.burnParticals:setEmissionArea("uniform", math.abs((self._Texture:getWidth() / 2) * self._Transform.scale),
+    --         math.abs((self._Texture:getHeight() / 2) * self._Transform.scale))
+    -- end
     self:op8(dt)
 end
 
 function Card:draw()
+    self:setGlobalPos()
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
     end
     love.graphics.setColor({ 0, 0, 0, self._Opac - .5 })
-    love.graphics.draw(self._Texture, self._Transform.x + 7, self._Transform.y + 7, 0, self._Transform.scale, self._Transform.scale, (self._Transform.w / 2),
+    love.graphics.draw(self._Texture, self._GlobalTransform.x + 7, self._GlobalTransform.y + 7, 0, self._GlobalTransform.sx, self._GlobalTransform.sy, (self._Transform.w / 2),
         (self._Transform.h / 2))
     love.graphics.setColor({ 1, 1, 1, 1 })
     if self.notPlayable then
         love.graphics.setShader(G.SHADERS["darkcard"])
     end
     love.graphics.setColor({ 1, 1, 1, self.transparency })
-    love.graphics.draw(self.texture, self._Transform.x, self._Transform.y, 0, self._Transform.scale, self._Transform.scale, (self._Transform.w / 2),
+    love.graphics.draw(self._Texture, self._GlobalTransform.x, self._GlobalTransform.y, 0, self._GlobalTransform.sx, self._GlobalTransform.sy, (self._Transform.w / 2),
         (self._Transform.h / 2))
     love.graphics.setColor({ 1, 1, 1, 1 })
     love.graphics.setShader()
     if self.fliped and self.rank == 10 then
-        love.graphics.draw(self.burnParticals, self._Transform.x, self._Transform.y)
+        love.graphics.draw(self.burnParticals, self._GlobalTransform.x, self._GlobalTransform.y)
     end
 end
 
@@ -241,7 +199,7 @@ function Deck.new(nx, ny)
 
     self.T = "Deck"
 
-    self.texture = love.graphics.newImage("resources/graphics/cards/cardBacks/cardBack1.png")
+    self._Texture = love.graphics.newImage("resources/graphics/cards/cardBacks/cardBack1.png")
     self.cards = self:buildDeck(nx, ny)
     self.discard = {}
     self:initSprite()
@@ -253,7 +211,7 @@ function Deck:shuffle()
     local posIndex = 0
     for x = 1, 52 do
         local tmpCard = self:getRandCard()
-        tmpCard:setPosImidiate(self._Transform.x + posIndex, self._Transform.y - posIndex)
+        tmpCard:setPosImidiate(self._GlobalTransform.x + posIndex, self._GlobalTransform.y - posIndex)
         table.insert(tmp, #tmp + 1, tmpCard)
         posIndex = posIndex + .5
     end
@@ -267,7 +225,7 @@ function Deck:buildDeck(x, y)
     local posIndex = 0
     for i = 1, 4 do
         for j = 1, 13 do
-            local newCard = Card.new(j, i, self._Transform.x + posIndex, self._Transform.y - posIndex)
+            local newCard = Card.new(j, i, self._GlobalTransform.x + posIndex, self._GlobalTransform.y - posIndex)
             newCard.mouseMoveable = false
             table.insert(tmp, newCard)
             posIndex = posIndex + .5
@@ -277,7 +235,7 @@ function Deck:buildDeck(x, y)
 end
 
 function Deck:addDiscard(newCard)
-    newCard:setPos(-200, self._Transform.y)
+    newCard:setPos(-200, self._GlobalTransform.y)
     newCard:setScale(1, 1)
     if newCard.fliped then
         newCard.flipping = true
@@ -335,7 +293,7 @@ function CardPile.new(nx, ny)
 end
 
 function CardPile:addCard(newCard)
-    newCard:setPos(self._Transform.x, self._Transform.y)
+    newCard:setPos(self._GlobalTransform.x, self._GlobalTransform.y)
     if not newCard.fliped then
         newCard.flipping = true
     end

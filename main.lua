@@ -1,5 +1,4 @@
 -- Comunity Librarys
-push = require "librarys.push"
 require "librarys.tesound"
 require "math"
 if not _RELESE_MODE then

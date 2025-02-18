@@ -136,7 +136,6 @@ function applyDisplaySettings()
 
     if yScale < G.SETTINGS.SCREENVARIABLES.SCREENSCALE then G.SETTINGS.SCREENVARIABLES.SCREENSCALE = yScale end
 
-    logger:log(windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE)
     if windowMode ~= G.SETTINGS.SCREENVARIABLES.SCREENMODE then
         if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.WINDOWED then
             width = screenx * .80
@@ -201,11 +200,11 @@ function HAlign(container, items, immediate, args)
     local padding = args.padding or 0
     local objPadding = args.objPadding or 0
 
-    if not container then logger:lot("No container supplyed!") return end
-    if not items then logger:log("No table of items supplyed!") return end
-    if #items == 0 then logger:log("Table supplyed is empty.") return end
+    if not container then return end
+    if not items then return end
+    if #items == 0 then return end
 
-    local pos = container:getPos("centerleft")
+    local pos = Vector.new(0, 0)
     local size = container:getSize()
 
     local xpoints = 0
@@ -218,9 +217,9 @@ function HAlign(container, items, immediate, args)
     end
     for x = 1, #items do
         if not immediate then
-            items[x]:setPos((nextPoint), pos.y)
+            items[x]:moveTo((nextPoint), pos.y)
         else
-            items[x]:setPosImidiate((nextPoint), pos.y)
+            items[x]:setPos((nextPoint), pos.y)
         end
         if not spaceEvenly and items[x+1] then
             nextPoint = ((nextPoint + items[x]:getWidth()/2) + (items[x+1]:getWidth()/2)) + objPadding
