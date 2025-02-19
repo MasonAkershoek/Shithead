@@ -211,9 +211,9 @@ function HAlign(container, items, immediate, args)
     local nextPoint = 0
     if spaceEvenly then
         xpoints = ((size.x) / (#items))
-        nextPoint = pos.x + xpoints/2
+        nextPoint = pos.x-(size.x/2) + xpoints/2
     else
-        nextPoint = (pos.x + items[1]:getWidth()/2) + padding
+        nextPoint = (pos.x-(size.x/2) + items[1]:getWidth()/2) + padding
     end
     for x = 1, #items do
         if not immediate then

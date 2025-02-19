@@ -103,7 +103,7 @@ end
 function UINode:getFromUIPos()
     local pos = self.parent:convertPoint(self.UIAreaPoint)
     self._Transform.x = pos.x
-    self._Transform.y = pos.y
+    self._Transform.y = pos.y 
 end
 
 -- UIBox class definition

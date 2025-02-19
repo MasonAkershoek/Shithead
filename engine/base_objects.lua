@@ -254,7 +254,7 @@ end
 function Node:drawBoundingRect()
     love.graphics.setColor(lovecolors:getColor("BLUE"))
     love.graphics.setLineWidth(10)
-    love.graphics.rectangle("line", self._GlobalTransform.x, self._GlobalTransform.y, self:getWidth(), self:getHeight())
+    love.graphics.rectangle("line", self._GlobalTransform.x-(self:getWidth()/2), self._GlobalTransform.y-(self:getHeight()/2), self:getWidth(), self:getHeight())
     love.graphics.setColor({1,1,1,1})
 end
 

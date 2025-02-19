@@ -2,6 +2,7 @@ function START_MAIN_MENU()
     G.MAJORSTATE = G.MAJORSTATES.MAINMENU
     G.MINORSTATE = G.MINORSTATES.MAININTRO
     local menuArea = CardArea.new(G.UI.ROOT.hCenter, G.UI.ROOT.vCenter, 1100, {cards = G.MAINMENUDATA.TITLECARDS})
+    menuArea:setScale(.5)
     table.insert(G.CARDAREAS, menuArea)
     G.EVENTMANAGER:addEventToQueue(Event.new(function () logger:log("Wait a moment to start the splash") end,{delay=1}))
     for letter = 1, #G.TILE do
