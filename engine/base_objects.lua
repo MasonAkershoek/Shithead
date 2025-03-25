@@ -54,6 +54,9 @@ function Node.new(nx, ny, args)
         hovered = {is=false, can=true},
     }
 
+    -- Valid modes are "Always" or "Never"
+    self._PauseMode = self._Args.PauseMode or "Always"
+
     -- Parent/Children pointers
     self._Parent = self._Args.parent or nil
     self._Children = {}
