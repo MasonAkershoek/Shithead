@@ -54,7 +54,7 @@ function Node.new(nx, ny, args)
         hovered = {is=false, can=true},
     }
 
-    -- Valid modes are "Always" or "Never"
+    -- Valid modes are "Always", "Never", "Input", 
     self._PauseMode = self._Args.PauseMode or "Always"
 
     -- Parent/Children pointers
@@ -254,19 +254,31 @@ function Node:isInside(x,y)
     return false
 end
 
+function Node:checkPause()
+    if G.SETTINGS.PAUSED then
+        if self._PauseMode == "Always" then
+            return true
+        else
+            return false
+        end
+    end
+end
+
 function Node:drawBoundingRect()
-    love.graphics.setColor(lovecolors:getColor("BLUE"))
-    love.graphics.setLineWidth(10)
-    love.graphics.rectangle("line", self._GlobalTransform.x-(self:getWidth()/2), self._GlobalTransform.y-(self:getHeight()/2), self:getWidth(), self:getHeight())
-    love.graphics.setColor({1,1,1,1})
+    if G.DRAWBOUNDINGRECTS then
+        love.graphics.setColor(lovecolors:getColor("BLUE"))
+        love.graphics.setLineWidth(10)
+        love.graphics.rectangle("line", self._GlobalTransform.x-(self:getWidth()/2), self._GlobalTransform.y-(self:getHeight()/2), self:getWidth(), self:getHeight())
+        love.graphics.setColor({1,1,1,1})
+    end
 end
 
 function Node:update(dt)
-    return
+    updateList(self._Children, dt)
 end
 
 function Node:draw()
-    return
+    drawList(self._Children)
 end
 
 -- Moveable Object
@@ -443,11 +455,3 @@ function Vector:checkDistance(otherVect, space)
         return false
     end
 end
-
--- if p1.x > (p2.x-space) and p1.x < (p2.x+space) then
---     if p1.y > (p2.y - space) and p1.y < (p2.y+space) then
---            return true
---     end
--- else
---     return false
---end

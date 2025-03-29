@@ -107,6 +107,7 @@ function Game:loadShaders()
     local path = "shaders/"
     for x, file in ipairs(love.filesystem.getDirectoryItems(path)) do
         self.SHADERS[string.sub(file, 1, #file - 5)] = love.graphics.newShader(path .. file)
+        logger:log(string.sub(file, 1, #file - 5))
     end
 end
 
@@ -149,6 +150,7 @@ function Game:draw()
 	love.graphics.setColor({ 1, 1, 1, 1 })
 
     love.graphics.setCanvas()
+
 
     local x,y,_ = love.window.getMode()
     love.graphics.draw(self.drawSpace, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,_GAME_WIDTH/2,_GAME_HEIGHT/2)

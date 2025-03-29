@@ -2,6 +2,7 @@ GAME_VERSION = "0.0.6"
 
 function Game:setGlobals()
     self.TILE = { "S", "H", "I", "T", "H", "E", "A", "D" }
+    self.DRAWBOUNDINGRECTS = false
 
     -- =================
     -- == Game States ==

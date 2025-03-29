@@ -168,21 +168,32 @@ end
 
 function Card:draw()
     self:setGlobalPos()
+    self:drawBoundingRect()
+
+    -- Handle Pause (Should be moved to the update function as the callback to the draw function should be added to the draw hash in the update function)
     if self.stopOnPause and G.SETTINGS.PAUSED then
         return
     end
+
+    -- Draw Shadow
     love.graphics.setColor({ 0, 0, 0, self._Opac - .5 })
     love.graphics.draw(self._Texture, self._GlobalTransform.x + 7, self._GlobalTransform.y + 7, 0, self._GlobalTransform.sx, self._GlobalTransform.sy, (self._Transform.w / 2),
         (self._Transform.h / 2))
     love.graphics.setColor({ 1, 1, 1, 1 })
+
+    -- Darken the card when in the notPlayable state
     if self.notPlayable then
         love.graphics.setShader(G.SHADERS["darkcard"])
     end
+
+    -- Draw the card itself
     love.graphics.setColor({ 1, 1, 1, self.transparency })
     love.graphics.draw(self._Texture, self._GlobalTransform.x, self._GlobalTransform.y, 0, self._GlobalTransform.sx, self._GlobalTransform.sy, (self._Transform.w / 2),
         (self._Transform.h / 2))
     love.graphics.setColor({ 1, 1, 1, 1 })
     love.graphics.setShader()
+
+    -- Draw the particals for the 10 card
     if self.fliped and self.rank == 10 then
         love.graphics.draw(self.burnParticals, self._GlobalTransform.x, self._GlobalTransform.y)
     end
@@ -271,6 +282,7 @@ function Deck:checkUsedCards(cardNum)
 end
 
 function Deck:draw()
+    self:drawBoundingRect()
     if #self.usedCards < 52 then
         drawList(self.cards)
     end
@@ -336,6 +348,7 @@ function CardPile:getTopCard(index)
 end
 
 function CardPile:draw()
+    self:drawBoundingRect()
     drawList(self.cards)
 end
 
