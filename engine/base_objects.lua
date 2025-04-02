@@ -332,40 +332,44 @@ end
 
 -- Needs Refactoring
 function Moveable:move(dt)
-    self._Transform.x = self._NextTransform.x
-    self._Transform.y = self._NextTransform.y
+    --self._Transform.x = self._NextTransform.x
+    --self._Transform.y = self._NextTransform.y
 
-    -- New Method Logic
-    -- if not self._NextTransform.complete and self._MovementVector.x == 0 then
-    --     local dirx = self._NextTransform.x - self._Transform.x
-    --     local diry = self._NextTransform.y - self._Transform.y
-    --     local distance = math.sqrt((dirx^2) + (diry^2))
-    --     local normx = dirx / distance
-    --     local normy = diry / distance
-    --     self._MovementVector:setVect(normx, normy)
-    -- end
-    -- count = 0
-    -- while not isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y)) and not self._States.drag.is and count < (self._Speed * dt) do
+    --New Method Logic
+    if not self._NextTransform.complete and self._MovementVector.x == 0 then
+        local dirx = self._NextTransform.x - self._Transform.x
+        local diry = self._NextTransform.y - self._Transform.y
+        local distance = math.sqrt((dirx^2) + (diry^2))
+        local normx = dirx / distance
+        local normy = diry / distance
+        self._MovementVector:setVect(normx, normy)
+    end
+    count = 0
+    while not isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y), 0) and not self._States.drag.is and count < (self._Speed * dt) do
         
-    -- end
+        for x in 2000 do
+            self._Transform.x = self._Transform.x + self._MovementVector.x
+            self._Transform.y = self._Transform.y + self._MovementVector.y
+        end
+    end
 
     -- -- Old method logic
-    -- if self.moveFlag or self.pos.x ~= self.newPos.x or self.pos.y ~= self.newPos.y then
-    --     local dirx = self.newPos.x - self.pos.x
-    --     local diry = self.newPos.y - self.pos.y
+    -- if self.moveFlag or self._Transform.x ~= self.newPos.x or self._Transform.y ~= self.newPos.y then
+    --     local dirx = self.newPos.x - self._Transform.x
+    --     local diry = self.newPos.y - self._Transform.y
     --     self.distance = math.sqrt((dirx ^ 2) + (diry ^ 2))
     --     local normx = dirx / self.distance
     --     local normy = diry / self.distance
-    --     self.HCenter.x = ((self.pos.x + self.newPos.x) / 2)
-    --     self.HCenter.y = ((self.pos.y + self.newPos.y) / 2)
+    --     self.HCenter.x = ((self._Transform.x + self.newPos.x) / 2)
+    --     self.HCenter.y = ((self._Transform.y + self.newPos.y) / 2)
     --     self.movement:setVect(normx, normy)
     --     self.moveFlag = false
     -- end
     -- if not self.pos:checkDistance(self.newPos, 5) and not self.mouseMove then
     --     for x = 1, G.CARDSPEED * dt do
     --         if not self.pos:checkDistance(self.newPos, 5) then
-    --             self.pos.x = (self.pos.x + (self.movement.x))
-    --             self.pos.y = (self.pos.y + (self.movement.y))
+    --             self._Transform.x = (self._Transform.x + (self.movement.x))
+    --             self._Transform.y = (self._Transform.y + (self.movement.y))
     --         else
     --             break
     --         end

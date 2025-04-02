@@ -35,7 +35,7 @@ function Card.new(newRank, newSuit, nx, ny)
     -- Card Image
     self._Faces = 
     {
-        cardBack = love.graphics.newImage("resources/graphics/cards/cardBacks/cardBack1.png")
+        cardBack = love.graphics.newImage("resources/graphics/cards/cardBacks/cardBack1.png"),
     }
     self:getCardFace()
     self:setSprite(self._Faces.cardBack)
@@ -126,7 +126,7 @@ end
 
 -- Needs major work to dynamicly change with chanch of pos and remove base scale
 function Card:flipAnimation()
-
+    
 end
 
 function Card:op8(dt)
