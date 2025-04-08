@@ -77,7 +77,7 @@ function Node:getHeight()
 end
 
 function Node:getSize()
-    return Vector.new(self._GlobalTransform.x, self._GlobalTransform.y)
+    return Vector.new(self._Transform.x, self._Transform.y)
 end
 
 function Node:setSize(nw, nh)
@@ -156,45 +156,47 @@ end
 --- Returns a spesifed point on the object 
 --- @param pos string Default: center [center, topleft, topright, bottomleft, bottomright, centerleft, centerright, centertop, centerbottom]
 --- @return Vector
-function Node:getPos(pos)
+function Node:getPos(pos, locFlag)
+    local flag = locFlag or false
     local pos = pos or "center"
     local ret = Vector.new()
 
+    local function calcPos(xFactor,yFactor)
+        if flag then
+            ret.x = self._GlobalTransform.x + (self._Transform.w * self._GlobalTransform.sx * xFactor)
+            ret.y = self._GlobalTransform.y + (self._Transform.h * self._GlobalTransform.sy * yFactor)
+        else
+            ret.x = self._Transform.x + (self._Transform.w * self._GlobalTransform.sx * xFactor)
+            ret.y = self._Transform.y + (self._Transform.h * self._GlobalTransform.sy * yFactor)
+        end
+    end
+
     if pos == "center" then
-        ret.x = self._Transform.x 
-        ret.y = self._Transform.y
+        calcPos(0,0)
 
     elseif pos == "topleft" then
-        ret.x = (self._Transform.x - ((self._Transform.w * self._Transform.sx) / 2))
-        ret.y = (self._Transform.y - ((self._Transform.h * self._Transform.st) / 2))
+        calcPos(-.5,-.5)
 
     elseif pos == "topright" then
-        ret.x = (self._Transform.x + ((self._Transform.w * self._Transform.sx) / 2))
-        ret.y = (self._Transform.y - ((self._Transform.h * self._Transform.sy) / 2))
+        calcPos(.5,-.5)
 
     elseif pos == "bottomleft" then
-        ret.x = (self._Transform.x - ((self._Transform.w * self._Transform.sx) / 2))
-        ret.y = (self._Transform.y + ((self._Transform.h * self._Transform.sy) / 2))
+        calcPos(-.5,.5)
 
     elseif pos == "bottomright" then
-        ret.x = (self._Transform.x + ((self._Transform.w * self._Transform.sx) / 2))
-        ret.y = (self._Transform.y + ((self._Transform.h * self._Transform.sy) / 2))
+        calcPos(.5,.5)
 
     elseif pos == "centerleft" then
-        ret.x = (self._Transform.x - ((self._Transform.w * self._Transform.sx) / 2))
-        ret.y = self._Transform.y
+        calcPos(-.5,0)
 
     elseif pos == "centerright" then
-        ret.x = (self._Transform.x + ((self._Transform.w * self._Transform.sx) / 2))
-        ret.y = self._Transform.y
+        calcPos(.5,0)
 
     elseif pos == "centertop" then
-        ret.x = self._Transform.x
-        ret.y = (self._Transform.y - ((self._Transform.h * self._Transform.sy) / 2))
+        calcPos(0, -.5)
 
     elseif pos == "centerbottom" then
-        ret.x = self._Transform.x
-        ret.y = (self._Transform.y + ((self._Transform.h * self._Transform.sy) / 2))
+        calcPos(0,.5)
     end
     return ret
 end
@@ -233,8 +235,8 @@ end
 function Node:checkMouseHover()
     local mousex, mousey = love.mouse.getPosition()
     local mousex, mousey = toGame(mousex, mousey)
-    if mousex > (self._Transform.x - self:getWidth() / 2) and mousex < (self._Transform.x + self:getWidth() / 2) then
-        if mousey > (self._Transform.y - self:getHeight() / 2) and mousey < (self._Transform.y + self:getHeight() / 2) then
+    if mousex > (self._GlobalTransform.x - self:getWidth() / 2) and mousex < (self._GlobalTransform.x + self:getWidth() / 2) then
+        if mousey > (self._GlobalTransform.y - self:getHeight() / 2) and mousey < (self._GlobalTransform.y + self:getHeight() / 2) then
             if not self:checkDeadZone(mousex, mousey) then
                 return true
             end
@@ -245,8 +247,8 @@ function Node:checkMouseHover()
 end
 
 function Node:isInside(x,y)
-    if x > (self._Transform.x - self:getWidth() / 2) and x < (self._Transform.x + self:getWidth() / 2) then
-        if y > (self._Transform.y - self:getHeight() / 2) and y < (self._Transform.y + self:getHeight() / 2) then
+    if x > (self._GlobalTransform.x - self:getWidth() / 2) and x < (self._GlobalTransform.x + self:getWidth() / 2) then
+        if y > (self._GlobalTransform.y - self:getHeight() / 2) and y < (self._GlobalTransform.y + self:getHeight() / 2) then
             return true
         end
         return false
