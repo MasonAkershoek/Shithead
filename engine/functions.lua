@@ -75,8 +75,8 @@ function addToDrawBuff(obj)
 end
 
 function isWithinRange(point1, point2, space)
-    if point1.x > (point2.x-space) and point1.x < (point2.x+space) then
-        if point1.y > (point2.y-space) and point1.y < (point2.y+space) then
+    if point1.x > (point2.x - space) and point1.x < (point2.x + space) then
+        if point1.y > (point2.y - space) and point1.y < (point2.y + space) then
             return true
         else
             return false
@@ -86,14 +86,6 @@ function isWithinRange(point1, point2, space)
     end
 end
 
--- if p1.x > (p2.x-space) and p1.x < (p2.x+space) then
---     if p1.y > (p2.y - space) and p1.y < (p2.y+space) then
---            return true
---     end
--- else
---     return false
---end
-
 function addCardToHand(card, hand)
 
 end
@@ -102,7 +94,7 @@ function initDisplay()
     local width = _GAME_WIDTH
     local height = _GAME_HEIGHT
     local screenx, screeny = love.window.getDesktopDimensions()
-    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 16, resizable=true }
+    local windowArgs = { vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, msaa = 16, resizable = true }
 
     G.SETTINGS.SCREENVARIABLES.DIPLAYNUM = love.window.getDisplayCount()
     for x = 1, G.SETTINGS.SCREENVARIABLES.DIPLAYNUM do
@@ -123,12 +115,12 @@ function initDisplay()
 end
 
 function applyDisplaySettings()
-    local width,height,flags = love.window.getMode()
+    local width, height, flags = love.window.getMode()
     local windowMode = G.SCREENMODES.WINDOWED
     local screenx, screeny = love.window.getDesktopDimensions()
     if flags.borderless == true then windowMode = G.SCREENMODES.BORDERLESS end
     if flags.fullscreen == true then windowMode = G.SCREENMODES.FULLSCREEN end
-    local windowArgs = {display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, msaa = 16, resizable=true, fullscreen=false, borderless=false}
+    local windowArgs = { display = G.SETTINGS.SCREENVARIABLES.CURRENTDISPLAY, vsync = G.SETTINGS.SCREENVARIABLES.VSYNC, msaa = 16, resizable = true, fullscreen = false, borderless = false }
 
     G.SETTINGS.SCREENVARIABLES.SCREENSCALE = width / _GAME_WIDTH
     local yScale = height / _GAME_HEIGHT
@@ -141,21 +133,27 @@ function applyDisplaySettings()
             width = screenx * .80
             height = screeny * .80
         end
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then windowArgs.borderless = true windowArgs.fullscreen = false end
-        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then windowArgs.fullscreen = true windowArgs.borderless = false end
-        love.window.updateMode(width,height,windowArgs)
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.BORDERLESS then
+            windowArgs.borderless = true
+            windowArgs.fullscreen = false
+        end
+        if G.SETTINGS.SCREENVARIABLES.SCREENMODE == G.SCREENMODES.FULLSCREEN then
+            windowArgs.fullscreen = true
+            windowArgs.borderless = false
+        end
+        love.window.updateMode(width, height, windowArgs)
     end
 end
 
--- Coverts the mouse position to the scaled canves 
+-- Coverts the mouse position to the scaled canves
 function toGame(x, y)
-    local w,h,_ = love.window.getMode()
+    local w, h, _ = love.window.getMode()
     local scale = G.SETTINGS.SCREENVARIABLES.SCREENSCALE
     local canvWidth = _GAME_WIDTH * scale
     local canvHeight = _GAME_HEIGHT * scale
-    local xpad = (w-canvWidth)
-    local ypad = (h-canvHeight)
-    return (x/scale)-xpad/(scale*2), (y/scale)-ypad/(scale*2)
+    local xpad = (w - canvWidth)
+    local ypad = (h - canvHeight)
+    return (x / scale) - xpad / (scale * 2), (y / scale) - ypad / (scale * 2)
 end
 
 -- sorts a given list of cards by rank
@@ -211,9 +209,9 @@ function HAlign(container, items, immediate, args)
     local nextPoint = 0
     if spaceEvenly then
         xpoints = ((size.x) / (#items))
-        nextPoint = pos.x-(size.x/2) + xpoints/2
+        nextPoint = pos.x - (size.x / 2) + xpoints / 2
     else
-        nextPoint = (pos.x-(size.x/2) + items[1]:getWidth()/2) + padding
+        nextPoint = (pos.x - (size.x / 2) + items[1]:getWidth() / 2) + padding
     end
     for x = 1, #items do
         if not immediate then
@@ -221,8 +219,8 @@ function HAlign(container, items, immediate, args)
         else
             items[x]:setPos((nextPoint), pos.y)
         end
-        if not spaceEvenly and items[x+1] then
-            nextPoint = ((nextPoint + items[x]:getWidth()/2) + (items[x+1]:getWidth()/2)) + objPadding
+        if not spaceEvenly and items[x + 1] then
+            nextPoint = ((nextPoint + items[x]:getWidth() / 2) + (items[x + 1]:getWidth() / 2)) + objPadding
         else
             nextPoint = nextPoint + xpoints
         end
@@ -237,9 +235,18 @@ function VAlign(container, items, immediate, args)
     local padding = args.padding or 0
     local objPadding = args.objPadding or 0
 
-    if not container then logger:lot("No container supplyed!") return end
-    if not items then logger:log("No table of items supplyed!") return end
-    if #items == 0 then logger:log("Table supplyed is empty.") return end
+    if not container then
+        logger:lot("No container supplyed!")
+        return
+    end
+    if not items then
+        logger:log("No table of items supplyed!")
+        return
+    end
+    if #items == 0 then
+        logger:log("Table supplyed is empty.")
+        return
+    end
 
     local pos = container:getPos("centertop")
     local size = container:getSize()
@@ -248,9 +255,9 @@ function VAlign(container, items, immediate, args)
     local nextPoint = 0
     if spaceEvenly then
         xpoints = ((size.y) / (#items))
-        nextPoint = pos.y + xpoints/2
+        nextPoint = pos.y + xpoints / 2
     else
-        nextPoint = (pos.y + items[1]:getHeight()/2) + padding
+        nextPoint = (pos.y + items[1]:getHeight() / 2) + padding
     end
     for x = 1, #items do
         if not immediate then
@@ -258,8 +265,8 @@ function VAlign(container, items, immediate, args)
         else
             items[x]:setPosImidiate(pos.x, nextPoint)
         end
-        if not spaceEvenly and items[x+1] then
-            nextPoint = ((nextPoint + items[x]:getHeight()/2) + (items[x+1]:getHeight()/2)) + objPadding
+        if not spaceEvenly and items[x + 1] then
+            nextPoint = ((nextPoint + items[x]:getHeight() / 2) + (items[x + 1]:getHeight() / 2)) + objPadding
         else
             nextPoint = nextPoint + xpoints
         end

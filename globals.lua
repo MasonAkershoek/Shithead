@@ -78,7 +78,7 @@ function Game:setGlobals()
     -- ====================
     -- == Card Constants ==
     -- ====================
-    self.CARDSPEED = 3000
+    self.CARDSPEED = 500
     self.CARDSUITS = { "Spades", "Diamonds", "Clubs", "Hearts" }
     self.SPECIALCARDS = { 2, 5, 8, 10 }
 
@@ -97,7 +97,7 @@ function Game:setGlobals()
     -- == Instances ==
     -- ===============
     self.UI = {
-        ROOT = UIArea.new(0,0,_GAME_WIDTH,_GAME_HEIGHT,11,11, {isRoot=true}),
+        ROOT = UIArea.new(0, 0, _GAME_WIDTH, _GAME_HEIGHT, 11, 11, { isRoot = true }),
         BOX = {},
         NODES = {}
     }
@@ -135,7 +135,7 @@ function Game:setGlobals()
         )
     )
     self.EVENTMANAGER:addListener("displaymodeleft",
-        Event.new(function ()
+        Event.new(function()
             G.SETTINGS.SCREENVARIABLES.SCREENMODE = G.SETTINGS.SCREENVARIABLES.SCREENMODE - 1
             if G.SETTINGS.SCREENVARIABLES.SCREENMODE < 1 then
                 G.SETTINGS.SCREENVARIABLES.SCREENMODE = 3
@@ -143,7 +143,7 @@ function Game:setGlobals()
         end)
     )
     self.EVENTMANAGER:addListener("displaymoderight",
-        Event.new(function ()
+        Event.new(function()
             G.SETTINGS.SCREENVARIABLES.SCREENMODE = G.SETTINGS.SCREENVARIABLES.SCREENMODE + 1
             if G.SETTINGS.SCREENVARIABLES.SCREENMODE > 3 then
                 G.SETTINGS.SCREENVARIABLES.SCREENMODE = 1

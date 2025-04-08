@@ -8,12 +8,12 @@ function Node.new(nx, ny, args)
 
     self.T = "Node"
 
-    self._Args = args or {T = {}}
+    self._Args = args or { T = {} }
 
     self._Conf = self._Args.conf or {}
 
     -- Transformation in the nodes local space
-    self._Transform = 
+    self._Transform =
     {
         x = self._Args.T.x or nx or 0,
         y = self._Args.T.y or ny or 0,
@@ -26,7 +26,7 @@ function Node.new(nx, ny, args)
         sky = self._Args.T.sky or 0
     }
 
-    self._GlobalTransform = 
+    self._GlobalTransform =
     {
         x = self._Args.T.x or nx or 0,
         y = self._Args.T.y or ny or 0,
@@ -39,22 +39,22 @@ function Node.new(nx, ny, args)
         sky = self._Args.T.sky or 0
     }
 
-    self._ClickOffset = Vector.new(0,0)
+    self._ClickOffset = Vector.new(0, 0)
 
     -- Zone of the Node where mouse hover will not be trigered
     self._DeadZone = nil
 
     -- Node States
-    self._States = 
+    self._States =
     {
         visible = true,
         paused = false,
-        clicked = {is=false, can=true},
-        drag = {is=false, can=true},
-        hovered = {is=false, can=true},
+        clicked = { is = false, can = true },
+        drag = { is = false, can = true },
+        hovered = { is = false, can = true },
     }
 
-    -- Valid modes are "Always", "Never", "Input", 
+    -- Valid modes are "Always", "Never", "Input",
     self._PauseMode = self._Args.PauseMode or "Always"
 
     -- Parent/Children pointers
@@ -128,7 +128,7 @@ function Node:removeChild(child, tag)
 end
 
 function Node:updateChildren(dt)
-    for _,child in ipairs(self.children) do
+    for _, child in ipairs(self.children) do
         child:update(dt)
     end
 end
@@ -153,7 +153,7 @@ function Node:updateFunctions()
     end
 end
 
---- Returns a spesifed point on the object 
+--- Returns a spesifed point on the object
 --- @param pos string Default: center [center, topleft, topright, bottomleft, bottomright, centerleft, centerright, centertop, centerbottom]
 --- @return Vector
 function Node:getPos(pos, locFlag)
@@ -161,7 +161,7 @@ function Node:getPos(pos, locFlag)
     local pos = pos or "center"
     local ret = Vector.new()
 
-    local function calcPos(xFactor,yFactor)
+    local function calcPos(xFactor, yFactor)
         if flag then
             ret.x = self._GlobalTransform.x + (self._Transform.w * self._GlobalTransform.sx * xFactor)
             ret.y = self._GlobalTransform.y + (self._Transform.h * self._GlobalTransform.sy * yFactor)
@@ -172,31 +172,23 @@ function Node:getPos(pos, locFlag)
     end
 
     if pos == "center" then
-        calcPos(0,0)
-
+        calcPos(0, 0)
     elseif pos == "topleft" then
-        calcPos(-.5,-.5)
-
+        calcPos(-.5, -.5)
     elseif pos == "topright" then
-        calcPos(.5,-.5)
-
+        calcPos(.5, -.5)
     elseif pos == "bottomleft" then
-        calcPos(-.5,.5)
-
+        calcPos(-.5, .5)
     elseif pos == "bottomright" then
-        calcPos(.5,.5)
-
+        calcPos(.5, .5)
     elseif pos == "centerleft" then
-        calcPos(-.5,0)
-
+        calcPos(-.5, 0)
     elseif pos == "centerright" then
-        calcPos(.5,0)
-
+        calcPos(.5, 0)
     elseif pos == "centertop" then
         calcPos(0, -.5)
-
     elseif pos == "centerbottom" then
-        calcPos(0,.5)
+        calcPos(0, .5)
     end
     return ret
 end
@@ -246,7 +238,7 @@ function Node:checkMouseHover()
     return false
 end
 
-function Node:isInside(x,y)
+function Node:isInside(x, y)
     if x > (self._GlobalTransform.x - self:getWidth() / 2) and x < (self._GlobalTransform.x + self:getWidth() / 2) then
         if y > (self._GlobalTransform.y - self:getHeight() / 2) and y < (self._GlobalTransform.y + self:getHeight() / 2) then
             return true
@@ -270,8 +262,9 @@ function Node:drawBoundingRect()
     if G.DRAWBOUNDINGRECTS then
         love.graphics.setColor(lovecolors:getColor("BLUE"))
         love.graphics.setLineWidth(10)
-        love.graphics.rectangle("line", self._GlobalTransform.x-(self:getWidth()/2), self._GlobalTransform.y-(self:getHeight()/2), self:getWidth(), self:getHeight())
-        love.graphics.setColor({1,1,1,1})
+        love.graphics.rectangle("line", self._GlobalTransform.x - (self:getWidth() / 2),
+            self._GlobalTransform.y - (self:getHeight() / 2), self:getWidth(), self:getHeight())
+        love.graphics.setColor({ 1, 1, 1, 1 })
     end
 end
 
@@ -294,17 +287,17 @@ function Moveable.new(nx, ny, args)
     self.T = "Moveable"
 
     -- Used to tell the movable object how to move this can include position, scale and rotation
-    self._NextTransform = 
+    self._NextTransform =
     {
         complete = false,
-        x = 0,
-        y = 0,
+        x = -1,
+        y = -1,
         r = 0,
         scale = 1
     }
 
-    self._States.move = {is=false, can=true}
-    self._States.mouseMoveable = {is=false, can=true}
+    self._States.move = { is = false, can = true }
+    self._States.mouseMoveable = { is = false, can = true }
     self._MovementVector = Vector.new(0, 0)
     self._DistanceToDest = 0
     self._Speed = self._Args.speed or 0
@@ -314,7 +307,7 @@ end
 function Moveable:mouseMoving()
     if self:checkMouseHover() and love.mouse.isDown(1) then
         local mx, my = love.mouse.getPosition()
-        mx,my = toGame(mx,my)
+        mx, my = toGame(mx, my)
         --mx, my = push:toGame(mx, my)
         self:setPosImidiate(mx, my)
         self.mouseMove = true
@@ -324,35 +317,55 @@ function Moveable:mouseMoving()
 end
 
 -- Updated setPos
-function Moveable:moveTo(x,y,s,r)
-    self._NextTransform.x = x or self._Transform.x
-    self._NextTransform.y = y or self._Transform.y
-    self._NextTransform.s = s or self._Transform.scale
-    self._NextTransform.r = r or self._Transform.r
-    self._NextTransform.complete = false
+function Moveable:moveTo(x, y, s, r)
+    logger:log("X: ", self._Transform.x)
+    logger:log("Y: ", self._Transform.y)
+    logger:log("NX: ", self._NextTransform.x)
+    logger:log("NY: ", self._NextTransform.y)
+    logger:log("NNX: ", x)
+    logger:log("NNX: ", y)
+    logger:log("MVX: ", self._MovementVector.x)
+    logger:log("MVY: ", self._MovementVector.y)
+    if self._Transform.x ~= x or self._Transform.y ~= y then
+        logger:log("GG1")
+        if self._NextTransform.x ~= x or self._NextTransform.y ~= y then
+            logger:log("GG2")
+            self._NextTransform.x = x
+            self._NextTransform.y = y
+            self._NextTransform.s = s
+            self._NextTransform.r = r
+
+            -- logger:log("X: ", self._Transform.x)
+            -- logger:log("Y: ", self._Transform.y)
+            -- logger:log("NX: ", x)
+            -- logger:log("NX: ", y)
+
+            local dirx = self._NextTransform.x - self._Transform.x
+            local diry = self._NextTransform.y - self._Transform.y
+            local distance = math.sqrt((dirx ^ 2) + (diry ^ 2))
+            local normx = dirx / distance
+            local normy = diry / distance
+            self._MovementVector:setVect(normx, normy)
+            self._NextTransform.complete = false
+        end
+    end
 end
 
 -- Needs Refactoring
 function Moveable:move(dt)
-    --self._Transform.x = self._NextTransform.x
-    --self._Transform.y = self._NextTransform.y
-
-    --New Method Logic
-    if not self._NextTransform.complete and self._MovementVector.x == 0 then
-        local dirx = self._NextTransform.x - self._Transform.x
-        local diry = self._NextTransform.y - self._Transform.y
-        local distance = math.sqrt((dirx^2) + (diry^2))
-        local normx = dirx / distance
-        local normy = diry / distance
-        self._MovementVector:setVect(normx, normy)
-    end
-    count = 0
-    while not isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y), 0) and not self._States.drag.is and count < (self._Speed * dt) do
-        
-        for x in 2000 do
+    if not isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y), 15) and not self._NextTransform.complete then
+        for x = 1, G.CARDSPEED * dt do
             self._Transform.x = self._Transform.x + self._MovementVector.x
             self._Transform.y = self._Transform.y + self._MovementVector.y
         end
+    elseif not self._NextTransform.complete then
+        logger:log("GG")
+        self._NextTransform.complete = true
+        self._NextTransform.x = -1
+        self._NextTransform.y = -1
+        self._MovementVector:setVect(-1, -1)
+        self._Transform.x = self._NextTransform.x
+        self._Transform.y = self._NextTransform.y
     end
 
     -- -- Old method logic
@@ -381,6 +394,48 @@ function Moveable:move(dt)
     --     self.pos:setVect(self.newPos.x, self.newPos.y)
     --     self.moving = false
     -- end
+
+    -- Updated setPos
+    -- function Moveable:moveTo(x, y, s, r)
+    --     if not self._States.move.is then
+    --         logger:log(x)
+    --         logger:log(y)
+    --         if self._Transform.x ~= x or self._Transform.y ~= y then
+    --             self._NextTransform.x = x or self._Transform.x
+    --             self._NextTransform.y = y or self._Transform.y
+    --             self._NextTransform.s = s or self._Transform.scale
+    --             self._NextTransform.r = r or self._Transform.r
+
+    --             local dirx = self._NextTransform.x - self._Transform.x
+    --             local diry = self._NextTransform.y - self._Transform.y
+    --             local distance = math.sqrt((dirx ^ 2) + (diry ^ 2))
+    --             local normx = dirx / distance
+    --             local normy = diry / distance
+    --             self._MovementVector:setVect(normx, normy)
+    --             self._NextTransform.complete = false
+    --             self._States.move.is = true
+    --         end
+    --     end
+    -- end
+
+    -- -- Needs Refactoring
+    -- function Moveable:move(dt)
+    --     if self._States.move.is then
+    --         if not isWithinRange(self:getPos("center", true), Vector.new(self._NextTransform.x, self._NextTransform.y), 15) and not self._NextTransform.complete then
+    --             for x = 1, G.CARDSPEED * dt do
+    --                 self:setPos(self._NextTransform.x, self._NextTransform.y)
+    --                 -- self._Transform.x = self._Transform.x + self._MovementVector.x
+    --                 -- self._Transform.y = self._Transform.y + self._MovementVector.y
+    --             end
+    --         elseif not self._NextTransform.complete then
+    --             print("GG")
+    --             self._NextTransform.complete = true
+    --             self._MovementVector:setVect(0, 0)
+    --             self._Transform.x = self._NextTransform.x
+    --             self._Transform.y = self._NextTransform.y
+    --             self._States.move.is = false
+    --         end
+    --     end
 end
 
 -- Sprite Object
@@ -419,7 +474,8 @@ end
 function Sprite:draw()
     self:setGlobalPos()
     love.graphics.setColor({ 1, 1, 1, self._Opac })
-    love.graphics.draw(self._Texture, self._GlobalTransform.x, self._GlobalTransform.y, self._GlobalTransform.r, self._GlobalTransform.sx, self._GlobalTransform.sy, self._Transform.w / 2, self._Transform.h / 2)
+    love.graphics.draw(self._Texture, self._GlobalTransform.x, self._GlobalTransform.y, self._GlobalTransform.r,
+        self._GlobalTransform.sx, self._GlobalTransform.sy, self._Transform.w / 2, self._Transform.h / 2)
     drawList(self._Children)
 end
 

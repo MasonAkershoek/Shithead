@@ -34,7 +34,7 @@ function Game:setup()
 
     bootManager("init Display", .3)
     initDisplay()
-    love.graphics.setDefaultFilter("nearest","linear",10)
+    love.graphics.setDefaultFilter("nearest", "nearest", 10)
     love.graphics.setLineStyle("rough")
 
     bootManager("Loading Graphics", .4)
@@ -50,8 +50,8 @@ function Game:setup()
 
     bootManager("Done!", 1)
 
-    TEsound.playLooping(self.SOUNDS["music2"],"static","main")
-    TEsound.volume("main", self.SETTINGS.SOUND.VOLUME/100)
+    --TEsound.playLooping(self.SOUNDS["music2"], "static", "main")
+    --TEsound.volume("main", self.SETTINGS.SOUND.VOLUME / 100)
 end
 
 function Game:createGameObj()
@@ -89,15 +89,18 @@ function Game:getCardGraphics()
     local cardBackPath = "resources/graphics/cards/cardBacks"
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardBackPath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDBACKS"][imageName] = love.graphics.newImage(cardBackPath .. "/" .. file,{mipmaps = true, dpiscale = 1})
+        self.CARDGRAPHICS["CARDBACKS"][imageName] = love.graphics.newImage(cardBackPath .. "/" .. file,
+            { mipmaps = true, dpiscale = 1 })
     end
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardFacePath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDFACES"][imageName] = love.graphics.newImage(cardFacePath .. "/" .. file,{mipmaps = true, dpiscale = 1})
+        self.CARDGRAPHICS["CARDFACES"][imageName] = love.graphics.newImage(cardFacePath .. "/" .. file,
+            { mipmaps = true, dpiscale = 1 })
     end
     for _, file in ipairs(love.filesystem.getDirectoryItems(cardLetterkPath)) do
         local imageName = string.sub(file, 1, -5)
-        self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file,{mipmaps = true, dpiscale = 1})
+        self.CARDGRAPHICS["CARDLETTERS"][imageName] = love.graphics.newImage(cardLetterkPath .. "/" .. file,
+            { mipmaps = true, dpiscale = 1 })
     end
 end
 
@@ -115,7 +118,7 @@ function Game:update(dt)
     applyDisplaySettings()
     updateList(G.UI.BOX, dt)
     updateList(G.CARDS, dt)
-    for _,area in pairs(G.CARDAREAS) do 
+    for _, area in pairs(G.CARDAREAS) do
         area:update(dt)
     end
     for _, func in ipairs(self.BUFFEREDFUNCS) do
@@ -129,7 +132,7 @@ function Game:draw()
 
     if G.SETTINGS.PAUSED then
         love.graphics.setCanvas(self.pauseCanves)
-        love.graphics.clear(lovecolors:getColor("BLACK",.5))
+        love.graphics.clear(lovecolors:getColor("BLACK", .5))
     else
         love.graphics.setCanvas(self.drawSpace)
         love.graphics.clear()
@@ -137,25 +140,27 @@ function Game:draw()
 
     self.UI.ROOT:draw()
 
-    for _,area in pairs(G.CARDAREAS) do 
+    for _, area in pairs(G.CARDAREAS) do
         area:draw()
     end
     drawList(G.CARDS)
     drawList(G.UI.BOX)
 
-	local x, y = love.mouse.getPosition()
-	x,y = toGame(x,y)
-	love.graphics.setColor(lovecolors:getColor("BLUE"))
-	love.graphics.rectangle("fill", x-5, y-5, 10, 10)
-	love.graphics.setColor({ 1, 1, 1, 1 })
+    local x, y = love.mouse.getPosition()
+    x, y = toGame(x, y)
+    love.graphics.setColor(lovecolors:getColor("BLUE"))
+    love.graphics.rectangle("fill", x - 5, y - 5, 10, 10)
+    love.graphics.setColor({ 1, 1, 1, 1 })
 
     love.graphics.setCanvas()
 
 
-    local x,y,_ = love.window.getMode()
-    love.graphics.draw(self.drawSpace, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,_GAME_WIDTH/2,_GAME_HEIGHT/2)
+    local x, y, _ = love.window.getMode()
+    love.graphics.draw(self.drawSpace, x / 2, y / 2, 0, G.SETTINGS.SCREENVARIABLES.SCREENSCALE,
+        G.SETTINGS.SCREENVARIABLES.SCREENSCALE, _GAME_WIDTH / 2, _GAME_HEIGHT / 2)
     if G.SETTINGS.PAUSED then
-        love.graphics.draw(self.pauseCanves, x/2,y/2,0,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,G.SETTINGS.SCREENVARIABLES.SCREENSCALE,_GAME_WIDTH/2,_GAME_HEIGHT/2)
+        love.graphics.draw(self.pauseCanves, x / 2, y / 2, 0, G.SETTINGS.SCREENVARIABLES.SCREENSCALE,
+            G.SETTINGS.SCREENVARIABLES.SCREENSCALE, _GAME_WIDTH / 2, _GAME_HEIGHT / 2)
     end
     love.graphics.setShader()
 end
