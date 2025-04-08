@@ -6,7 +6,7 @@ function START_MAIN_MENU()
     table.insert(G.CARDAREAS, menuArea)
     G.EVENTMANAGER:addEventToQueue(Event.new(function() logger:log("Wait a moment to start the splash") end,
         { delay = 1 }))
-    for letter = 1, 2 do
+    for letter = 1, #G.TILE do
         G.EVENTMANAGER:addEventToQueue(
             Event.new(
                 function()

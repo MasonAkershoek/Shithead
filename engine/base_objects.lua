@@ -1,8 +1,14 @@
--- Node Object
-----------------------------------------------
+---Node Object
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- Node is the base object of all game objects
 Node = {}
 Node.__index = Node
 
+---Node Object Constructer
+---@param nx float New X Position
+---@param ny float New Y Position
+---@param args table A table containing arguments to change the construction of the object
+---@return table
 function Node.new(nx, ny, args)
     local self = setmetatable({}, Node)
 
@@ -276,11 +282,17 @@ function Node:draw()
     drawList(self._Children)
 end
 
--- Moveable Object
-----------------------------------------------
+--- Moveable Object
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--- Base object for game objects that need to move around the game space 
 Moveable = setmetatable({}, { __index = Node })
 Moveable.__index = Moveable
 
+---Object Constructer
+---@param nx float New X position of object
+---@param ny float New Y position of object
+---@param args table A table containing arguments to change the construction of the object
+---@return table
 function Moveable.new(nx, ny, args)
     local self = setmetatable(Node.new(nx, ny, args), Moveable)
 
@@ -316,29 +328,19 @@ function Moveable:mouseMoving()
     end
 end
 
--- Updated setPos
+---moveTo - Sets the movables next position to move to. This only effects the movables local position not its global position
+---@param x float New X position
+---@param y float New Y Position
+---@param s float New Scale Value
+---@param r float New Rotation Value
 function Moveable:moveTo(x, y, s, r)
-    logger:log("X: ", self._Transform.x)
-    logger:log("Y: ", self._Transform.y)
-    logger:log("NX: ", self._NextTransform.x)
-    logger:log("NY: ", self._NextTransform.y)
-    logger:log("NNX: ", x)
-    logger:log("NNX: ", y)
-    logger:log("MVX: ", self._MovementVector.x)
-    logger:log("MVY: ", self._MovementVector.y)
     if self._Transform.x ~= x or self._Transform.y ~= y then
-        logger:log("GG1")
         if self._NextTransform.x ~= x or self._NextTransform.y ~= y then
-            logger:log("GG2")
+            logger:log("GG")
             self._NextTransform.x = x
             self._NextTransform.y = y
             self._NextTransform.s = s
             self._NextTransform.r = r
-
-            -- logger:log("X: ", self._Transform.x)
-            -- logger:log("Y: ", self._Transform.y)
-            -- logger:log("NX: ", x)
-            -- logger:log("NX: ", y)
 
             local dirx = self._NextTransform.x - self._Transform.x
             local diry = self._NextTransform.y - self._Transform.y
@@ -355,87 +357,21 @@ end
 function Moveable:move(dt)
     if not isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y), 15) and not self._NextTransform.complete then
         for x = 1, G.CARDSPEED * dt do
-            self._Transform.x = self._Transform.x + self._MovementVector.x
-            self._Transform.y = self._Transform.y + self._MovementVector.y
+            if not isWithinRange(self:getPos(), Vector.new(self._NextTransform.x, self._NextTransform.y), 15) then
+                self._Transform.x = self._Transform.x + self._MovementVector.x
+                self._Transform.y = self._Transform.y + self._MovementVector.y
+            else
+                break
+            end
         end
     elseif not self._NextTransform.complete then
-        logger:log("GG")
+        self._Transform.x = self._NextTransform.x
+        self._Transform.y = self._NextTransform.y
         self._NextTransform.complete = true
         self._NextTransform.x = -1
         self._NextTransform.y = -1
         self._MovementVector:setVect(-1, -1)
-        self._Transform.x = self._NextTransform.x
-        self._Transform.y = self._NextTransform.y
     end
-
-    -- -- Old method logic
-    -- if self.moveFlag or self._Transform.x ~= self.newPos.x or self._Transform.y ~= self.newPos.y then
-    --     local dirx = self.newPos.x - self._Transform.x
-    --     local diry = self.newPos.y - self._Transform.y
-    --     self.distance = math.sqrt((dirx ^ 2) + (diry ^ 2))
-    --     local normx = dirx / self.distance
-    --     local normy = diry / self.distance
-    --     self.HCenter.x = ((self._Transform.x + self.newPos.x) / 2)
-    --     self.HCenter.y = ((self._Transform.y + self.newPos.y) / 2)
-    --     self.movement:setVect(normx, normy)
-    --     self.moveFlag = false
-    -- end
-    -- if not self.pos:checkDistance(self.newPos, 5) and not self.mouseMove then
-    --     for x = 1, G.CARDSPEED * dt do
-    --         if not self.pos:checkDistance(self.newPos, 5) then
-    --             self._Transform.x = (self._Transform.x + (self.movement.x))
-    --             self._Transform.y = (self._Transform.y + (self.movement.y))
-    --         else
-    --             break
-    --         end
-    --     end
-    -- elseif not self.mouseMove then
-    --     self.movement:setVect(0, 0)
-    --     self.pos:setVect(self.newPos.x, self.newPos.y)
-    --     self.moving = false
-    -- end
-
-    -- Updated setPos
-    -- function Moveable:moveTo(x, y, s, r)
-    --     if not self._States.move.is then
-    --         logger:log(x)
-    --         logger:log(y)
-    --         if self._Transform.x ~= x or self._Transform.y ~= y then
-    --             self._NextTransform.x = x or self._Transform.x
-    --             self._NextTransform.y = y or self._Transform.y
-    --             self._NextTransform.s = s or self._Transform.scale
-    --             self._NextTransform.r = r or self._Transform.r
-
-    --             local dirx = self._NextTransform.x - self._Transform.x
-    --             local diry = self._NextTransform.y - self._Transform.y
-    --             local distance = math.sqrt((dirx ^ 2) + (diry ^ 2))
-    --             local normx = dirx / distance
-    --             local normy = diry / distance
-    --             self._MovementVector:setVect(normx, normy)
-    --             self._NextTransform.complete = false
-    --             self._States.move.is = true
-    --         end
-    --     end
-    -- end
-
-    -- -- Needs Refactoring
-    -- function Moveable:move(dt)
-    --     if self._States.move.is then
-    --         if not isWithinRange(self:getPos("center", true), Vector.new(self._NextTransform.x, self._NextTransform.y), 15) and not self._NextTransform.complete then
-    --             for x = 1, G.CARDSPEED * dt do
-    --                 self:setPos(self._NextTransform.x, self._NextTransform.y)
-    --                 -- self._Transform.x = self._Transform.x + self._MovementVector.x
-    --                 -- self._Transform.y = self._Transform.y + self._MovementVector.y
-    --             end
-    --         elseif not self._NextTransform.complete then
-    --             print("GG")
-    --             self._NextTransform.complete = true
-    --             self._MovementVector:setVect(0, 0)
-    --             self._Transform.x = self._NextTransform.x
-    --             self._Transform.y = self._NextTransform.y
-    --             self._States.move.is = false
-    --         end
-    --     end
 end
 
 -- Sprite Object
