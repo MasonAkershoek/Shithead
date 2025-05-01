@@ -238,6 +238,7 @@ function OpponentIcon.new(iconPath)
     self.texture = love.graphics.newImage(iconPath)
     self:setScale(2,2)
     self:initSprite()
+    self.mouseMoveable = false
     return self
 end
 
